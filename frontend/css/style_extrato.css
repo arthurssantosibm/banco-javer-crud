@@ -1,0 +1,293 @@
+/* =====================================================
+   VARIÁVEIS DE CORES
+===================================================== */
+:root {
+    --primary-color: #007bff;
+    --accent-color: #ff6f00;
+    --bg-color: #f4f7f6;
+    --card-bg: #ffffff;
+    --text-color: #333333;
+    --light-text: #666666;
+    --shadow-light: 0 4px 12px rgba(0, 0, 0, 0.05);
+}
+
+/* =====================================================
+   RESET BASE
+===================================================== */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    background-color: var(--bg-color);
+    color: var(--text-color);
+    display: flex;
+    min-height: 100vh;
+}
+.logo-img {
+    height: 40px;
+    margin-right: 15px;
+}
+/* =====================================================
+   SIDEBAR
+===================================================== */
+.sidebar {
+    width: 250px;
+    background: var(--primary-color);
+    color: white;
+    padding: 20px 0;
+    display: flex;
+    flex-direction: column;
+    box-shadow: 2px 0 10px rgba(0, 0, 0, 0.1);
+}
+
+.user-info {
+    text-align: center;
+    padding: 20px;
+    margin-bottom: 20px;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.user-info .material-icons {
+    font-size: 48px;
+    margin-bottom: 5px;
+    color: var(--accent-color);
+}
+
+.user-info h3 {
+    font-weight: 500;
+    font-size: 1.1em;
+}
+
+.sidebar-nav {
+    flex-grow: 1;
+}
+
+.nav-item {
+    display: flex;
+    align-items: center;
+    padding: 15px 20px;
+    color: white;
+    text-decoration: none;
+    transition: background-color 0.3s, border-left 0.3s, transform 0.2s;
+    border-left: 5px solid transparent;
+}
+
+.nav-item .material-icons {
+    margin-right: 15px;
+}
+
+.nav-item:hover {
+    background-color: rgba(255, 255, 255, 0.1);
+    border-left-color: var(--accent-color);
+    transform: translateX(5px);
+}
+
+.nav-item.active {
+    background-color: rgba(255, 255, 255, 0.2);
+    border-left-color: var(--accent-color);
+    font-weight: bold;
+}
+
+.logout {
+    margin-top: auto;
+    border-top: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+/* =====================================================
+   MAIN CONTENT / HEADER
+===================================================== */
+.main-content {
+    flex-grow: 1;
+    padding: 30px 0 30px 0;
+    overflow-y: auto;
+    
+}
+
+.header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 20px 30px;
+    margin-bottom: 30px;
+    margin-top: -30px;
+    background: linear-gradient(90deg, var(--primary-color), #00aaff);
+    color: white;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+    border-radius: 0 0 15px 15px;
+    max-width: 100%;
+}
+
+.bank-logo {
+    font-size: 1.8em;
+    font-weight: 700;
+}
+
+.highlight {
+    color: var(--accent-color);
+}
+
+.icon-button {
+    background: none;
+    border: none;
+    color: white;
+    cursor: pointer;
+    padding: 8px;
+    border-radius: 50%;
+    transition: background-color 0.3s;
+}
+
+.icon-button:hover {
+    background-color: rgba(255, 255, 255, 0.2);
+}
+
+
+/* =====================================================
+   ANIMAÇÕES
+===================================================== */
+@keyframes fadeInSlideUp {
+    from {
+        opacity: 0;
+        transform: translateY(20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.animate-in {
+    opacity: 0;
+    animation: fadeInSlideUp 0.8s ease-out forwards;
+}
+
+.delay-1 { animation-delay: 0.1s; }
+.delay-2 { animation-delay: 0.2s; }
+.delay-3 { animation-delay: 0.3s; }
+
+a{
+    text-decoration: none;
+    color: inherit;
+}
+
+#transferForm {
+    background-color: var(--card-bg);
+    padding: 30px;
+    border-radius: 12px;
+    box-shadow: 5px 5px 15px #333333;
+    max-width: 420px;
+    width: 100%;
+    margin: 0 auto;
+    animation: fadeInSlideUp 0.6s ease-out;
+}
+
+/* Grupo de campos */
+.form-group {
+    display: flex;
+    flex-direction: column;
+    margin-bottom: 20px;
+}
+
+/* Labels */
+.form-group label {
+    font-size: 0.9em;
+    font-weight: 600;
+    color: var(--light-text);
+    margin-bottom: 8px;
+}
+
+/* Inputs */
+.form-group input {
+    padding: 12px 14px;
+    border-radius: 8px;
+    border: 1px solid #7b7b7b;
+    font-size: 1em;
+    color: var(--text-color);
+    background-color: #fff;
+    transition: border-color 0.3s, box-shadow 0.3s;
+}
+
+/* Remove setas do input number */
+.form-group input[type="number"]::-webkit-inner-spin-button,
+.form-group input[type="number"]::-webkit-outer-spin-button {
+    -webkit-appearance: none;
+    margin: 0;
+}
+
+/* Focus nos inputs */
+.form-group input:focus {
+    outline: none;
+    border-color: var(--primary-color);
+    box-shadow: 0 0 0 3px rgba(0, 123, 255, 0.15);
+}
+
+/* Placeholder (caso use depois) */
+.form-group input::placeholder {
+    color: #aaa;
+}
+
+/* Botão de submit */
+.submit-btn {
+    width: 100%;
+    padding: 14px;
+    border: none;
+    border-radius: 8px;
+    background: linear-gradient(
+        90deg,
+        var(--primary-color),
+        #00aaff
+    );
+    color: #fff;
+    font-size: 1em;
+    font-weight: 700;
+    cursor: pointer;
+    transition: transform 0.2s, box-shadow 0.2s, opacity 0.2s;
+}
+
+/* Hover botão */
+.submit-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 20px rgba(0, 123, 255, 0.3);
+    opacity: 0.95;
+}
+
+/* Botão pressionado */
+.submit-btn:active {
+    transform: translateY(0);
+    box-shadow: none;
+}
+
+/* =====================================================
+   RESPONSIVIDADE
+===================================================== */
+@media (max-width: 1024px) {
+    .dashboard-grid {
+        grid-template-columns: repeat(2, 1fr);
+    }
+}
+
+@media (max-width: 768px) {
+    body {
+        flex-direction: column;
+    }
+
+    .sidebar {
+        width: 100%;
+        flex-direction: row;
+        justify-content: space-around;
+        padding: 10px 0;
+    }
+
+    .user-info {
+        display: none;
+    }
+
+
+
+    .transactions-chart-card {
+        height: 300px;
+    }
+}

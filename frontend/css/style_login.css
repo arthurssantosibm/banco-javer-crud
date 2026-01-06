@@ -1,0 +1,138 @@
+/* Variáveis de Cores (Consistência com o BankFlow) */
+:root {
+    --primary-color: #007bff; /* Azul Elétrico - Confiança/Principal */
+    --accent-color: #ff6f00; /* Laranja Vivo - Destaque/Energia */
+    --bg-color: #eef3f6; /* Fundo Leve e Moderno */
+    --card-bg: #ffffff; /* Fundo do Formulário */
+    --text-color: #333333;
+    --light-text: #666666;
+    --shadow: 0 8px 25px rgba(0, 0, 0, 0.1);
+    --input-focus: #4d94ff; 
+}
+
+/* Base e Layout */
+body {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    background-color: var(--bg-color);
+    color: var(--text-color);
+    display: flex;
+    justify-content: center; /* Centraliza horizontalmente */
+    align-items: center; /* Centraliza verticalmente */
+    min-height: 100vh; /* Ocupa a altura total da tela */
+    margin: 0;
+    padding: 20px;
+    box-sizing: border-box;
+}
+
+/* Container do Formulário */
+.form-container {
+    width: 100%;
+    max-width: 400px; /* Formulários de login/cadastro costumam ser mais estreitos */
+    background: var(--card-bg);
+    padding: 35px;
+    border-radius: 12px;
+    box-shadow: var(--shadow);
+    animation: fadeIn 0.8s ease-out; /* Animação de entrada */
+    transition: transform 0.3s;
+}
+
+.form-container:hover {
+    transform: translateY(-5px); /* Efeito suave ao passar o mouse */
+}
+
+/* Título */
+h1 {
+    text-align: center;
+    color: var(--primary-color);
+    margin-bottom: 30px;
+    font-size: 1.6em;
+    font-weight: 700;
+    border-bottom: 3px solid var(--accent-color); /* Destaque com cor acentuada */
+    padding-bottom: 10px;
+}
+
+/* Agrupamento de Campos */
+.form-group {
+    margin-bottom: 20px;
+}
+
+/* Rótulos */
+label {
+    display: block;
+    margin-bottom: 8px;
+    font-weight: 500;
+    color: var(--text-color);
+    font-size: 0.95em;
+}
+
+/* Estilo dos Inputs (Email e Senha) */
+input[type="email"], 
+input[type="password"] {
+    width: 100%;
+    padding: 12px 15px;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    box-sizing: border-box;
+    font-size: 1em;
+    color: var(--text-color);
+    transition: border-color 0.3s, box-shadow 0.3s;
+}
+
+/* Efeito de Foco (quando o usuário clica no campo) */
+input[type="email"]:focus, 
+input[type="password"]:focus {
+    border-color: var(--input-focus);
+    box-shadow: 0 0 0 3px rgba(0, 123, 255, 0.2);
+    outline: none;
+}
+
+/* Botão de Envio (Cadastro) */
+button[type="submit"] {
+    width: 100%;
+    background-color: var(--accent-color);
+    color: white;
+    border: none;
+    padding: 14px;
+    border-radius: 8px;
+    font-size: 1.1em;
+    font-weight: 600;
+    cursor: pointer;
+    box-shadow: 0 4px 15px rgba(255, 111, 0, 0.4);
+    transition: background-color 0.3s, transform 0.2s, box-shadow 0.3s;
+    margin-top: 25px;
+}
+
+button[type="submit"]:hover {
+    background-color: #cc5c00; /* Laranja mais escuro */
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(255, 111, 0, 0.6);
+}
+
+button[type="submit"]:active {
+    transform: translateY(0);
+    box-shadow: 0 4px 15px rgba(255, 111, 0, 0.4);
+}
+
+.cad{
+    text-align: center;
+    margin-top: 20px;
+    font-size: 0.95em;
+    color: var(--light-text);
+}
+
+a{
+    color: var(--primary-color);
+    font-weight: 600;
+}
+
+/* Animações */
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(15px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}

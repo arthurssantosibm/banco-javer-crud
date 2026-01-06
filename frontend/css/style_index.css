@@ -1,0 +1,121 @@
+/* Variáveis de Cores (Mantendo a identidade do Dashboard) */
+:root {
+    --primary-color: #007bff; /* Azul Elétrico */
+    --accent-color: #ff6f00; /* Laranja Vivo */
+    --bg-color: #f4f7f6; /* Fundo Leve */
+    --text-color: #333333;
+    --light-text: #666666;
+    --shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+}
+
+/* Estilização Base */
+body {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    background-color: var(--bg-color);
+    color: var(--text-color);
+    display: flex;
+    flex-direction: column;
+    justify-content: center; /* Centraliza verticalmente */
+    align-items: center; /* Centraliza horizontalmente */
+    min-height: 100vh;
+    margin: 0;
+    text-align: center;
+}
+
+/* Título Principal */
+h1 {
+    font-size: 3em;
+    font-weight: 700;
+    color: var(--primary-color);
+    margin-bottom: 10px;
+    animation: fadeInDown 0.8s ease-out; /* Animação de entrada */
+}
+
+/* Destaque do Nome (Flow) */
+h1 label {
+    color: var(--accent-color);
+    font-weight: 800;
+}
+
+/* Parágrafos de Descrição e Link */
+p {
+    font-size: 1.1em;
+    color: var(--light-text);
+    margin-bottom: 20px;
+    max-width: 400px;
+    line-height: 1.5;
+}
+
+/* Estilização dos Links (Sign up) */
+p a {
+    color: var(--primary-color);
+    text-decoration: none;
+    font-weight: 600;
+    transition: color 0.3s;
+}
+
+p a:hover {
+    color: var(--accent-color);
+    text-decoration: underline;
+}
+
+/* Botão Principal */
+a button {
+    background-color: var(--accent-color);
+    color: white;
+    border: none;
+    padding: 15px 30px;
+    border-radius: 8px;
+    font-size: 1.2em;
+    font-weight: 600;
+    cursor: pointer;
+    box-shadow: 0 4px 15px rgba(255, 111, 0, 0.4);
+    transition: background-color 0.3s, transform 0.2s, box-shadow 0.3s;
+    margin-top: 10px;
+}
+
+a button:hover {
+    background-color: #cc5c00; /* Laranja um pouco mais escuro */
+    transform: translateY(-3px);
+    box-shadow: 0 6px 20px rgba(255, 111, 0, 0.6);
+}
+
+a button:active {
+    transform: translateY(0);
+}
+
+/* Rodapé */
+footer {
+    width: 100%;
+    position: absolute;
+    bottom: 0;
+    padding: 15px 0;
+    background-color: rgba(255, 255, 255, 0.7); /* Fundo semi-transparente */
+    border-top: 1px solid #eee;
+}
+
+.copyright {
+    margin: 0;
+    font-size: 0.9em;
+    text-align: center;
+    color: var(--light-text);
+}
+
+/* Animação para o título */
+@keyframes fadeInDown {
+    from {
+        opacity: 0;
+        transform: translateY(-20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+img {
+    width: 100px;
+    height: auto;
+    margin-top: 20px;
+    animation: fadeInUp 0.8s ease-out; /* Animação de entrada para a imagem */
+}

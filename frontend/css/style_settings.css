@@ -1,0 +1,344 @@
+/* =====================================================
+   VARIÁVEIS DE CORES
+===================================================== */
+:root {
+    --primary-color: #007bff;
+    --accent-color: #ff6f00;
+    --bg-color: #f4f7f6;
+    --card-bg: #ffffff;
+    --text-color: #333333;
+    --light-text: #666666;
+    --shadow-light: 0 4px 12px rgba(0, 0, 0, 0.05);
+}
+
+/* =====================================================
+   RESET BASE
+===================================================== */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    background-color: var(--bg-color);
+    color: var(--text-color);
+    display: flex;
+    min-height: 100vh;
+}
+.logo-img {
+    height: 40px;
+    margin-right: 15px;
+}
+a{
+    text-decoration: none;
+    color: inherit;
+}
+
+/* =====================================================
+   SIDEBAR
+===================================================== */
+.sidebar {
+    width: 250px;
+    background: var(--primary-color);
+    color: white;
+    padding: 20px 0;
+    display: flex;
+    flex-direction: column;
+    box-shadow: 2px 0 10px rgba(0, 0, 0, 0.1);
+}
+
+.user-info {
+    text-align: center;
+    padding: 20px;
+    margin-bottom: 20px;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.user-info .material-icons {
+    font-size: 48px;
+    margin-bottom: 5px;
+    color: var(--accent-color);
+}
+
+.user-info h3 {
+    font-weight: 500;
+    font-size: 1.1em;
+}
+
+.sidebar-nav {
+    flex-grow: 1;
+}
+
+.nav-item {
+    display: flex;
+    align-items: center;
+    padding: 15px 20px;
+    color: white;
+    text-decoration: none;
+    transition: background-color 0.3s, border-left 0.3s, transform 0.2s;
+    border-left: 5px solid transparent;
+}
+
+.nav-item .material-icons {
+    margin-right: 15px;
+}
+
+.nav-item:hover {
+    background-color: rgba(255, 255, 255, 0.1);
+    border-left-color: var(--accent-color);
+    transform: translateX(5px);
+}
+
+.nav-item.active {
+    background-color: rgba(255, 255, 255, 0.2);
+    border-left-color: var(--accent-color);
+    font-weight: bold;
+}
+
+.logout {
+    margin-top: auto;
+    border-top: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+/* =====================================================
+   MAIN CONTENT / HEADER (AJUSTADO)
+===================================================== */
+.main-content {
+    flex-grow: 1;
+    /* Mantido apenas padding vertical para que o header possa encostar */
+    padding: 30px 0 30px 0;
+    overflow-y: auto;
+}
+
+.header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 20px 30px;
+    /* Margens negativas ajustadas para encostar no topo (compensando padding-top do main-content) */
+    margin-bottom: 30px;
+    margin-top: -30px; 
+    background: linear-gradient(90deg, var(--primary-color), #00aaff);
+    color: white;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+    border-radius: 0 0 15px 15px;
+    max-width: 100%;
+}
+
+.bank-logo {
+    font-size: 1.8em;
+    font-weight: 700;
+}
+
+.highlight {
+    color: var(--accent-color);
+}
+
+.icon-button {
+    background: none;
+    border: none;
+    color: white;
+    cursor: pointer;
+    padding: 8px;
+    border-radius: 50%;
+    transition: background-color 0.3s;
+}
+
+.icon-button:hover {
+    background-color: rgba(255, 255, 255, 0.2);
+}
+
+/* =====================================================
+   CARD / FORMULÁRIO (AJUSTADO COM ESPAÇAMENTO LATERAL)
+===================================================== */
+.card {
+    /* Adiciona margem lateral para afastar o card das bordas do main-content */
+    margin-left: 30px;
+    margin-right: 30px;
+    
+    /* Estilos base do card */
+    background-color: var(--card-bg);
+    border-radius: 12px;
+    padding: 30px; 
+    box-shadow: var(--shadow-light);
+    position: relative;
+    transition: transform 0.3s;
+}
+
+.card:hover {
+    transform: translateY(-5px);
+}
+
+.card h2 {
+    font-size: 1.5em;
+    font-weight: 600;
+    color: var(--text-color);
+    margin-bottom: 25px;
+    padding-bottom: 10px;
+    border-bottom: 2px solid var(--bg-color); 
+}
+
+#settingsForm {
+    display: flex;
+    flex-direction: column;
+    gap: 18px; 
+}
+
+/* Estilização das Labels */
+#settingsForm label {
+    font-size: 0.9em;
+    font-weight: 600;
+    color: var(--light-text);
+    margin-bottom: 4px;
+    display: block; 
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+/* Estilização dos Campos de Input */
+#settingsForm input[type="text"],
+#settingsForm input[type="email"] {
+    width: 100%;
+    padding: 12px;
+    border: 1px solid #e0e0e0;
+    border-radius: 8px;
+    font-size: 1em;
+    color: var(--text-color);
+    background-color: #fcfcfc;
+    transition: all 0.3s ease;
+}
+
+/* Efeito de Foco */
+#settingsForm input:focus {
+    border-color: var(--primary-color);
+    box-shadow: 0 0 0 3px rgba(0, 123, 255, 0.15);
+    outline: none;
+    background-color: var(--card-bg);
+}
+
+/* Estilo para Campos Desabilitados */
+#settingsForm input[disabled] {
+    background-color: var(--bg-color); 
+    color: var(--light-text);
+    cursor: not-allowed;
+    border-style: dashed; 
+    opacity: 0.8;
+}
+
+/* Estilo do Botão de Envio */
+button {
+    background-color: var(--primary-color);
+    color: white;
+    border: none;
+    padding: 14px 25px;
+    border-radius: 8px;
+    font-size: 1.05em;
+    font-weight: 700;
+    cursor: pointer;
+    margin-top: 20px;
+    transition: background-color 0.3s, transform 0.2s, box-shadow 0.3s;
+    width: fit-content;
+    align-self: flex-start;
+}
+
+/* Efeito Hover e Ativo no Botão */
+button:hover {
+    background-color: #0056b3; 
+    transform: translateY(-2px);
+    box-shadow: 0 4px 10px rgba(0, 123, 255, 0.3);
+}
+button:active {
+    transform: translateY(0);
+}
+
+/* Estilo para a linha divisória */
+.separator {
+    border: none;
+    border-top: 1px solid #ddd;
+    margin: 25px 0;
+}
+
+/* Estilo para o cabeçalho da seção de senha */
+#settingsForm h3 {
+    color: var(--primary-color);
+    font-size: 1.2em;
+    margin-bottom: 5px;
+}
+
+/* Estilo para a dica de segurança */
+.security-tip {
+    font-size: 0.85em;
+    color: var(--light-text);
+    margin-bottom: 20px;
+}
+
+/* Garante que os novos inputs de senha sejam estilizados corretamente */
+#settingsForm input[type="password"] {
+    width: 100%;
+    padding: 12px;
+    border: 1px solid #e0e0e0;
+    border-radius: 8px;
+    font-size: 1em;
+    color: var(--text-color);
+    background-color: #fcfcfc;
+    transition: all 0.3s ease;
+}
+
+/* Aplica o estilo de foco também aos novos campos de senha */
+#settingsForm input[type="password"]:focus {
+    border-color: var(--primary-color);
+    box-shadow: 0 0 0 3px rgba(0, 123, 255, 0.15);
+    outline: none;
+    background-color: var(--card-bg);
+}
+
+/* =====================================================
+   ANIMAÇÕES
+===================================================== */
+@keyframes fadeInSlideUp {
+    from {
+        opacity: 0;
+        transform: translateY(20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.animate-in {
+    opacity: 0;
+    animation: fadeInSlideUp 0.8s ease-out forwards;
+}
+
+.delay-1 { animation-delay: 0.1s; }
+.delay-2 { animation-delay: 0.2s; }
+.delay-3 { animation-delay: 0.3s; }
+
+/* =====================================================
+   RESPONSIVIDADE
+===================================================== */
+@media (max-width: 768px) {
+    body {
+        flex-direction: column;
+    }
+
+    .sidebar {
+        width: 100%;
+        flex-direction: row;
+        justify-content: space-around;
+        padding: 10px 0;
+    }
+
+    .user-info {
+        display: none;
+    }
+    
+    /* Remove a margem lateral do card para telas pequenas */
+    .card {
+        margin-left: 10px;
+        margin-right: 10px;
+    }
+}

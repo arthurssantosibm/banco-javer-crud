@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="icon" href="../img/bankflow_logo.png" type="image/png">
+    <link rel="stylesheet" href="../css/style_settings.css">
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+    <title>Configurações BankFlow</title>
+</head>
+<body>
+<aside class="sidebar">
+        <div class="user-info">
+            <span class="material-icons">account_circle</span>
+            <h3 id="client-name">Olá</h3>
+        </div>
+
+        <nav class="sidebar-nav">
+            <a href="home.html" class="nav-item">
+                <span class="material-icons">home</span> Dashboard
+            </a>
+            <a href="#" class="nav-item active">
+                <span class="material-icons">settings</span> Configurações
+            </a>
+            <a href="extrato.html" class="nav-item">
+                <span class="material-icons">payments</span> Extrato
+            </a>
+            <a href="#" class="nav-item logout">
+                <span class="material-icons">logout</span> Sair
+            </a>
+        </nav>
+    </aside>
+
+<main class="main-content">
+    <header class="header">
+        <a href="home.html"><img src="../img/bankflow_logo.png" alt="Logo BankFlow" class="logo-img"></a>
+        <a href="home.html"><div class="bank-logo">Bank<span class="highlight">Flow</span></div></a>
+        <div class="header-actions">
+            <button class="icon-button"><span class="material-icons">notifications</span></button>
+            <button class="icon-button"><span class="material-icons">help</span></button>
+        </div>
+    </header>
+
+    <section class="card animate-in">
+        <h2>Dados e Segurança do Usuário</h2>
+
+        <form id="settingsForm">
+
+            <label>Nome</label>
+            <input type="text" id="nome" required>
+
+            <label>Email</label>
+            <input type="email" id="email" required>
+
+            <label>Saldo</label>
+            <input type="text" id="saldo" disabled>
+
+            <label>Score de Crédito</label>
+            <input type="text" id="score" disabled>
+            
+            <hr class="separator"> 
+            
+            <h3>Alterar Senha</h3>
+            <p class="security-tip">Deixe os campos de senha vazios se não quiser alterá-la.</p>
+
+            <label>Senha Atual</label>
+            <input type="password" id="current_password" placeholder="Necessário para alterar">
+
+            <label>Nova Senha</label>
+            <input type="password" id="new_password" placeholder="Mínimo 8 caracteres">
+            
+            <label>Confirmar Nova Senha</label>
+            <input type="password" id="confirm_password" placeholder="Repita a nova senha">
+
+            <button type="submit">Salvar Alterações</button>
+            <button type="button" id="deleta-conta-btn">Deletar Conta</button>
+        </form>
+
+    </section>
+</main>
+<script src="../js/settings.js"></script>
+</body>
+</html>

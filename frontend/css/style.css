@@ -1,0 +1,561 @@
+:root {
+    /* LIGHT MODE (Variáveis originais refinadas) */
+    --primary-color: #007bff;        /* Azul principal */
+    --accent-color: #ff6f00;         /* Laranja de destaque */
+    --bg-color: #f4f7f6;             /* Fundo da página (claro) */
+    --card-bg: #f8f8f8;              /* Fundo dos cartões/caixas */
+    --text-color: #333333;           /* Texto principal escuro */
+    --light-text: #000000;           /* Texto secundário/títulos de card */
+    --shadow-new: 0 3px 20px rgba(0, 0, 0, 0.12); /* Sombra um pouco mais forte */
+    --border-light: #e0e0e0;         /* Bordas e linhas de transação */
+    --transaction-in: #27ae60;       /* Verde de entrada (Light) */
+    --transaction-out: #e74c3c;      /* Vermelho de saída (Light) */
+    --header-gradient-end: #00aaff;
+    
+    /* DARK MODE (Novas Variáveis ajustadas) */
+    --dark-bg: #121212;              /* Fundo da página escura (preto sutil) */
+    --dark-card: #1f1f1f;            /* Fundo dos cartões escuros (mais escuro que o fundo) */
+    --dark-text: #e0e0e0;            /* Texto principal claro */
+    --dark-light-text: #b0b0b0;      /* Texto secundário claro */
+    --dark-shadow: 0 6px 15px rgba(0, 0, 0, 0.5); /* Sombra mais escura e difusa */
+    --dark-border: #3a3a3a;          /* Bordas escuras */
+    --dark-primary-color: #01579b;   /* Azul Marinho mais profundo para Dark Sidebar */
+    --dark-accent-color: #ff8f00;    /* Laranja ligeiramente mais brilhante no escuro */
+    --dark-transaction-in: #66bb6a;  /* Verde mais suave para Dark */
+    --dark-transaction-out: #ff5252; /* Vermelho mais suave para Dark */
+}
+
+/* =====================================================
+    DEFINIÇÃO DO TEMA DARK
+===================================================== */
+.dark-mode {
+    /* Inversão das cores principais */
+    --bg-color: var(--dark-bg);
+    --card-bg: var(--dark-card);
+    --text-color: var(--dark-text);
+    --light-text: var(--dark-light-text);
+    --shadow-light: var(--dark-shadow);
+    --border-light: var(--dark-border);
+    --primary-color: var(--dark-primary-color); 
+    --accent-color: var(--dark-accent-color);
+    --transaction-in: var(--dark-transaction-in);
+    --transaction-out: var(--dark-transaction-out);
+    --header-gradient-end: #03a9f4;
+}
+/* =====================================================
+    RESET BASE (Adicionado transição suave ao body)
+===================================================== */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    background-color: var(--bg-color);
+    color: var(--text-color);
+    display: flex;
+    min-height: 100vh;
+    transition: background-color 0.5s ease, color 0.5s ease;
+}
+
+
+
+.logo-img {
+    height: 40px;
+    margin-right: 15px;
+}
+/* =====================================================
+    SIDEBAR
+===================================================== */
+.sidebar {
+    width: 250px;
+    background: var(--primary-color);
+    color: white; /* Cor padrão, mantida pois a primary-color é escura */
+    padding: 20px 0;
+    display: flex;
+    flex-direction: column;
+    box-shadow: var(--shadow-light); /* Shadow mais forte */
+    transition: background-color 0.5s ease, box-shadow 0.5s ease;
+}
+
+.user-info {
+    text-align: center;
+    padding: 20px;
+    margin-bottom: 20px;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.2); /* Borda mais visível */
+}
+
+/* Ajuste de cor de borda para Dark Mode */
+.dark-mode .user-info {
+    border-bottom-color: var(--dark-border);
+}
+.user-info .material-icons {
+    font-size: 48px;
+    margin-bottom: 5px;
+    color: var(--accent-color);
+}
+
+.user-info h3 {
+    font-weight: 500;
+    font-size: 1.1em;
+}
+
+.sidebar-nav {
+    flex-grow: 1;
+}
+
+.nav-item {
+    display: flex;
+    align-items: center;
+    padding: 15px 20px;
+    color: white; 
+    text-decoration: none;
+    transition: background-color 0.3s, border-left 0.3s, transform 0.2s;
+    border-left: 5px solid transparent;
+}
+
+.nav-item .material-icons {
+    margin-right: 15px;
+}
+
+.nav-item:hover {
+    background-color: rgba(255, 255, 255, 0.15); /* Hover mais visível */
+    border-left-color: var(--accent-color);
+    transform: translateX(5px);
+}
+
+.nav-item.active {
+    background-color: rgba(255, 255, 255, 0.3); /* Ativo mais visível */
+    border-left-color: var(--accent-color);
+    font-weight: bold;
+}
+
+/* Ajustes Dark Mode para itens de navegação */
+.dark-mode .nav-item {
+    color: var(--dark-text); /* Cor clara no Dark Sidebar */
+}
+.dark-mode .nav-item:hover {
+    background-color: rgba(0, 0, 0, 0.15); 
+}
+.dark-mode .nav-item.active {
+    background-color: rgba(0, 0, 0, 0.3);
+}
+
+.logout {
+    margin-top: auto;
+    border-top: 1px solid rgba(255, 255, 255, 0.2);
+}
+/* Ajuste Dark Mode para logout */
+.dark-mode .logout {
+    border-top-color: var(--dark-border);
+}
+
+
+/* =====================================================
+    MAIN CONTENT / HEADER
+===================================================== */
+.main-content {
+    flex-grow: 1;
+    overflow-y: auto;
+}
+
+.header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 20px 30px;
+    margin-bottom: 30px;
+    max-width: 100%;
+    background: linear-gradient(90deg, var(--primary-color), var(--header-gradient-end)); 
+    color: white;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2); /* Sombra mais destacada */
+    border-radius: 0 0 20px 20px; /* Borda mais arredondada */
+    max-width: 100%;
+    transition: all 0.5s ease;
+}
+
+/* Dark Mode Header */
+.dark-mode .header {
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.6);
+}
+
+.bank-logo {
+    font-size: 1.8em;
+    font-weight: 700;
+}
+
+.highlight {
+    color: var(--accent-color);
+}
+
+.icon-button {
+    background: none;
+    border: none;
+    color: white;
+    cursor: pointer;
+    padding: 10px; /* Aumenta o padding para ser mais clicável */
+    border-radius: 50%;
+    transition: background-color 0.3s;
+}
+
+.icon-button:hover {
+    background-color: rgba(255, 255, 255, 0.3);
+}
+/* Dark Mode Icon Button */
+.dark-mode .icon-button {
+    color: var(--dark-text);
+}
+.dark-mode .icon-button:hover {
+    background-color: rgba(255, 255, 255, 0.1);
+}
+
+/* =====================================================
+    DASHBOARD GRID
+===================================================== */
+.dashboard-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 30px;
+    
+}
+
+.latest-transactions-card {
+    grid-column: 1 / -1;
+    height: 350px;
+}
+.transactions-select {
+    width: 100%;
+    padding: 10px;
+    margin-bottom: 12px;
+    border-radius: 8px;
+    border: 1px solid #ddd;
+    background: var(--card-bg);
+    color: var(--text-color);
+}
+
+.transaction-list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
+.transaction-list li {
+    display: flex;
+    justify-content: space-between;
+    padding: 10px 0;
+    border-bottom: 1px solid #eee;
+    font-size: 0.95rem;
+}
+
+.transaction-list li.in {
+    color: #27ae60;
+}
+
+.dark-mode .transaction-list li.in {
+    color: #27ae60;
+}
+/* =====================================================
+    CARDS
+===================================================== */
+.card {
+    background-color: var(--card-bg);
+    border-radius: 16px;
+    padding: 30px;
+    margin-left: 10px;
+    margin-right: 10px;
+    box-shadow: 5px 5px 25px #000000;
+    position: relative;
+    transition: transform 0.3s, background-color 0.5s, box-shadow 0.5s;
+}
+/* Dark Mode Card (opcional: adicionar borda sutil) */
+.dark-mode .card {
+    border: 1px solid var(--dark-border);
+}
+.dark-mode #score-percentage-display {
+    color: var(--dark-text);
+}
+.dark-mode #current-balance {
+    color: var(--dark-text);
+}
+
+.card:hover {
+    transform: translateY(-8px); /* Efeito hover mais pronunciado */
+    box-shadow: 0 10px 20px rgba(0, 0, 0, 0.15); /* Sombra mais forte no hover */
+}
+.dark-mode .card:hover {
+    box-shadow: 0 10px 20px rgba(0, 0, 0, 0.7);
+}
+
+
+.card-title {
+    font-size: 1.1em;
+    color: var(--light-text);
+    margin-bottom: 15px;
+}
+
+.card-icon {
+    position: absolute;
+    top: 15px;
+    right: 15px;
+    opacity: 0.1; /* Reduzido a opacidade para ser mais sutil */
+    color: var(--accent-color);
+}
+
+.card-icon .material-icons {
+    font-size: 50px; /* Aumentado o ícone */
+}
+
+.card-value {
+    font-size: 2.4em; /* Aumentado o valor */
+    font-weight: 700;
+    margin-bottom: 15px;
+}
+
+.balance-card .card-value {
+    color: var(--primary-color);
+}
+
+.invoice-value {
+    color: var(--transaction-out);
+}
+
+.view-statement-btn {
+    background-color: var(--accent-color);
+    color: white;
+    border: none;
+    padding: 12px 20px; /* Botão maior */
+    border-radius: 8px; /* Borda mais arredondada */
+    cursor: pointer;
+    font-weight: 600;
+    letter-spacing: 0.5px;
+    transition: background-color 0.3s, transform 0.2s;
+}
+
+.view-statement-btn:hover {
+    background-color: #e65c00; /* Laranja ligeiramente mais escuro no hover */
+    transform: translateY(-2px);
+}
+.dark-mode .view-statement-btn:hover {
+    background-color: #cc6600;
+}
+
+/* =====================================================
+    FORMULÁRIO (Configurações, Login/Cadastro)
+===================================================== */
+.form-group {
+    margin-bottom: 20px;
+}
+
+label {
+    display: block;
+    margin-bottom: 8px;
+    font-weight: 600;
+    color: var(--text-color);
+}
+
+input[type="text"], 
+input[type="email"], 
+input[type="password"],
+input[type="number"] {
+    width: 100%;
+    padding: 12px;
+    border: 1px solid var(--border-light);
+    border-radius: 8px;
+    background-color: var(--card-bg);
+    color: var(--text-color);
+    transition: border-color 0.3s, background-color 0.3s;
+}
+
+input[type="text"]:focus, 
+input[type="email"]:focus, 
+input[type="password"]:focus,
+input[type="number"]:focus {
+    border-color: var(--primary-color);
+    outline: none;
+    box-shadow: 0 0 0 3px rgba(0, 123, 255, 0.2);
+}
+
+/* Campos de valor (apenas leitura) */
+input[readonly] {
+    background-color: var(--bg-color); /* Fundo sutil */
+    opacity: 0.7;
+}
+.dark-mode input[readonly] {
+    background-color: #2a2a2a;
+}
+
+
+/* Botão de Submissão Padrão */
+.submit-btn {
+    display: inline-block;
+    padding: 12px 25px;
+    background-color: var(--primary-color);
+    color: white;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    font-size: 1.1em;
+    font-weight: 600;
+    transition: background-color 0.3s, transform 0.2s;
+}
+
+.submit-btn:hover {
+    background-color: #0056b3;
+    transform: translateY(-2px);
+}
+
+
+/* =====================================================
+    TRANSAÇÕES
+===================================================== */
+.transaction-list {
+    list-style: none;
+}
+
+.transaction-list li {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 12px 0; /* Padding maior */
+    border-bottom: 1px solid var(--border-light); 
+    transition: border-bottom-color 0.5s;
+}
+.transaction-list li:last-child {
+    border-bottom: none;
+}
+
+.transaction-list .type.in {
+    color: var(--transaction-in);
+    font-weight: 600;
+}
+
+.transaction-list .type.out {
+    color: var(--transaction-out);
+    font-weight: 600;
+}
+
+/* =====================================================
+    SCORE DE CRÉDITO (MEIA LUA)
+===================================================== */
+.score-card {
+    text-align: center;
+}
+
+.gauge-container {
+    position: relative;
+    width: 100%;
+    max-width: 100%;
+    height: 130px;
+    margin: 20px auto 0;
+}
+
+#credit-score-chart {
+    width: 100% !important;
+    height: 100% !important;
+}
+
+#score-percentage-display {
+    position: absolute;
+    top: 65%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    font-size: 2.0em;
+    font-weight: 800; 
+    color: var(--primary-color); 
+}
+
+/* =====================================================
+    ANIMAÇÕES
+===================================================== */
+@keyframes fadeInSlideUp {
+    from {
+        opacity: 0;
+        transform: translateY(20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.animate-in {
+    opacity: 0;
+    animation: fadeInSlideUp 0.8s cubic-bezier(0.25, 0.46, 0.45, 0.94) forwards; /* Curva de animação mais bonita */
+}
+
+.delay-1 { animation-delay: 0.1s; }
+.delay-2 { animation-delay: 0.2s; }
+.delay-3 { animation-delay: 0.3s; }
+
+a{
+    text-decoration: none;
+    color: inherit;
+}
+/* =====================================================
+    RESPONSIVIDADE
+===================================================== */
+@media (max-width: 1024px) {
+    .dashboard-grid {
+        grid-template-columns: repeat(2, 1fr);
+    }
+}
+
+@media (max-width: 768px) {
+    /* Ajusta o padding do conteúdo principal */
+    .main-content {
+        padding: 20px;
+    }
+
+    body {
+        flex-direction: column;
+    }
+    
+    /* SIDEBAR MOBILE */
+    .sidebar {
+        width: 100%;
+        height: 60px; /* Altura fixa para mobile */
+        flex-direction: row;
+        justify-content: space-around;
+        padding: 0; /* Remove padding vertical */
+        box-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
+    }
+    .user-info, .logout {
+        display: none; /* Esconde info e logout no mobile */
+    }
+    .sidebar-nav {
+        flex-grow: 1;
+        display: flex; /* Transforma a navegação em linha */
+        justify-content: space-around;
+    }
+    .nav-item {
+        padding: 10px; /* Menos padding */
+        border-left: none; /* Remove borda lateral */
+        flex-direction: column; /* Coloca ícone e texto em coluna */
+        text-align: center;
+        font-size: 0.7em;
+    }
+    .nav-item span:last-child {
+        margin-top: 2px;
+    }
+    .nav-item .material-icons {
+        margin-right: 0;
+        font-size: 20px;
+    }
+    .nav-item:hover, .nav-item.active {
+        background-color: rgba(255, 255, 255, 0.1);
+        border-left: none;
+        transform: none;
+    }
+    
+    /* GRID MOBILE */
+    .dashboard-grid {
+        grid-template-columns: 1fr;
+        gap: 20px;
+    }
+    .transactions-card {
+        height: 300px;
+    }
+    
+}
