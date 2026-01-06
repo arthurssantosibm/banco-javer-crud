@@ -7,7 +7,7 @@ from mysql.connector import errorcode
 
 DB_PASSWORD = "1701076288"
 DB_USER = "admin"
-DB_HOST = "database-project.cc1kujauuftf.us-east-1.rds.amazonaws.com"
+DB_HOST = "databaseproject.cc1kujauuftf.us-east-1.rds.amazonaws.com"
 DB_PORT = 3306
 DB_NAME = "mysql"
 
