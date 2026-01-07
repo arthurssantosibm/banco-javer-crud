@@ -2,7 +2,9 @@ from fastapi import APIRouter, HTTPException
 import mysql.connector
 from mysql.connector import Error
 from models.core.db_javer import get_connection
-from api.main import bcrypt_context
+from models.core.security import bcrypt_context
+from schemas.schemas import LoginSchema
+from api.jwt import create_access_token
 
 auth_router = APIRouter(prefix="/auth", tags=["auth"])
 
@@ -46,6 +48,36 @@ async def criar_conta(nome: str, email: str, senha: str, telefone: str):
         raise HTTPException(status_code=500, detail=str(e))
         
     
+    finally:
+        cursor.close()
+        conn.close()
+
+@auth_router.post("/login")
+async def login(data: LoginSchema):
+    conn = get_connection()
+    cursor = conn.cursor(dictionary=True)
+    
+    try:
+        cursor.execute(
+        "SELECT id, senha FROM usuarios WHERE email = %s",
+        (data.email,))
+        
+        user = cursor.fetchone()
+        
+        if not user:
+            raise HTTPException(status_code=401, detail="Credenciais inválidas")
+        if not bcrypt_context.verify(data.senha, user["senha"]):
+            raise HTTPException(status_code=401, detail="Credenciais inválidas")
+
+        token = create_access_token(
+            data={"sub": str(user["id"])}
+        )
+
+        return {
+            "access_token": token,
+            "token_type": "bearer"
+        }
+
     finally:
         cursor.close()
         conn.close()

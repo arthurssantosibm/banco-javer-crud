@@ -1,15 +1,11 @@
-from fastapi import FastAPI
-from passlib.context import CryptContext
 from dotenv import load_dotenv
-import os
+from pathlib import Path
 
-load_dotenv()
+BASE_DIR = Path(__file__).resolve().parent
+load_dotenv(BASE_DIR / ".env")
 
-SECRET_KEY = os.getenv("SECRET_KEY")
+from fastapi import FastAPI
+from api.auth_routes import auth_router
 
 app = FastAPI()
-
-bcrypt_context = CryptContext(schemes=["bcrypt"])
-
-from api.auth_routes import auth_router
 app.include_router(auth_router)
