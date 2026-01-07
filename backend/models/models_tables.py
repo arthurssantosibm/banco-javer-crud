@@ -3,7 +3,7 @@ from sqlalchemy.orm import declarative_base
 from dotenv import load_dotenv
 import os
 
-load_dotenv()
+load_dotenv(".env")
 DATABASE_URL = (
     f"mysql+pymysql://{os.getenv('DB_USER')}:"
     f"{os.getenv('DB_PASSWORD')}@"
@@ -11,6 +11,8 @@ DATABASE_URL = (
     f"{os.getenv('DB_PORT')}/"
     f"{os.getenv('DB_NAME')}"
 )
+print("DB_PORT =", os.getenv("DB_PORT"))
+print("DATABASE_URL =", DATABASE_URL)
 
 engine = create_engine(DATABASE_URL, echo=True)
 Base = declarative_base()
