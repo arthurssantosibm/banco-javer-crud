@@ -21,7 +21,7 @@ async def criar_conta(nome: str, email: str, senha: str, telefone: str):
         
         cursor.execute(
             """
-            INSERT INTO users (nome, email, senha, telefone)
+            INSERT INTO usuarios (nome, email, senha, telefone)
             VALUES (%s, %s, %s, %s)
             """,
             (nome, email, senha, telefone)
