@@ -23,29 +23,17 @@ try:
     # print(f"Banco '{DB_NAME}' verificado/criado")
     
     cursor.execute(f"USE {DB_NAME}")
-    '''
-    
-    FUNCAO PARA CRIAR TABELAS 
     
     
     create_table_sql = """
-    CREATE TABLE IF NOT EXISTS usuarios (
-        id INT AUTO_INCREMENT PRIMARY KEY,
-        nome VARCHAR(100) NOT NULL,
-        email VARCHAR(100) UNIQUE NOT NULL,
-        senha VARCHAR(255),
-        saldo_cc DECIMAL(10,2) DEFAULT 0.00,
-        telefone VARCHAR(15),
-        correntista BOOLEAN DEFAULT TRUE,
-        criado_em TIMESTAMP DEFAULT CURRENT_TIMESTAMP
-    ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+    ALTER TABLE usuarios MODIFY senha VARCHAR(255);
     """
     
     cursor.execute(create_table_sql)
     conn.commit()
 
-    print("Tabela 'usuarios' criada com sucesso")
-    '''
+    print("Tabela 'usuarios' atualizada com sucesso")
+    
 except mysql.connector.Error as e:
     if e.errno == errorcode.ER_ACCESS_DENIED_ERROR:
         print("Erro de autenticação: usuário ou senha incorretos")
