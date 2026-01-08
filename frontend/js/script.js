@@ -97,48 +97,7 @@ document.addEventListener("DOMContentLoaded", async () => {
     }
 
     /* ================= TRANSAÇÕES ================= */
-    const listEl = document.getElementById("transaction-list");
-
-    try {
-        const res = await fetch("http://127.0.0.1:8000/transacoes", {
-            headers: {
-                "Authorization": `Bearer ${token}`
-            }
-        });
-
-        const data = await res.json();
-        listEl.innerHTML = "";
-
-        if (!data.length) {
-            listEl.innerHTML = "<li>Nenhuma transação encontrada</li>";
-            return;
-        }
-
-        data.forEach(tx => {
-            const li = document.createElement("li");
-            const isEntrada = tx.tipo === "entrada";
-
-            li.className = isEntrada ? "in" : "out";
-
-            li.innerHTML = `
-                <span>
-                    ${isEntrada ? "+" : "-"} R$ ${Number(tx.valor).toFixed(2).replace(".", ",")}
-                </span>
-                <span>
-                    ${tx.descricao || ""}
-                    <br>
-                    <small>${new Date(tx.data_hora).toLocaleString("pt-BR")}</small>
-                </span>
-            `;
-
-            listEl.appendChild(li);
-        });
-
-    } catch (err) {
-        console.error("Erro transações:", err);
-        listEl.innerHTML = "<li>Erro ao carregar transações</li>";
-    }
-
+    
     /* ================= TEMA ================= */
     const themeToggle = document.getElementById("theme-toggle");
 
