@@ -1,41 +1,45 @@
-document.addEventListener("DOMContentLoaded", () => {
+async function login() {
+    const email = document.getElementById('email').value
+    const senha = document.getElementById('senha').value
+    const errorDiv = document.getElementById('error')
 
-    const loginForm = document.getElementById("loginForm");
-    const API_LOGIN = "http://127.0.0.1:5000/api/login";
+    errorDiv.textContent = ""
 
-    loginForm.addEventListener("submit", async (e) => {
-        e.preventDefault();
+    if (!email || !senha) {
+        errorDiv.textContent = "Preencha todos os campos"
+        return
+    }
 
-        const email = document.getElementById("email").value.trim();
-        const senha = document.getElementById("senha").value;
+    try {
+        const response = await fetch("http://127.0.0.1:8000/auth/login", {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json"
+            },
+            body: JSON.stringify({
+                email: email,
+                senha: senha
+            })
+        })
 
-        try {
-            const response = await fetch(API_LOGIN, {
-                method: "POST",
-                headers: {
-                    "Content-Type": "application/json"
-                },
-                body: JSON.stringify({ email, senha })
-            });
+        const data = await response.json()
 
-            const result = await response.json();
-
-            if (response.ok && result.user) {
-                localStorage.setItem("loggedUser", JSON.stringify({
-                    id: result.user.id,
-                    nome: result.user.nome,
-                    email: result.user.email,
-                    saldo: result.user.saldo_cc
-                }));
-                window.location.href = "home.html";
-
-            } else {
-                alert(result.message || "Email ou senha inválidos");
-            }
-
-        } catch (error) {
-            console.error(error);
-            alert("Erro ao conectar com o servidor");
+        if (!response.ok) {
+            errorDiv.textContent = data.detail || "Erro ao fazer login"
+            return
         }
-    });
-});
+
+        localStorage.setItem("access_token", data.access_token)
+        console.log("Login bem-sucedido! Redirecionando...")
+        window.location.href = "home.html"
+
+    } catch (error) {
+        errorDiv.textContent = "Erro de conexão com o servidor"
+        console.error(error)
+    }
+}
+
+document.getElementById('loginForm').addEventListener('submit', async (event) => {
+    event.preventDefault()
+    await login()
+})

@@ -1,22 +1,40 @@
 document.addEventListener("DOMContentLoaded", async () => {
-    const storedUser = localStorage.getItem("loggedUser");
+    const token = localStorage.getItem("access_token");
 
-    if (!storedUser) {
+    // 🔒 Proteção da rota
+    if (!token) {
         window.location.href = "login.html";
         return;
     }
 
-    const user = JSON.parse(storedUser);
     let saldo = 0;
+    let user = null;
 
-    /* ================= USER ================= */
-    const clientNameEl = document.getElementById("client-name");
-    if (clientNameEl && user.nome) {
-        clientNameEl.textContent = `Olá, ${user.nome}!`;
+    try {
+        const res = await fetch("http://127.0.0.1:8000/user/user", {
+            headers: {
+                "Authorization": `Bearer ${token}`
+            }
+        });
+
+        if (!res.ok) throw new Error("Token inválido");
+
+        user = await res.json();
+
+        const clientNameEl = document.getElementById("client-name");
+        if (clientNameEl) {
+            clientNameEl.textContent = `Olá, ${user.nome}!`;
+        }
+
+    } catch (err) {
+        console.error("Erro usuário:", err);
+        localStorage.removeItem("access_token");
+        window.location.href = "login.html";
+        return;
     }
 
     document.querySelector(".logout")?.addEventListener("click", () => {
-        localStorage.removeItem("loggedUser");
+        localStorage.removeItem("access_token");
         window.location.href = "login.html";
     });
 
@@ -40,64 +58,53 @@ document.addEventListener("DOMContentLoaded", async () => {
         requestAnimationFrame(step);
     }
 
-    try {
-        const res = await fetch(
-            `http://127.0.0.1:5000/api/dashboard?user_id=${user.id}`
-        );
-
-        const data = await res.json();
-        saldo = Number(data.saldo_cc) || 0;
-
-        user.saldo = saldo;
-        localStorage.setItem("loggedUser", JSON.stringify(user));
-
-    } catch (err) {
-        console.error("Erro dashboard:", err);
-    }
+    saldo = Number(user.saldo_cc) || 0;
 
     const balanceEl = document.getElementById("current-balance");
     if (balanceEl) animateCount(balanceEl, 0, saldo, 1000);
 
     /* ================= SCORE ================= */
-const scoreCanvas = document.getElementById("credit-score-chart");
-const scoreLabel = document.getElementById("score-percentage-display");
+    const scoreCanvas = document.getElementById("credit-score-chart");
+    const scoreLabel = document.getElementById("score-percentage-display");
 
-if (scoreCanvas && scoreLabel) {
-    const score = Math.min(Math.round(saldo * 0.1), 1000);
-    const percent = Math.round((score / 1000) * 100);
+    if (scoreCanvas && scoreLabel) {
+        const score = Math.min(Math.round(saldo * 0.1), 1000);
+        const percent = Math.round((score / 1000) * 100);
 
-    new Chart(scoreCanvas.getContext("2d"), {
-        type: "doughnut",
-        data: {
-            datasets: [{
-                data: [score, 1000 - score],
-                backgroundColor: ["#4caf50", "#cc3737ff"],
-                borderWidth: 0
-            }]
-        },
-        options: {
-            responsive: true,
-            maintainAspectRatio: false,
-            circumference: 180,
-            rotation: 270,
-            cutout: "80%",
-            plugins: {
-                legend: { display: false },
-                tooltip: { enabled: false }
+        new Chart(scoreCanvas.getContext("2d"), {
+            type: "doughnut",
+            data: {
+                datasets: [{
+                    data: [score, 1000 - score],
+                    backgroundColor: ["#4caf50", "#cc3737ff"],
+                    borderWidth: 0
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                circumference: 180,
+                rotation: 270,
+                cutout: "80%",
+                plugins: {
+                    legend: { display: false },
+                    tooltip: { enabled: false }
+                }
             }
-        }
-    });
-    
-    scoreLabel.textContent = `${percent}%`;
-}
+        });
+
+        scoreLabel.textContent = `${percent}%`;
+    }
 
     /* ================= TRANSAÇÕES ================= */
     const listEl = document.getElementById("transaction-list");
 
     try {
-        const res = await fetch(
-            `http://127.0.0.1:5000/api/transacoes?user_id=${user.id}`
-        );
+        const res = await fetch("http://127.0.0.1:8000/transacoes", {
+            headers: {
+                "Authorization": `Bearer ${token}`
+            }
+        });
 
         const data = await res.json();
         listEl.innerHTML = "";
@@ -109,8 +116,8 @@ if (scoreCanvas && scoreLabel) {
 
         data.forEach(tx => {
             const li = document.createElement("li");
-
             const isEntrada = tx.tipo === "entrada";
+
             li.className = isEntrada ? "in" : "out";
 
             li.innerHTML = `
@@ -118,7 +125,7 @@ if (scoreCanvas && scoreLabel) {
                     ${isEntrada ? "+" : "-"} R$ ${Number(tx.valor).toFixed(2).replace(".", ",")}
                 </span>
                 <span>
-                    ${isEntrada ? `De ${tx.email_origem}` : `Para ${tx.email_destino}`}
+                    ${tx.descricao || ""}
                     <br>
                     <small>${new Date(tx.data_hora).toLocaleString("pt-BR")}</small>
                 </span>

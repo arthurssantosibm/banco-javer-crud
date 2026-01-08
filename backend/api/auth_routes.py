@@ -1,12 +1,13 @@
-from fastapi import APIRouter, HTTPException
+from fastapi import APIRouter, HTTPException, Depends
 import mysql.connector
 from mysql.connector import Error
 from models.core.db_javer import get_connection
 from models.core.security import bcrypt_context
-from schemas.schemas import LoginSchema
-from api.jwt import create_access_token
+from schemas.schemas import LoginSchema, HomeSchema
+from api.jwt import create_access_token, get_current_user_id
 
 auth_router = APIRouter(prefix="/auth", tags=["auth"])
+user_router = APIRouter(prefix="/user", tags=["user"])
 
 BCRYPT_MAX_BYTES = 72
 
@@ -77,6 +78,31 @@ async def login(data: LoginSchema):
             "access_token": token,
             "token_type": "bearer"
         }
+
+    finally:
+        cursor.close()
+        conn.close()
+
+@user_router.get("/user")
+async def get_user(user_id: int = Depends(get_current_user_id)):
+    conn = get_connection()
+    cursor = conn.cursor(dictionary=True)
+    
+    try:
+        cursor.execute(
+            """
+            SELECT id, nome, email, telefone, saldo_cc, correntista
+            FROM usuarios
+            WHERE id = %s
+            """,
+            (user_id,))
+
+        user = cursor.fetchone()
+
+        if not user:
+            raise HTTPException(status_code=404, detail="Usuário não encontrado")
+
+        return user
 
     finally:
         cursor.close()
