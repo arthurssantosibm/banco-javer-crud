@@ -2,14 +2,17 @@ from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker, declarative_base
 from urllib.parse import quote_plus
 import os
+from dotenv import load_dotenv
 import mysql.connector
 from mysql.connector import errorcode
 
-DB_PASSWORD = "1701076288"
-DB_USER = "admin"
-DB_HOST = "databaseproject.cc1kujauuftf.us-east-1.rds.amazonaws.com"
-DB_PORT = 3306
-DB_NAME = "mysql"
+load_dotenv()
+
+DB_PASSWORD = os.getenv("DB_PASSWORD")
+DB_USER = os.getenv("DB_USER")
+DB_HOST = os.getenv("DB_HOST")
+DB_PORT = os.getenv("DB_PORT")
+DB_NAME = os.getenv("DB_NAME")
 
 try:
     conn = mysql.connector.connect(
