@@ -12,4 +12,4 @@ OBS.: Inicializar o banco de dados antes da API é o ideal
 
 2. app.include_router(auth_router)
    incluindo um roteamento modular usando 'from api.auth_routes import auth_router' onde eu defino o prefixo para realizar os testes de cada rota na documentacao do fastapi 
-   (http://127.0.0.1:800/docs)
+   (http://127.0.0.1:8000/docs)
