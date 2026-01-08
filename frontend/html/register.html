@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Cadastro de Cliente</title>
 
-    <link rel="icon" href="../img/bankflow_logo.png" type="image/png">
+    <link rel="icon" href="../img/bankjaverlogo.png" type="image/png">
     <link rel="stylesheet" href="../css/style_register.css">
 </head>
 <body>
@@ -23,8 +23,9 @@
                 name="nome"
                 required
                 minlength="3"
-                placeholder="Ex: Arthur da Silva"
             >
+
+            <span id="nomeError" class="error-message"></span>
         </div>
 
         <div class="form-group">
@@ -34,8 +35,8 @@
                 id="email"
                 name="email"
                 required
-                placeholder="Ex: arthur@email.com"
             >
+            <span id="emailError" class="error-message"></span>
         </div>
 
         <div class="form-group">
@@ -46,21 +47,28 @@
                 name="telefone"
                 required
                 pattern="[0-9]{10,11}"
-                placeholder="Ex: 11987654321"
             >
+            <span id="telefoneError" class="error-message"></span>
         </div>
-
-        <div class="form-group">
-            <label for="senha">Senha</label>
-            <input
-                type="password"
-                id="senha"
-                name="senha"
-                required
-                minlength="6"
-                placeholder="Ex: 123456"
-            >
-        </div>
+ 
+        <section>
+            <div class="form-group">
+                <label for="senha">Senha</label>
+                
+                <div class="input-icon-container">
+                    <input
+                        type="password"
+                        id="senha"
+                        name="senha"
+                        required
+                        minlength="6"
+                    >
+                    <div id="icons"></div> 
+                </div>
+                
+                <span id="senhaError" class="error-message"></span>
+            </div>
+        </section>
 
         <button type="submit">Cadastrar Cliente</button>
         <div class="login">

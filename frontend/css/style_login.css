@@ -1,13 +1,15 @@
 /* Variáveis de Cores (Consistência com o BankFlow) */
 :root {
-    --primary-color: #007bff; /* Azul Elétrico - Confiança/Principal */
-    --accent-color: #ff6f00; /* Laranja Vivo - Destaque/Energia */
-    --bg-color: #eef3f6; /* Fundo Leve e Moderno */
-    --card-bg: #ffffff; /* Fundo do Formulário */
-    --text-color: #333333;
-    --light-text: #666666;
-    --shadow: 0 8px 25px rgba(0, 0, 0, 0.1);
-    --input-focus: #4d94ff; 
+    --primary-color: #CC5803;
+    --accent-color: #F7934C;
+
+    --bg-color: #FFF6E5;
+    --card-bg: #FFFFFF;
+
+    --text-color: #1F1300;
+    --light-text: #3A2600;
+    --shadow: 0 8px 30px rgba(31, 19, 0, 0.15);
+    --input-focus: #F7B05B; 
 }
 
 /* Base e Layout */

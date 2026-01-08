@@ -49,7 +49,7 @@ document.addEventListener("DOMContentLoaded", async () => {
 
             el.textContent =
                 "R$ " + value.toLocaleString("pt-BR", {
-                    minimumFractionDigits: 2
+                    minimumFractionDigits: 2 
                 });
 
             if (progress < 1) requestAnimationFrame(step);

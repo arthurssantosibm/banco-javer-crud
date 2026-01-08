@@ -1,13 +1,15 @@
 /* Variáveis de Cores (Consistência com o BankFlow) */
 :root {
-    --primary-color: #007bff; /* Azul Elétrico */
-    --accent-color: #ff6f00; /* Laranja Vivo */
-    --bg-color: #eef3f6; /* Fundo Leve */
-    --card-bg: #ffffff; /* Fundo do Formulário */
-    --text-color: #333333;
-    --light-text: #666666;
-    --shadow: 0 8px 25px rgba(0, 0, 0, 0.1);
-    --input-focus: #4d94ff; /* Azul claro para foco */
+    --primary-color: #CC5803;
+    --accent-color: #F7934C;
+
+    --bg-color: #FFF6E5;
+    --card-bg: #FFFFFF;
+
+    --text-color: #1F1300;
+    --light-text: #3A2600;
+    --shadow: 0 8px 30px rgba(31, 19, 0, 0.15);
+    --input-focus: #F7B05B; /* Azul claro para foco */
 }
 
 /* Base e Layout */
@@ -23,6 +25,11 @@ body {
     padding: 20px;
     box-sizing: border-box;
 }
+.error-message {
+        color: red;
+        font-size: 0.9em;
+        display: block; /* Garante que a mensagem fique em sua própria linha */
+    }
 
 /* Container Principal do Formulário */
 .form-container {
@@ -49,6 +56,7 @@ h1 {
 /* Agrupamento de Campos */
 .form-group {
     margin-bottom: 20px;
+    position: relative;
 }
 
 /* Rótulos */
@@ -80,12 +88,42 @@ input[type="password"] {
 input[type="text"]:focus, 
 input[type="email"]:focus, 
 input[type="tel"]:focus, 
-input[type="number"]:focus {
+input[type="number"]:focus,
+input[type="password"]:focus {
     border-color: var(--input-focus);
     box-shadow: 0 0 0 3px rgba(0, 123, 255, 0.2);
     outline: none;
 }
 
+#icons {
+    position: absolute;
+    top: 50%;
+    right: 20px;
+    transform: translateY(-50%);
+    /* Imagem padrão: Olho fechado (ou o que você quiser que apareça quando a senha está escondida) */
+    background: url(../img/disable.png); 
+    width: 20px;
+    height: 20px;
+    cursor: pointer;
+    background-size: cover;
+    z-index: 10;
+}
+
+/* Estado de SENHA VISÍVEL (Olho aberto) */
+#icons.show-password {
+    /* Troca para a imagem de olho aberto */
+    background: url(../img/enable.png); 
+}
+
+.input-icon-container {
+    position: relative;
+    width: 100%;
+}
+.input-icon-container input[type="password"],
+.input-icon-container input[type="text"] {
+    width: 100%;
+    padding-right: 40px;
+}
 /* Grupo do Checkbox (Correntista) */
 .checkbox-group {
     display: flex;
