@@ -140,6 +140,9 @@ document.addEventListener("DOMContentLoaded", () => {
     cadastroForm.addEventListener("submit", async (event) => {
         event.preventDefault();
 
+        // Referencie o botão aqui, assim ele pode ser usado em qualquer lugar
+        const submitButton = document.getElementById("submitButton");
+
         // Roda todas as validações novamente e verifica se todas passaram
         const isNomeValid = validateNome(nomeInput.value);
         const isEmailValid = validateEmail(emailInput.value);
@@ -159,41 +162,60 @@ document.addEventListener("DOMContentLoaded", () => {
 
             try {
                 // Desabilita o botão para evitar cliques múltiplos
-                const submitButton = document.getElementById("submitButton");
-                submitButton.disabled = true;
+                if (submitButton) submitButton.disabled = true; // Verificação extra
 
                 const response = await fetch('http://127.0.0.1:8000/auth/criar_conta', {
                     method: "POST",
-                    headers: { "Content-Type": "application/json" },
+                    headers: {
+                        "Content-Type": "application/json"
+                    },
                     body: JSON.stringify(formData)
                 });
 
-                const result = await response.json();
+                // Tenta obter o resultado JSON (mesmo em caso de erro, o servidor pode enviar detalhes)
+                const result = await response.json(); 
 
                 if (response.ok) {
                     alert(`✅ Cadastro realizado com sucesso!`);
-                    cadastroForm.reset();
+                    
+                    // Redirecionamento após o cadastro bem-sucedido é uma boa prática
+                    window.location.href = 'login.html'; 
+                    
+                    // A limpeza do formulário (cadastroForm.reset();) pode ser opcional 
+                    // se você for redirecionar, mas mantenha-a se for ficar na mesma página.
                     // Limpar mensagens de erro após o sucesso
                     [nomeError, emailError, telefoneError, senhaError].forEach(el => el.textContent = '');
                 } else {
-                    alert(`❌ Erro: ${result.message}`);
+                    // Se a resposta NÃO for 2xx (ex: 400 Bad Request, 409 Conflict)
+                    // O servidor Fast API geralmente retorna o erro no campo 'detail'.
+                    const errorMessage = result.detail || result.message || "Erro desconhecido do servidor.";
+                    
+                    // Se for um erro específico (ex: Email já cadastrado), você pode exibi-lo no campo certo
+                    if (errorMessage.includes("Email já cadastrado")) { 
+                        emailError.textContent = "❌ Este email já está em uso.";
+                        alert(`❌ Erro: Email já cadastrado.`);
+                    } else {
+                        alert(`❌ Erro: ${errorMessage}`);
+                    }
                     console.error("Erro do servidor:", result);
                 }
 
-                submitButton.disabled = false; // Reabilita o botão
-
             } catch (error) {
-                alert("❌ Não foi possível conectar ao servidor.");
+                alert("❌ Não foi possível conectar ao servidor. Verifique a rede ou o endereço.");
                 console.error("Erro de rede:", error);
-                document.getElementById("submitButton").disabled = false;
+            } finally {
+                // Garante que o botão seja reabilitado, mesmo em caso de falha de rede ou servidor.
+                if (submitButton) submitButton.disabled = false; 
             }
+
         } else {
-            // Se o formulário não for válido, as funções de validação já terão notificado o usuário
+            // Se o formulário não for válido
             alert("❌ Por favor, corrija os erros no formulário antes de enviar.");
+            // O foco deve ir para o primeiro campo inválido para guiar o usuário
+            if (!isNomeValid) nomeInput.focus();
+            else if (!isEmailValid) emailInput.focus();
+            else if (!isTelefoneValid) telefoneInput.focus();
+            else if (!isSenhaValid) senhaInput.focus();
         }
-        
-    });
-});
-
-
-
+    })
+})

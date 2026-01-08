@@ -3,7 +3,7 @@ import mysql.connector
 from mysql.connector import Error
 from models.core.db_javer import get_connection
 from models.core.security import bcrypt_context
-from schemas.schemas import LoginSchema, HomeSchema
+from schemas.schemas import LoginSchema, HomeSchema, CriarConta
 from api.jwt import create_access_token, get_current_user_id
 
 auth_router = APIRouter(prefix="/auth", tags=["auth"])
@@ -12,7 +12,11 @@ user_router = APIRouter(prefix="/user", tags=["user"])
 BCRYPT_MAX_BYTES = 72
 
 @auth_router.post("/criar_conta")
-async def criar_conta(nome: str, email: str, senha: str, telefone: str):
+async def criar_conta(data: CriarConta):
+    nome = data.nome
+    email = data.email
+    senha = data.senha
+    telefone = data.telefone
     conn = get_connection()
     cursor = conn.cursor(dictionary=True)
     

@@ -13,3 +13,9 @@ class HomeSchema(BaseModel):
     telefone: str
     correntista: bool
     saldo_cc: float
+
+class CriarConta(BaseModel):
+    nome: str
+    email: EmailStr
+    telefone: str
+    senha: str

@@ -113,6 +113,15 @@ input[type="password"]:focus {
 #icons.show-password {
     /* Troca para a imagem de olho aberto */
     background: url(../img/enable.png); 
+    width: 20px;
+    height: 20px;
+    position: absolute;
+    top: 50%;
+    right: 20px;
+    transform: translateY(-50%);
+    cursor: pointer;
+    background-size: cover;
+    z-index: 10;
 }
 
 .input-icon-container {
