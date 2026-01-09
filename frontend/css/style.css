@@ -144,7 +144,13 @@ a {
     flex-grow: 1;
     overflow-y: auto;
 }
-
+.score-points {
+    font-size: 0.9rem;
+    color: var(--light-text);
+    margin-top: -20px;
+    font-weight: bold;
+    display: block;
+}
 /* =====================================================
     HEADER
 ===================================================== */

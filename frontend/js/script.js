@@ -61,6 +61,7 @@ document.addEventListener("DOMContentLoaded", async () => {
 
     const scoreCanvas = document.getElementById("credit-score-chart")
     const scoreLabel = document.getElementById("score-percentage-display")
+    const scorePointsLabel = document.getElementById("score-points-display");
 
     if (scoreCanvas && scoreLabel) {
         const score = Math.min(Math.round(saldo * 0.1), 1000)
@@ -89,6 +90,7 @@ document.addEventListener("DOMContentLoaded", async () => {
         })
 
         scoreLabel.textContent = `${percent}%`
+        scorePointsLabel.textContent = `${score} pontos`;
     }
 
     const themeToggle = document.getElementById("theme-toggle")
