@@ -238,7 +238,6 @@ def listar_transacoes(current_user_id: int = Depends(get_current_user_id)):
     cursor = conn.cursor(dictionary=True)
 
     try:
-        # 🔹 Buscar email do usuário logado
         cursor.execute(
             "SELECT email FROM usuarios WHERE id = %s",
             (current_user_id,)
@@ -250,7 +249,6 @@ def listar_transacoes(current_user_id: int = Depends(get_current_user_id)):
 
         email = user["email"]
 
-        # 🔹 Buscar transações onde ele é origem ou destino
         cursor.execute(
             """
             SELECT 
