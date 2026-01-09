@@ -57,7 +57,14 @@ h1 {
 .form-group {
     margin-bottom: 20px;
 }
-
+.error {
+        color: red;
+        font-size: 0.9em;
+        display: block;
+        margin-top: 10px;
+        margin-bottom: -10px;
+        text-align: center;
+    }
 /* Rótulos */
 label {
     display: block;

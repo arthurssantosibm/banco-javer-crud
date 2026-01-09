@@ -38,6 +38,10 @@ async function login() {
         console.error(error)
     }
 }
+const loginButton = document.getElementById('loginButton')
+loginButton.addEventListener('click', function(){
+    loginButton.innerText = 'Processando...'
+})
 
 document.getElementById('loginForm').addEventListener('submit', async (event) => {
     event.preventDefault()
