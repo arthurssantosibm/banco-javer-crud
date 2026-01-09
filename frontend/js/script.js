@@ -123,7 +123,7 @@ document.addEventListener("DOMContentLoaded", async () => {
                 li.classList.add(tipo);
 
                 li.innerHTML = `
-                    <strong>${isSaida ? "Transferência enviada" : "Transferência recebida"}</strong><br>
+                    <strong>${isSaida ? "Enviada" : "Transferência recebida"}</strong><br>
                     ${sinal} R$ ${Number(tx.valor).toFixed(2)}<br>
                     <small>${tx.mensagem || "Sem mensagem"}</small><br>
                     <small>${new Date(tx.create_time).toLocaleString()}</small>
