@@ -2,13 +2,13 @@
    VARIÁVEIS DE CORES
 ===================================================== */
 :root {
-    --primary-color: #007bff;
-    --accent-color: #ff6f00;
-    --bg-color: #f4f7f6;
-    --card-bg: #ffffff;
-    --text-color: #333333;
-    --light-text: #666666;
-    --shadow-light: 0 4px 12px rgba(0, 0, 0, 0.05);
+    --primary-color: #CC5803;
+    --accent-color: #F7934C;
+    --bg-color: #FFF6E5;
+    --card-bg: #FFFFFF;
+    --text-color: #1F1300;
+    --light-text: #3A2600;
+    --shadow-light: 0 8px 30px rgba(31, 19, 0, 0.15);
 }
 
 /* =====================================================

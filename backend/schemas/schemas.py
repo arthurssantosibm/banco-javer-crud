@@ -1,4 +1,5 @@
 from pydantic import BaseModel, EmailStr
+from typing import Optional
 
 class LoginSchema(BaseModel):
     email: EmailStr
@@ -19,3 +20,10 @@ class CriarConta(BaseModel):
     email: EmailStr
     telefone: str
     senha: str
+
+class UpdateUserSchema(BaseModel):
+    nome: str
+    email: EmailStr
+    telefone: str
+    current_password: Optional[str] = None
+    new_password: Optional[str] = None
