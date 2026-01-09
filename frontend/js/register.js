@@ -132,7 +132,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
             try {
                 if (submitButton) submitButton.disabled = true
-
+                submitButton.innerText = 'Cadastrando...'
                 const response = await fetch('http://127.0.0.1:8000/auth/criar_conta', {
                     method: "POST",
                     headers: {
@@ -161,10 +161,11 @@ document.addEventListener("DOMContentLoaded", () => {
                 }
 
             } catch (error) {
-                alert("Não foi possível conectar ao servidor. Verifique a rede ou o endereço.")
+                /* alert("Não foi possível conectar ao servidor. Verifique a rede ou o endereço.") */
                 console.error("Erro de rede:", error)
             } finally {
                 if (submitButton) submitButton.disabled = false
+                submitButton.innerText = 'Cadastrar Cliente'
             }
 
         } else {
