@@ -3,56 +3,74 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel="icon" href="../img/bankflow_logo.png" type="image/png">
+    <link rel="icon" href="../img/bankjaverlogo.png" type="image/png">
     <link rel="stylesheet" href="../css/style_extrato.css">
     <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
-    <title>Extrato BankFlow</title>
+    <title>Extrato BankJaver</title>
 </head>
 <body>
+
 <aside class="sidebar">
-        <div class="user-info">
-            <span class="material-icons">account_circle</span>
-            <h3 id="client-name">Olá</h3>
+    <div class="user-info">
+        <span class="material-icons">account_circle</span>
+        <h3 id="client-name">Olá</h3>
+    </div>
+
+    <nav class="sidebar-nav">
+        <a href="home.html" class="nav-item">
+            <span class="material-icons">home</span> Dashboard
+        </a>
+        <a href="settings.html" class="nav-item">
+            <span class="material-icons">settings</span> Configurações
+        </a>
+        <a href="#" class="nav-item active">
+            <span class="material-icons">payments</span> Extrato
+        </a>
+        <a href="#" class="nav-item logout">
+            <span class="material-icons">logout</span> Sair
+        </a>
+    </nav>
+</aside>
+
+<main class="main-content">
+
+    <header class="header">
+        <a href="home.html">
+            <img src="../img/bankflow_logo.png" alt="Logo BankFlow" class="logo-img">
+        </a>
+        <a href="home.html">
+            <div class="bank-logo">Bank<span class="highlight">Flow</span></div>
+        </a>
+        <div class="header-actions">
+            <button class="icon-button"><span class="material-icons">notifications</span></button>
+            <button class="icon-button"><span class="material-icons">help</span></button>
         </div>
+    </header>
 
-        <nav class="sidebar-nav">
-            <a href="home.html" class="nav-item">
-                <span class="material-icons">home</span> Dashboard
-            </a>
-            <a href="settings.html" class="nav-item">
-                <span class="material-icons">settings</span> Configurações
-            </a>
-            <a href="#" class="nav-item active">
-                <span class="material-icons">payments</span> Extrato
-            </a>
-            <a href="#" class="nav-item logout">
-                <span class="material-icons">logout</span> Sair
-            </a>
-        </nav>
-    </aside>
-
-    <main class="main-content">
-
-        <header class="header">
-            <a href="home.html"><img src="../img/bankflow_logo.png" alt="Logo BankFlow" class="logo-img"></a>
-            <a href="home.html"><div class="bank-logo">Bank<span class="highlight">Flow</span></div></a>
-            <div class="header-actions">
-                <button class="icon-button"><span class="material-icons">notifications</span></button>
-                <button class="icon-button"><span class="material-icons">help</span></button>
-            </div>
-        </header>
-        
+    <!-- FORMULÁRIO DE TRANSFERÊNCIA -->
+    <section class="card">
         <form id="transferForm">
             <div class="form-group">
                 <label for="emailDestino">Email do Destinatário</label>
                 <input type="email" id="emailDestino" required>
             </div>
+
             <div class="form-group">
                 <label for="valorTransferencia">Valor (R$)</label>
                 <input type="number" id="valorTransferencia" step="0.01" min="0.01" required>
             </div>
+
+            <div class="form-group">
+                <label for="mensagem">Mensagem (opcional)</label>
+                <input type="text" id="mensagem" placeholder="Digite uma mensagem">
+            </div>
+
             <button type="submit" class="submit-btn">Transferir</button>
         </form>
+    </section>
+
+</main>
+
 <script src="../js/extrato.js"></script>
 </body>
 </html>

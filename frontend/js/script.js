@@ -91,19 +91,51 @@ document.addEventListener("DOMContentLoaded", async () => {
 
         scoreLabel.textContent = `${percent}%`
         scorePointsLabel.textContent = `${score} pontos`;
+    async function carregarTransacoes() {
+        try {
+            const res = await fetch("http://127.0.0.1:8000/transacoes/listar_transacoes", {
+                headers: {
+                    "Authorization": `Bearer ${token}`
+                }
+            });
+
+            if (!res.ok) throw new Error("Erro ao buscar transações");
+
+            const transacoes = await res.json();
+            const list = document.getElementById("transaction-list");
+
+            if (!list) return;
+
+            list.innerHTML = "";
+
+            if (transacoes.length === 0) {
+                list.innerHTML = `<li class="empty">Nenhuma transação encontrada</li>`;
+                return;
+            }
+
+            // mostra só as 5 últimas na HOME
+            transacoes.slice(0, 5).forEach(tx => {
+                const isSaida = tx.email_origin === user.email;
+                const tipo = isSaida ? "saida" : "entrada";
+                const sinal = isSaida ? "-" : "+";
+
+                const li = document.createElement("li");
+                li.classList.add(tipo);
+
+                li.innerHTML = `
+                    <strong>${isSaida ? "Transferência enviada" : "Transferência recebida"}</strong><br>
+                    ${sinal} R$ ${Number(tx.valor).toFixed(2)}<br>
+                    <small>${tx.mensagem || "Sem mensagem"}</small><br>
+                    <small>${new Date(tx.create_time).toLocaleString()}</small>
+                `;
+
+                list.appendChild(li);
+            });
+
+        } catch (err) {
+            console.error("Erro ao carregar transações:", err);
+        }
     }
-
-    const themeToggle = document.getElementById("theme-toggle")
-
-    themeToggle?.addEventListener("click", () => {
-        document.body.classList.toggle("dark-mode")
-        localStorage.setItem(
-            "theme",
-            document.body.classList.contains("dark-mode") ? "dark" : "light"
-        )
-    })
-
-    if (localStorage.getItem("theme") === "dark") {
-        document.body.classList.add("dark-mode")
+        carregarTransacoes();
     }
-})
+});

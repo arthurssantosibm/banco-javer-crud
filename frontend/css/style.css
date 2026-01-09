@@ -280,18 +280,28 @@ a {
 ===================================================== */
 .transaction-list {
     list-style: none;
+    padding: 0;
+    margin-top: 10px;
 }
 
 .transaction-list li {
-    padding: 12px 0;
-    border-bottom: 1px solid var(--border-light);
-    display: flex;
-    justify-content: space-between;
+    padding: 12px;
+    border-bottom: 1px solid #eee;
 }
 
-.transaction-list li:last-child {
-    border-bottom: none;
+.transaction-list li.entrada {
+    color: green;
 }
+
+.transaction-list li.saida {
+    color: red;
+}
+
+.transaction-list .empty {
+    text-align: center;
+    color: #999;
+}
+
 
 .type.in {
     color: var(--transaction-in);
