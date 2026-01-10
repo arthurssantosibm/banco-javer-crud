@@ -10,7 +10,9 @@ Como incializar o projeto:
 
 - Instalar o pacote venv (ambiente virtual), para isso, no mesmo terminal execute: python -m venv venv
 
-- Agora com o ambiente virtual instalado, execute no terminal a instalação dos pacotes: pip install fastapi uvicorn sqlalchemy passlib[bcrypt] python-jose[cryptography] python-dotenv python-multipart
+- Rode no terminal: venv/Scripts/activate
+
+- Agora com o ambiente virtual instalado, execute no terminal a instalação dos pacotes: pip install fastapi uvicorn sqlalchemy passlib[bcrypt] python-jose[cryptography] python-dotenv python-multipart mysql-connector-python python-dotenv sqlalchemy
 
 - execute a api no terminal para subir a aplicação com: uvicorn api.main:app --reload
 isso faz com que o terminal execute a variavel de ambiente 'app' da api e mantenha sempre atualizado com o '--reload'
