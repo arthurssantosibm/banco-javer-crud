@@ -114,42 +114,70 @@ async def get_user(user_id: int = Depends(get_current_user_id)):
         conn.close()
 
 @user_router.put("/update_user")
-async def update_user(data: UpdateUserSchema, user_id: int = Depends(get_current_user_id)):
+async def update_user(
+    data: UpdateUserSchema,
+    user_id: int = Depends(get_current_user_id)
+):
     conn = get_connection()
     cursor = conn.cursor(dictionary=True)
-    
+
     try:
         cursor.execute(
             "SELECT senha FROM usuarios WHERE id = %s",
             (user_id,)
         )
         user = cursor.fetchone()
-        
+
         if not user:
             raise HTTPException(status_code=404, detail="Usuário não encontrado")
-        
+
         senha_hash = user["senha"]
-        
+
         if data.new_password:
             if not data.current_password:
-                raise HTTPException(status_code=400, detail="Senha atual obrigatória")
-            if not bcrypt_context.verify(data.current_password, senha_hash):
-                raise HTTPException(status_code=401, detail="Senha atual incorreta")
-            
+                raise HTTPException(
+                    status_code=400,
+                    detail="Senha atual obrigatória"
+                )
+
+            if not bcrypt_context.verify(
+                data.current_password,
+                senha_hash
+            ):
+                raise HTTPException(
+                    status_code=401,
+                    detail="Senha atual incorreta"
+                )
+
             nova_senha_hash = bcrypt_context.hash(data.new_password)
-            
+
             cursor.execute(
-                "UPDATE usuarios SET nome = %s, email = %s WHERE id = %s",
-                (data.nome, data.email, user_id)
+                """
+                UPDATE usuarios
+                SET nome=%s, email=%s, telefone=%s, senha=%s
+                WHERE id=%s
+                """,
+                (
+                    data.nome,
+                    data.email,
+                    data.telefone,
+                    nova_senha_hash,
+                    user_id
+                )
             )
         else:
             cursor.execute(
-               """
+                """
                 UPDATE usuarios
                 SET nome=%s, email=%s, telefone=%s
                 WHERE id=%s
                 """,
-                (data.nome, data.email, data.telefone, user_id)
+                (
+                    data.nome,
+                    data.email,
+                    data.telefone,
+                    user_id
+                )
             )
 
         conn.commit()
@@ -158,6 +186,7 @@ async def update_user(data: UpdateUserSchema, user_id: int = Depends(get_current
     finally:
         cursor.close()
         conn.close()
+
         
 @transacoes_router.post("/transacoes")
 async def criar_transacao(data: TransacaoCreate, user_id: int = Depends(get_current_user_id)):

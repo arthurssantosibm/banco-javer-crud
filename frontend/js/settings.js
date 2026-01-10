@@ -32,6 +32,10 @@ document.addEventListener("DOMContentLoaded", async () => {
     document.getElementById("settingsForm").addEventListener("submit", async (e) => {
         e.preventDefault();
 
+        const submitButton = document.getElementById("submitBtn")
+        submitButton.innerText = "Salvando..."
+        submitButton.disabled = true
+
         const payload = {
             nome: document.getElementById("nome").value,
             email: document.getElementById("email").value,
