@@ -308,6 +308,13 @@ button:active {
     animation: fadeInSlideUp 0.8s ease-out forwards;
 }
 
+#senhaError {
+        color: red;
+        font-size: 0.9em;
+        display: block;
+        margin-left: 30px;
+    }
+
 .delay-1 { animation-delay: 0.1s; }
 .delay-2 { animation-delay: 0.2s; }
 .delay-3 { animation-delay: 0.3s; }
