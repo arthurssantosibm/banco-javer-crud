@@ -1,4 +1,5 @@
 from pydantic import BaseModel, EmailStr
+from datetime import datetime
 from typing import Optional
 
 class LoginSchema(BaseModel):
@@ -31,4 +32,4 @@ class UpdateUserSchema(BaseModel):
 class TransacaoCreate(BaseModel):
     email_destination: EmailStr
     valor: float
-    mensagem: str | None = None
+    mensagem: str

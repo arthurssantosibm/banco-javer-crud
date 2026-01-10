@@ -26,8 +26,13 @@ document.addEventListener("DOMContentLoaded", async () => {
     document.getElementById("transferForm").addEventListener("submit", async (e) => {
         e.preventDefault()
 
+        const transferButton = document.getElementById("transfBtn")
+        transferButton.innerText = "Transferindo..."
+        transferButton.disabled = true
+
         const emailDestino = document.getElementById("emailDestino").value
         const valor = parseFloat(document.getElementById("valorTransferencia").value)
+        const mensagem = document.getElementById("mensagem").value;
 
         try {
             const response = await fetch("http://127.0.0.1:8000/transacoes/transacoes", {
@@ -37,7 +42,7 @@ document.addEventListener("DOMContentLoaded", async () => {
                     email_origin: user.email,
                     email_destination: emailDestino,
                     valor: valor,
-                    mensagem: ""
+                    mensagem: mensagem
                 })
             })
 
@@ -55,7 +60,11 @@ document.addEventListener("DOMContentLoaded", async () => {
         } catch (err) {
             console.error("Erro na transferência", err)
             alert("Erro ao realizar transferência")
-        }
+        } finally {
+        transferButton.innerText = "Transferir"
+        transferButton.disabled = false
+            }
+        })
     })
 
     async function carregarTransacoes() {
@@ -99,4 +108,3 @@ document.addEventListener("DOMContentLoaded", async () => {
         localStorage.removeItem("access_token")
         window.location.href = "login.html"
     })
-})
