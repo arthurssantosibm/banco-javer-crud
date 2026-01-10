@@ -117,6 +117,7 @@ document.addEventListener("DOMContentLoaded", async () => {
                 const isSaida = tx.email_origin === user.email
                 const tipo = isSaida ? "saida" : "entrada"
                 const sinal = isSaida ? "-" : "+"
+                const emailRelacionado = isSaida ? tx.email_destination : tx.email_origin
 
                 const li = document.createElement("li")
                 li.classList.add(tipo)
@@ -124,6 +125,7 @@ document.addEventListener("DOMContentLoaded", async () => {
                 li.innerHTML = `
                     <strong>${isSaida ? "Enviada" : "Transferência recebida"}</strong><br>
                     ${sinal} R$ ${Number(tx.valor).toFixed(2)}<br>
+                    <small>De/Para: ${emailRelacionado}</small><br>
                     <small>${tx.mensagem || "Sem mensagem"}</small><br>
                     <small>${new Date(tx.create_time).toLocaleString()}</small>
                 `;
