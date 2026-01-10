@@ -165,7 +165,6 @@ async def criar_transacao(data: TransacaoCreate, user_id: int = Depends(get_curr
     cursor = conn.cursor(dictionary=True)
 
     try:
-        # 🔹 Buscar usuário de origem
         cursor.execute(
             "SELECT email, saldo_cc FROM usuarios WHERE id = %s",
             (user_id,)
@@ -184,7 +183,6 @@ async def criar_transacao(data: TransacaoCreate, user_id: int = Depends(get_curr
         if saldo < data.valor:
             raise HTTPException(status_code=400, detail="Saldo insuficiente")
 
-        # 🔹 Buscar usuário de destino
         cursor.execute(
             "SELECT id FROM usuarios WHERE email = %s",
             (data.email_destination,)
@@ -194,7 +192,6 @@ async def criar_transacao(data: TransacaoCreate, user_id: int = Depends(get_curr
         if not user_destination:
             raise HTTPException(status_code=404, detail="Usuário de destino não encontrado")
 
-        # 🔹 Inserir transação
         cursor.execute(
             """
             INSERT INTO transacoes 
@@ -208,8 +205,7 @@ async def criar_transacao(data: TransacaoCreate, user_id: int = Depends(get_curr
                 data.mensagem
             )
         )
-
-        # 🔹 Atualizar saldos
+        
         cursor.execute(
             "UPDATE usuarios SET saldo_cc = saldo_cc - %s WHERE id = %s",
             (data.valor, user_id)

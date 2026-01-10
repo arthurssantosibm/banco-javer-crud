@@ -61,7 +61,7 @@ document.addEventListener("DOMContentLoaded", async () => {
 
     const scoreCanvas = document.getElementById("credit-score-chart")
     const scoreLabel = document.getElementById("score-percentage-display")
-    const scorePointsLabel = document.getElementById("score-points-display");
+    const scorePointsLabel = document.getElementById("score-points-display")
 
     if (scoreCanvas && scoreLabel) {
         const score = Math.min(Math.round(saldo * 0.1), 1000)
@@ -90,7 +90,7 @@ document.addEventListener("DOMContentLoaded", async () => {
         })
 
         scoreLabel.textContent = `${percent}%`
-        scorePointsLabel.textContent = `${score} pontos`;
+        scorePointsLabel.textContent = `${score} pontos`
     async function carregarTransacoes() {
         try {
             const res = await fetch("http://127.0.0.1:8000/transacoes/listar_transacoes", {
@@ -99,28 +99,27 @@ document.addEventListener("DOMContentLoaded", async () => {
                 }
             });
 
-            if (!res.ok) throw new Error("Erro ao buscar transações");
+            if (!res.ok) throw new Error("Erro ao buscar transações")
 
-            const transacoes = await res.json();
-            const list = document.getElementById("transaction-list");
+            const transacoes = await res.json()
+            const list = document.getElementById("transaction-list")
 
-            if (!list) return;
+            if (!list) return
 
-            list.innerHTML = "";
+            list.innerHTML = ""
 
             if (transacoes.length === 0) {
-                list.innerHTML = `<li class="empty">Nenhuma transação encontrada</li>`;
+                list.innerHTML = `<li class="empty">Nenhuma transação encontrada</li>`
                 return;
             }
 
-            // mostra só as 5 últimas na HOME
             transacoes.slice(0, 5).forEach(tx => {
-                const isSaida = tx.email_origin === user.email;
-                const tipo = isSaida ? "saida" : "entrada";
-                const sinal = isSaida ? "-" : "+";
+                const isSaida = tx.email_origin === user.email
+                const tipo = isSaida ? "saida" : "entrada"
+                const sinal = isSaida ? "-" : "+"
 
-                const li = document.createElement("li");
-                li.classList.add(tipo);
+                const li = document.createElement("li")
+                li.classList.add(tipo)
 
                 li.innerHTML = `
                     <strong>${isSaida ? "Enviada" : "Transferência recebida"}</strong><br>
@@ -129,13 +128,13 @@ document.addEventListener("DOMContentLoaded", async () => {
                     <small>${new Date(tx.create_time).toLocaleString()}</small>
                 `;
 
-                list.appendChild(li);
+                list.appendChild(li)
             });
 
         } catch (err) {
-            console.error("Erro ao carregar transações:", err);
+            console.error("Erro ao carregar transações:", err)
         }
     }
-        carregarTransacoes();
+        carregarTransacoes()
     }
-});
+})

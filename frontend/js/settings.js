@@ -1,9 +1,9 @@
 document.addEventListener("DOMContentLoaded", async () => {
-    const token = localStorage.getItem("access_token");
+    const token = localStorage.getItem("access_token")
 
     if (!token) {
-        window.location.href = "login.html";
-        return;
+        window.location.href = "login.html"
+        return
     }
 
     const headers = {
@@ -11,33 +11,31 @@ document.addEventListener("DOMContentLoaded", async () => {
         "Authorization": `Bearer ${token}`
     };
 
-    /* ================= CARREGAR USUÁRIO ================= */
     try {
         const res = await fetch("http://127.0.0.1:8000/user/user", {
             headers
         });
 
-        const user = await res.json();
+        const user = await res.json()
 
-        document.getElementById("client-name").textContent = `Olá, ${user.nome}`;
+        document.getElementById("client-name").textContent = `Olá, ${user.nome}`
         document.getElementById("nome").value = user.nome;
         document.getElementById("email").value = user.email;
-        document.getElementById("saldo").value = `R$ ${Number(user.saldo_cc).toFixed(2)}`;
-        document.getElementById("score").value = `${(Number(user.saldo_cc) * 0.1).toFixed(0)} pontos`;
+        document.getElementById("saldo").value = `R$ ${Number(user.saldo_cc).toFixed(2)}`
+        document.getElementById("score").value = `${(Number(user.saldo_cc) * 0.1).toFixed(0)} pontos`
 
     } catch (err) {
-        console.error("Erro ao carregar usuário", err);
-        alert("Erro ao carregar dados do usuário");
+        console.error("Erro ao carregar usuário", err)
+        alert("Erro ao carregar dados do usuário")
     }
 
-    /* ================= SALVAR ALTERAÇÕES ================= */
     document.getElementById("settingsForm").addEventListener("submit", async (e) => {
         e.preventDefault();
 
         const payload = {
             nome: document.getElementById("nome").value,
             email: document.getElementById("email").value,
-            telefone: "", // caso queira adicionar no HTML depois
+            telefone: "",
             current_password: document.getElementById("current_password").value || null,
             new_password: document.getElementById("new_password").value || null
         };
@@ -49,25 +47,24 @@ document.addEventListener("DOMContentLoaded", async () => {
                 body: JSON.stringify(payload)
             });
 
-            const data = await res.json();
+            const data = await res.json()
 
             if (!res.ok) {
-                alert(data.detail || "Erro ao atualizar dados");
+                alert(data.detail || "Erro ao atualizar dados")
                 return;
             }
 
-            alert("Dados atualizados com sucesso!");
-            document.getElementById("current_password").value = "";
-            document.getElementById("new_password").value = "";
-            document.getElementById("confirm_password").value = "";
+            alert("Dados atualizados com sucesso!")
+            document.getElementById("current_password").value = ""
+            document.getElementById("new_password").value = ""
+            document.getElementById("confirm_password").value = ""
 
         } catch (err) {
-            console.error("Erro update", err);
-            alert("Erro de conexão com o servidor");
+            console.error("Erro update", err)
+            alert("Erro de conexão com o servidor")
         }
     });
 
-    /* ================= LOGOUT ================= */
     document.querySelector(".logout").addEventListener("click", () => {
         localStorage.removeItem("access_token");
         window.location.href = "login.html";

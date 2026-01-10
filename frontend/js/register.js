@@ -27,17 +27,17 @@ document.addEventListener("DOMContentLoaded", () => {
         icon.addEventListener("click", showHidePassword)
     }
 
-    const nomesProprios = ["joao", "maria", "pedro", "ana", "luiz", "carlos", "sofia", "antonio", "gabriel", "rafael"];
+    const nomesProprios = ["joao", "maria", "pedro", "ana", "luiz", "carlos", "sofia", "antonio", "gabriel", "rafael"]
 
     function validateNome(nome) {
-        let error = "";
+        let error = ""
         const nomeLimpo = nome.trim()
 
         if (nomeLimpo.length === 0) {
             error = "O nome não pode estar vazio."
         } 
         if (nomeLimpo.length < 6){
-            error = "O nome deve ser completo";
+            error = "O nome deve ser completo"
         }
         else if (!/^[A-Z][a-z]*(\s[A-Z][a-z]*)*$/.test(nomeLimpo)) {
             error = "O nome deve ter iniciais maiúsculas em cada palavra e conter apenas letras."
@@ -48,7 +48,7 @@ document.addEventListener("DOMContentLoaded", () => {
     }
 
     function validateEmail(email) {
-        let error = "";
+        let error = ""
         if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
             error = "Por favor, insira um email válido (ex: seu.email@dominio.com)."
         }
@@ -58,7 +58,7 @@ document.addEventListener("DOMContentLoaded", () => {
     }
 
     function validateTelefone(telefone) {
-        let error = "";
+        let error = ""
         const telefoneNumeros = telefone.replace(/\D/g, '')
 
         if (telefoneNumeros.length < 10 || telefoneNumeros.length > 11) {
@@ -72,7 +72,7 @@ document.addEventListener("DOMContentLoaded", () => {
     }
 
     function validateSenha(senha) {
-        let erros = [];
+        let erros = []
         if (senha.length < 8) {
             erros.push("Mínimo de 8 caracteres.")
         }
@@ -93,12 +93,12 @@ document.addEventListener("DOMContentLoaded", () => {
             erros.push("Não deve conter espaços.")
         }
 
-        const sequenciaNumRegex = /(123|234|345|456|567|678|789|987|876|765|654|543|432|321|012|210)/;
+        const sequenciaNumRegex = /(123|234|345|456|567|678|789|987|876|765|654|543|432|321|012|210)/
         if (sequenciaNumRegex.test(senha)) {
             erros.push("Não deve conter sequências numéricas (ex: 123, 321).")
         }
 
-        const senhaMinuscula = senha.toLowerCase();
+        const senhaMinuscula = senha.toLowerCase()
         if (nomesProprios.some(nome => senhaMinuscula.includes(nome))) {
             erros.push("Não deve conter um nome próprio comum.")
         }
@@ -114,7 +114,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
 
     cadastroForm.addEventListener("submit", async (event) => {
-        event.preventDefault();
+        event.preventDefault()
         const submitButton = document.getElementById("submitButton")
         const isNomeValid = validateNome(nomeInput.value)
         const isEmailValid = validateEmail(emailInput.value)
@@ -161,7 +161,6 @@ document.addEventListener("DOMContentLoaded", () => {
                 }
 
             } catch (error) {
-                /* alert("Não foi possível conectar ao servidor. Verifique a rede ou o endereço.") */
                 console.error("Erro de rede:", error)
             } finally {
                 if (submitButton) submitButton.disabled = false
