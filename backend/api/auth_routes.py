@@ -1,58 +1,69 @@
 from fastapi import APIRouter, HTTPException, Depends
 import mysql.connector
-import http
+import httpx
 from mysql.connector import Error
 from models.core.db_javer import get_connection
 from models.core.security import bcrypt_context
 from schemas.schemas import LoginSchema, UpdateUserSchema, CriarConta, TransacaoCreate
 from api.jwt import create_access_token, get_current_user_id
-from backend.api_client.execute_routes import insert_usuario
+
 
 auth_router = APIRouter(prefix="/auth", tags=["auth"])
 user_router = APIRouter(prefix="/user", tags=["user"])
 transacoes_router = APIRouter(prefix="/transacoes", tags=["transacoes"])
 
+DATA_API_URL = "http://127.0.0.1:8001"
+INTERNAL_KEY = "INTERNAL_SECRET"
 BCRYPT_MAX_BYTES = 72
+
+
+# 🔹 Cliente HTTP para Data API
+async def insert_usuario(data: dict):
+    async with httpx.AsyncClient(timeout=5.0) as client:
+        response = await client.post(
+            f"{DATA_API_URL}/usuarios",
+            json=data,
+            headers={
+                "X-Internal-Key": INTERNAL_KEY
+            }
+        )
+        response.raise_for_status()
+
 
 @auth_router.post("/criar_conta")
 async def criar_conta(data: CriarConta):
-    nome = data.nome
-    email = data.email
-    senha = data.senha
-    telefone = data.telefone
     conn = get_connection()
     cursor = conn.cursor(dictionary=True)
-    
+
     try:
         cursor.execute(
             "SELECT id FROM usuarios WHERE email = %s",
-            (email,)
+            (data.email,)
         )
-        
+
         if cursor.fetchone():
-            raise HTTPException(status_code=400, detail="Email já cadastrado")
-        
-        password_bytes = senha.encode("utf-8")
-        
-        if len(password_bytes) > BCRYPT_MAX_BYTES:
-            password_to_hash = password_bytes[:BCRYPT_MAX_BYTES]
-        else:
-            password_to_hash = password_bytes
-        
+            raise HTTPException(
+                status_code=400,
+                detail="Email já cadastrado"
+            )
+
+        # 🔐 Hash da senha (bcrypt aceita até 72 bytes)
+        password_bytes = data.senha.encode("utf-8")
+        password_to_hash = password_bytes[:BCRYPT_MAX_BYTES]
+
         senha_hash = bcrypt_context.hash(password_to_hash)
-        
-        
+
+        # 🔁 Chama Data API para inserir
         await insert_usuario({
             "nome": data.nome,
             "email": data.email,
             "telefone": data.telefone,
-            "senha": data.senha
+            "senha": senha_hash
         })
-        
-        
+
         return {"mensagem": "Conta criada com sucesso!"}
 
-    except http.HTTPError:
+    except httpx.HTTPError:
         raise HTTPException(
             status_code=500,
             detail="Erro ao salvar usuário"
