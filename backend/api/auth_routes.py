@@ -16,8 +16,6 @@ DATA_API_URL = "http://127.0.0.1:8001"
 INTERNAL_KEY = "INTERNAL_SECRET"
 BCRYPT_MAX_BYTES = 72
 
-
-# 🔹 Cliente HTTP para Data API
 async def insert_usuario(data: dict):
     async with httpx.AsyncClient(timeout=5.0) as client:
         response = await client.post(
@@ -37,23 +35,35 @@ async def criar_conta(data: CriarConta):
 
     try:
         cursor.execute(
-            "SELECT id FROM usuarios WHERE email = %s",
-            (data.email,)
+            "SELECT id, email, telefone FROM usuarios WHERE email = %s AND telefone = %s",
+            (data.email, data.telefone)
         )
 
-        if cursor.fetchone():
+        validate = cursor.fetchone()
+        if validate:
+            if validate["email"] == data.email:
+                msg = "Email já cadastrado"
+            elif validate["telefone"] == data.telefone:
+                msg = "Telefone já cadastrado"
+            else:
+                msg = "Email e Telefone já cadastrados"
+            
             raise HTTPException(
                 status_code=400,
-                detail="Email já cadastrado"
+                detail=msg
             )
 
-        # 🔐 Hash da senha (bcrypt aceita até 72 bytes)
+        #if cursor.fetchone():
+        #    raise HTTPException(
+        #        status_code=400,
+        #        detail="Email ou Telefone já cadastrados"
+        #    )
+
         password_bytes = data.senha.encode("utf-8")
         password_to_hash = password_bytes[:BCRYPT_MAX_BYTES]
 
         senha_hash = bcrypt_context.hash(password_to_hash)
 
-        # 🔁 Chama Data API para inserir
         await insert_usuario({
             "nome": data.nome,
             "email": data.email,
@@ -201,7 +211,6 @@ async def update_user(
     finally:
         cursor.close()
         conn.close()
-
         
 @transacoes_router.post("/transacoes")
 async def criar_transacao(data: TransacaoCreate, user_id: int = Depends(get_current_user_id)):
