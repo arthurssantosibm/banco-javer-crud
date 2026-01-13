@@ -1,10 +1,12 @@
 from fastapi import APIRouter, HTTPException, Depends
 import mysql.connector
+import http
 from mysql.connector import Error
 from models.core.db_javer import get_connection
 from models.core.security import bcrypt_context
 from schemas.schemas import LoginSchema, UpdateUserSchema, CriarConta, TransacaoCreate
 from api.jwt import create_access_token, get_current_user_id
+from backend.api_client.execute_routes import insert_usuario
 
 auth_router = APIRouter(prefix="/auth", tags=["auth"])
 user_router = APIRouter(prefix="/user", tags=["user"])
@@ -39,21 +41,23 @@ async def criar_conta(data: CriarConta):
         
         senha_hash = bcrypt_context.hash(password_to_hash)
         
-        cursor.execute(
-            """
-            INSERT INTO usuarios (nome, email, senha, telefone)
-            VALUES (%s, %s, %s, %s)
-            """,
-            (nome, email, senha_hash, telefone)
-        )
         
-        conn.commit()
+        await insert_usuario({
+            "nome": data.nome,
+            "email": data.email,
+            "telefone": data.telefone,
+            "senha": data.senha
+        })
+        
+        
         return {"mensagem": "Conta criada com sucesso!"}
-    
-    except mysql.connector.Error as e:
-        raise HTTPException(status_code=500, detail=str(e))
-        
-    
+
+    except http.HTTPError:
+        raise HTTPException(
+            status_code=500,
+            detail="Erro ao salvar usuário"
+        )
+
     finally:
         cursor.close()
         conn.close()
