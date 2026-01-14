@@ -35,24 +35,27 @@ async def criar_conta(data: CriarConta):
 
     try:
         cursor.execute(
-            "SELECT id, email, telefone FROM usuarios WHERE email = %s AND telefone = %s",
+            """
+            SELECT email, telefone
+            FROM usuarios
+            WHERE email = %s OR telefone = %s
+            """,
             (data.email, data.telefone)
         )
 
-        validate = cursor.fetchone()
-        if validate:
-            if validate["email"] == data.email:
-                msg = "Email já cadastrado"
-            elif validate["telefone"] == data.telefone:
-                msg = "Telefone já cadastrado"
-            else:
-                msg = "Email e Telefone já cadastrados"
-            
-            raise HTTPException(
-                status_code=400,
-                detail=msg
-            )
+        rows = cursor.fetchall()
 
+        for row in rows:
+            if row["email"] == data.email and row["telefone"] == data.telefone:
+                msg = "Email e telefone já cadastrados"
+            elif row["email"] == data.email:
+                msg = "Email já cadastrado"
+            else:
+                msg = "Telefone já cadastrado"
+
+            raise HTTPException(status_code=400, detail=msg)
+
+        
         #if cursor.fetchone():
         #    raise HTTPException(
         #        status_code=400,
