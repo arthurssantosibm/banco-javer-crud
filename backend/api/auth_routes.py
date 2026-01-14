@@ -16,6 +16,8 @@ DATA_API_URL = "http://127.0.0.1:8001"
 INTERNAL_KEY = "INTERNAL_SECRET"
 BCRYPT_MAX_BYTES = 72
 
+
+# BLOCO CADASTRO
 async def insert_usuario(data: dict):
     async with httpx.AsyncClient(timeout=5.0) as client:
         response = await client.post(
@@ -79,7 +81,7 @@ async def criar_conta(data: CriarConta):
         conn.close()
 
 
-
+# BLOCO LOGIN
 async def login_usuario(email: str):
     try:
         async with httpx.AsyncClient(timeout=5.0) as client:
@@ -111,7 +113,6 @@ async def login_usuario(email: str):
             status_code=500,
             detail="Data API indisponível"
         )
-
 
 @auth_router.post("/login")
 async def login(data: LoginSchema):
