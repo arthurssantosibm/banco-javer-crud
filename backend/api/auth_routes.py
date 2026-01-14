@@ -135,8 +135,7 @@ async def login(data: LoginSchema):
         "token_type": "bearer"
     }
 
-
-
+# BLOCO USUÁRIO
 @user_router.get("/user")
 async def get_user(user_id: int = Depends(get_current_user_id)):
     conn = get_connection()
@@ -162,6 +161,32 @@ async def get_user(user_id: int = Depends(get_current_user_id)):
         cursor.close()
         conn.close()
 
+
+# BLOCO ATUALIZAÇÃO DE USUÁRIO
+async def update_user_data_api(user_id: int, payload: dict):
+    try:
+        async with httpx.AsyncClient(timeout=15.0) as client:
+            response = await client.put(
+                f"{DATA_API_URL}/updateUsuarios/{user_id}",
+                json=payload,
+                headers={
+                    "X-Internal-Key": INTERNAL_KEY
+                }
+            )
+
+        if response.status_code != 200:
+            raise HTTPException(
+                status_code=500,
+                detail=f"Erro na Data API: {response.text}"
+            )
+
+    except httpx.TimeoutException:
+        raise HTTPException(
+            status_code=504,
+            detail="Timeout ao comunicar com a Data API"
+        )
+
+
 @user_router.put("/update_user")
 async def update_user(
     data: UpdateUserSchema,
@@ -180,7 +205,8 @@ async def update_user(
         if not user:
             raise HTTPException(status_code=404, detail="Usuário não encontrado")
 
-        senha_hash = user["senha"]
+        senha_hash_atual = user["senha"]
+        nova_senha_hash = None
 
         if data.new_password:
             if not data.current_password:
@@ -191,7 +217,7 @@ async def update_user(
 
             if not bcrypt_context.verify(
                 data.current_password,
-                senha_hash
+                senha_hash_atual
             ):
                 raise HTTPException(
                     status_code=401,
@@ -200,37 +226,16 @@ async def update_user(
 
             nova_senha_hash = bcrypt_context.hash(data.new_password)
 
-            cursor.execute(
-                """
-                UPDATE usuarios
-                SET nome=%s, email=%s, telefone=%s, senha=%s
-                WHERE id=%s
-                """,
-                (
-                    data.nome,
-                    data.email,
-                    data.telefone,
-                    nova_senha_hash,
-                    user_id
-                )
-            )
-        else:
-            cursor.execute(
-                """
-                UPDATE usuarios
-                SET nome=%s, email=%s, telefone=%s
-                WHERE id=%s
-                """,
-                (
-                    data.nome,
-                    data.email,
-                    data.telefone,
-                    user_id
-                )
-            )
+        payload = {
+            "nome": data.nome,
+            "email": data.email,
+            "telefone": data.telefone,
+            "senha": nova_senha_hash
+        }
 
-        conn.commit()
-        return {"message": "Dados atualizados com sucesso"}
+        await update_user_data_api(user_id, payload)
+
+        return {"message": "Usuário atualizado com sucesso"}
 
     finally:
         cursor.close()
