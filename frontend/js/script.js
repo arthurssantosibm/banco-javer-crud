@@ -64,14 +64,15 @@ document.addEventListener("DOMContentLoaded", async () => {
     const scorePointsLabel = document.getElementById("score-points-display")
 
     if (scoreCanvas && scoreLabel) {
-        const score = Math.min(Math.round(saldo * 0.1), 1000)
-        const percent = Math.round((score / 1000) * 100)
+        const score = saldo * 0.1
+        const maxScore = score * 1.2
+        const percent = (score / maxScore) * 100
 
         new Chart(scoreCanvas.getContext("2d"), {
             type: "doughnut",
             data: {
                 datasets: [{
-                    data: [score, 1000 - score],
+                    data: [score, maxScore - score],
                     backgroundColor: ["#4caf50", "#cc3737ff"],
                     borderWidth: 0
                 }]
@@ -89,8 +90,10 @@ document.addEventListener("DOMContentLoaded", async () => {
             }
         })
 
-        scoreLabel.textContent = `${percent}%`
-        scorePointsLabel.textContent = `${score} pontos`
+        scoreLabel.textContent = `${percent.toFixed(2)}%`
+        scorePointsLabel.textContent = `${score.toLocaleString("pt-BR", {
+            minimumFractionDigits: 2
+        })} pontos`
     async function carregarTransacoes() {
         try {
             const res = await fetch("http://127.0.0.1:8000/transacoes/listar_transacoes", {

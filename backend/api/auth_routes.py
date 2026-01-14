@@ -93,26 +93,28 @@ async def login_usuario(email: str):
                 }
             )
 
-        if response.status_code == 404:
-            raise HTTPException(
-                status_code=401,
-                detail="Credenciais inválidas"
-            )
-
-        if response.status_code == 403:
-            raise HTTPException(
-                status_code=500,
-                detail="Erro de comunicação interna"
-            )
-
-        response.raise_for_status()
-        return response.json()
-
-    except httpx.RequestError:
+    except httpx.ConnectError:
         raise HTTPException(
-            status_code=500,
-            detail="Data API indisponível"
+            status_code=503,
+            detail="API indisponível"
         )
+
+    except httpx.TimeoutException:
+        raise HTTPException(
+            status_code=504,
+            detail="Timeout ao conectar com API"
+        )
+
+    if response.status_code == 404:
+        raise HTTPException(status_code=401, detail="Credenciais inválidas")
+
+    if response.status_code == 422:
+        raise HTTPException(status_code=400, detail="Dados inválidos")
+
+    if response.status_code >= 500:
+        raise HTTPException(status_code=502, detail="Erro interno da API")
+
+    return response.json()
 
 @auth_router.post("/login")
 async def login(data: LoginSchema):
