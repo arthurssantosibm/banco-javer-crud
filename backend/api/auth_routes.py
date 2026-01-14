@@ -19,14 +19,13 @@ BCRYPT_MAX_BYTES = 72
 async def insert_usuario(data: dict):
     async with httpx.AsyncClient(timeout=5.0) as client:
         response = await client.post(
-            f"{DATA_API_URL}/usuarios",
+            f"{DATA_API_URL}/loginUsuarios",
             json=data,
             headers={
                 "X-Internal-Key": INTERNAL_KEY
             }
         )
         response.raise_for_status()
-
 
 @auth_router.post("/criar_conta")
 async def criar_conta(data: CriarConta):
@@ -79,35 +78,61 @@ async def criar_conta(data: CriarConta):
         cursor.close()
         conn.close()
 
-@auth_router.post("/login")
-async def login(data: LoginSchema):
-    conn = get_connection()
-    cursor = conn.cursor(dictionary=True)
-    
-    try:
-        cursor.execute(
-        "SELECT id, senha FROM usuarios WHERE email = %s",
-        (data.email,))
-        
-        user = cursor.fetchone()
-        
-        if not user:
-            raise HTTPException(status_code=401, detail="Credenciais inválidas")
-        if not bcrypt_context.verify(data.senha, user["senha"]):
-            raise HTTPException(status_code=401, detail="Credenciais inválidas")
 
-        token = create_access_token(
-            data={"sub": str(user["id"])}
+
+async def login_usuario(email: str):
+    try:
+        async with httpx.AsyncClient(timeout=5.0) as client:
+            response = await client.post(
+                f"{DATA_API_URL}/loginUsuarios",
+                json={"email": email},
+                headers={
+                    "X-Internal-Key": INTERNAL_KEY
+                }
+            )
+
+        if response.status_code == 404:
+            raise HTTPException(
+                status_code=401,
+                detail="Credenciais inválidas"
+            )
+
+        if response.status_code == 403:
+            raise HTTPException(
+                status_code=500,
+                detail="Erro de comunicação interna"
+            )
+
+        response.raise_for_status()
+        return response.json()
+
+    except httpx.RequestError:
+        raise HTTPException(
+            status_code=500,
+            detail="Data API indisponível"
         )
 
-        return {
-            "access_token": token,
-            "token_type": "bearer"
-        }
 
-    finally:
-        cursor.close()
-        conn.close()
+@auth_router.post("/login")
+async def login(data: LoginSchema):
+    user = await login_usuario(data.email)
+
+    if not bcrypt_context.verify(data.senha, user["senha"]):
+        raise HTTPException(
+            status_code=401,
+            detail="Credenciais inválidas"
+        )
+
+    token = create_access_token(
+        data={"sub": str(user["id"])}
+    )
+
+    return {
+        "access_token": token,
+        "token_type": "bearer"
+    }
+
+
 
 @user_router.get("/user")
 async def get_user(user_id: int = Depends(get_current_user_id)):
