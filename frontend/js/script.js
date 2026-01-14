@@ -13,11 +13,11 @@ document.addEventListener("DOMContentLoaded", async () => {
             headers: {
                 "Authorization": `Bearer ${token}`
             }
-        });
+        })
 
         if (!res.ok) throw new Error("Token inválido")
 
-        user = await res.json();
+        user = await res.json()
 
         const clientNameEl = document.getElementById("client-name")
         if (clientNameEl) {
@@ -34,7 +34,7 @@ document.addEventListener("DOMContentLoaded", async () => {
     document.querySelector(".logout")?.addEventListener("click", () => {
         localStorage.removeItem("access_token")
         window.location.href = "login.html"
-    });
+    })
 
     function animateCount(el, start, end, duration) {
         let startTime = null
@@ -45,10 +45,10 @@ document.addEventListener("DOMContentLoaded", async () => {
             const value = start + progress * (end - start)
             el.textContent =
                 "R$ " + value.toLocaleString("pt-BR", {
-                    minimumFractionDigits: 2 
-                });
+                    minimumFractionDigits: 2
+                })
 
-            if (progress < 1) requestAnimationFrame(step);
+            if (progress < 1) requestAnimationFrame(step)
         }
 
         requestAnimationFrame(step)
@@ -60,20 +60,84 @@ document.addEventListener("DOMContentLoaded", async () => {
     if (balanceEl) animateCount(balanceEl, 0, saldo, 1000)
 
     const scoreCanvas = document.getElementById("credit-score-chart")
-    const scoreLabel = document.getElementById("score-percentage-display")
     const scorePointsLabel = document.getElementById("score-points-display")
 
-    if (scoreCanvas && scoreLabel) {
+    /* =======================
+       PLUGIN DO PONTEIRO
+    ======================== */
+    const gaugeNeedle = {
+    id: "gaugeNeedle",
+    afterDatasetDraw(chart) {
+        const { ctx } = chart;
+        const meta = chart.getDatasetMeta(0);
+        const centerX = meta.data[0].x;
+        const centerY = meta.data[0].y;
+        const radius = meta.data[0].outerRadius;
+
+        const value = chart.data.datasets[0].needleValue;
+        const max = chart.data.datasets[0].maxValue;
+
+        // Cálculo do ângulo (ajustado para iniciar na esquerda e terminar na direita)
+        const angle = Math.PI + (value / max) * Math.PI;
+
+        ctx.save();
+        ctx.translate(centerX, centerY);
+        ctx.rotate(angle);
+
+        // 1. Sombra da agulha para dar profundidade
+        ctx.shadowColor = 'rgba(0, 0, 0, 0.4)';
+        ctx.shadowBlur = 5;
+        ctx.shadowOffsetX = 2;
+        ctx.shadowOffsetY = 2;
+
+        // 2. Desenho da Agulha (Formato Triangular/Diamante)
+        ctx.beginPath();
+        ctx.fillStyle = "#333333"; // Cor principal da agulha
+        
+        // Criando um triângulo fino que nasce do centro
+        ctx.moveTo(0, -5);           // Lado superior da base
+        ctx.lineTo(radius * 0.9, 0); // Ponta da agulha
+        ctx.lineTo(0, 5);            // Lado inferior da base
+        ctx.fill();
+
+        // 3. Ponto Central (O "Eixo")
+        ctx.shadowBlur = 0; // Remove sombra para o círculo interno
+        ctx.shadowOffsetX = 0;
+        ctx.shadowOffsetY = 0;
+
+        // Círculo externo do eixo (borda)
+        ctx.beginPath();
+        ctx.arc(0, 0, 10, 0, Math.PI * 2);
+        ctx.fillStyle = "#333333";
+        ctx.fill();
+
+        // Detalhe brilhante no centro (efeito metálico)
+        ctx.beginPath();
+        ctx.arc(0, 0, 5, 0, Math.PI * 2);
+        ctx.fillStyle = "#e0e0e0";
+        ctx.fill();
+
+        ctx.restore();
+    }
+};
+
+    if (scoreCanvas && scorePointsLabel) {
+
+        // 🔹 pontos reais (10% do saldo, sem limite)
         const score = saldo * 0.1
-        const maxScore = score * 1.2
-        const percent = (score / maxScore) * 100
+
+        // 🔹 métrica visual: proximidade de 1000
+        const maxVisualScore = 1000
+        const visualScore = Math.min(score, maxVisualScore)
 
         new Chart(scoreCanvas.getContext("2d"), {
             type: "doughnut",
             data: {
                 datasets: [{
-                    data: [score, maxScore - score],
-                    backgroundColor: ["#4caf50", "#cc3737ff"],
+                    data: [visualScore, maxVisualScore - visualScore],
+                    needleValue: visualScore,
+                    maxValue: maxVisualScore,
+                    backgroundColor: ["#47d998", "#ff6961"],
                     borderWidth: 0
                 }]
             },
@@ -82,25 +146,30 @@ document.addEventListener("DOMContentLoaded", async () => {
                 maintainAspectRatio: false,
                 circumference: 180,
                 rotation: 270,
-                cutout: "80%",
+                cutout: "70%",
                 plugins: {
                     legend: { display: false },
                     tooltip: { enabled: false }
                 }
-            }
+            },
+            plugins: [gaugeNeedle]
         })
 
-        scoreLabel.textContent = `${percent.toFixed(2)}%`
-        scorePointsLabel.textContent = `${score.toLocaleString("pt-BR", {
-            minimumFractionDigits: 2
-        })} pontos`
+        // 🔹 apenas pontos (sem porcentagem)
+        scorePointsLabel.textContent =
+            `${score.toLocaleString("pt-BR", {
+                minimumFractionDigits: 2,
+                maximumFractionDigits: 2
+            })} Pontos`
+    }
+
     async function carregarTransacoes() {
         try {
             const res = await fetch("http://127.0.0.1:8000/transacoes/listar_transacoes", {
                 headers: {
                     "Authorization": `Bearer ${token}`
                 }
-            });
+            })
 
             if (!res.ok) throw new Error("Erro ao buscar transações")
 
@@ -113,7 +182,7 @@ document.addEventListener("DOMContentLoaded", async () => {
 
             if (transacoes.length === 0) {
                 list.innerHTML = `<li class="empty">Nenhuma transação encontrada</li>`
-                return;
+                return
             }
 
             transacoes.slice(0, 5).forEach(tx => {
@@ -131,15 +200,15 @@ document.addEventListener("DOMContentLoaded", async () => {
                     <small>De/Para: ${emailRelacionado}</small><br>
                     <small>${tx.mensagem || "Sem mensagem"}</small><br>
                     <small>${new Date(tx.create_time).toLocaleString()}</small>
-                `;
+                `
 
                 list.appendChild(li)
-            });
+            })
 
         } catch (err) {
             console.error("Erro ao carregar transações:", err)
         }
     }
-        carregarTransacoes()
-    }
+
+    carregarTransacoes()
 })

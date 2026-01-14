@@ -144,13 +144,7 @@ a {
     flex-grow: 1;
     overflow-y: auto;
 }
-.score-points {
-    font-size: 0.9rem;
-    color: var(--light-text);
-    margin-top: -20px;
-    font-weight: bold;
-    display: block;
-}
+
 /* =====================================================
     HEADER
 ===================================================== */
@@ -327,14 +321,32 @@ a {
 
 #score-percentage-display {
     position: absolute;
-    top: 65%;
+    top: 35%;
     left: 50%;
     transform: translate(-50%, -50%);
-    font-size: 2rem;
-    font-weight: 800;
+    font-size: 4rem;
+    font-weight: 200;
     color: var(--primary-color);
 }
-
+.score-points {
+    font-size: 0.9rem;
+    color: var(--light-text);
+    margin-top: -55px;
+    font-weight: bold;
+    display: block;
+    z-index: 10;
+    background: rgba(255, 255, 255, 0.15);
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
+    padding: 8px 20px;
+    border-radius: 50px;
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+    width: fit-content;
+    margin-left: auto;
+    margin-right: auto;
+    text-align: center;
+}
 /* =====================================================
     ANIMAÇÕES
 ===================================================== */
