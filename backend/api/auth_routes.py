@@ -55,13 +55,6 @@ async def criar_conta(data: CriarConta):
 
             raise HTTPException(status_code=400, detail=msg)
 
-        
-        #if cursor.fetchone():
-        #    raise HTTPException(
-        #        status_code=400,
-        #        detail="Email ou Telefone já cadastrados"
-        #    )
-
         password_bytes = data.senha.encode("utf-8")
         password_to_hash = password_bytes[:BCRYPT_MAX_BYTES]
 
