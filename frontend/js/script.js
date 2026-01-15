@@ -171,7 +171,7 @@ document.addEventListener("DOMContentLoaded", async () => {
                 return
             }
 
-            transacoes.slice(0, 5).forEach(tx => {
+            transacoes.forEach(tx => {
                 const isSaida = tx.email_origin === user.email
                 const tipo = isSaida ? "saida" : "entrada"
                 const sinal = isSaida ? "-" : "+"
