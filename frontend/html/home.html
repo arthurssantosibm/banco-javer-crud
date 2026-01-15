@@ -44,10 +44,9 @@
                 <div class="bank-logo">Bank<span class="highlight">Javer</span></div>
             </a>
             <div class="header-actions">
-                <!-- <button class="icon-button" id="theme-toggle"><span class="material-icons">contrast</span></button> -->
-                <!-- <button class="icon-button"><span class="material-icons">notifications</span></button> -->
-                <button class="icon-button" onclick="dispararAlerta()"><span class="material-icons">help</span></button>
-
+                <button class="icon-button" onclick="dispararAlerta()">
+                    <span class="material-icons">help</span>
+                </button>
             </div>
         </header>
 
@@ -59,7 +58,15 @@
                 </div>
                 <h2 class="card-title">Saldo Disponível</h2>
                 <p class="card-value" id="current-balance">R$ --</p>
-                <a href="extrato.html"><button class="view-statement-btn">Transferir</button></a>
+
+                <div style="display:flex; gap:10px;">
+                    <a href="extrato.html">
+                        <button class="view-statement-btn">Transferir</button>
+                    </a>
+                    <button class="view-statement-btn" id="openDepositDialog">
+                        Depositar
+                    </button>
+                </div>
             </div>
 
             <div class="card score-card animate-in delay-1">
@@ -67,13 +74,11 @@
                     <span class="material-icons" id="credit-score-display">credit_score</span>
                 </div>
                 <h2 class="card-title">Score de Crédito</h2>
-                
 
                 <div class="gauge-container">
                     <canvas id="credit-score-chart"></canvas>
                     <span class="score-points" id="score-points-display">-- Pontos</span>
                     <span class="score-percentage" id="score-percentage-display"></span>
-                    
                 </div>
             </div>
 
@@ -88,10 +93,26 @@
 
     </main>
 
-    <!-- Script da aplicação -->
+    <!-- DIALOG DE DEPÓSITO -->
+    <dialog id="depositDialog">
+        <h3>Realizar Depósito</h3>
+
+        <input
+            type="number"
+            id="depositValue"
+            placeholder="Valor do depósito"
+            min="1"
+            step="0.01"
+        >
+
+        <div class="dialog-actions">
+            <button id="cancelDeposit">Cancelar</button>
+            <button id="confirmDeposit">Depositar</button>
+        </div>
+    </dialog>
+
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <script src="../js/script.js" defer></script>
 
 </body>
-
 </html>

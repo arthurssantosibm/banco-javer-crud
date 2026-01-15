@@ -1,4 +1,4 @@
-from pydantic import BaseModel, EmailStr
+from pydantic import BaseModel, EmailStr, Field
 from datetime import datetime
 from typing import Optional
 
@@ -32,4 +32,11 @@ class UpdateUserSchema(BaseModel):
 class TransacaoCreate(BaseModel):
     email_destination: EmailStr
     valor: float
+    mensagem: str
+
+class DepositoRequest(BaseModel):
+    valor: float = Field(..., gt=0, description="Valor do depósito")
+    
+class DepositoResponse(BaseModel):
+    saldo_atual: float
     mensagem: str

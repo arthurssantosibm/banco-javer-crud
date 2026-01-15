@@ -4,13 +4,14 @@ import httpx
 from mysql.connector import Error
 from models.core.db_javer import get_connection
 from models.core.security import bcrypt_context
-from schemas.schemas import LoginSchema, UpdateUserSchema, CriarConta, TransacaoCreate
+from schemas.schemas import LoginSchema, UpdateUserSchema, CriarConta, TransacaoCreate, DepositoRequest, DepositoResponse
 from api.jwt import create_access_token, get_current_user_id
 
 
 auth_router = APIRouter(prefix="/auth", tags=["auth"])
 user_router = APIRouter(prefix="/user", tags=["user"])
 transacoes_router = APIRouter(prefix="/transacoes", tags=["transacoes"])
+deposit_router = APIRouter(prefix="/depositos", tags=["depositos"])
 
 DATA_API_URL = "http://127.0.0.1:8001"
 INTERNAL_KEY = "INTERNAL_SECRET"
@@ -79,7 +80,6 @@ async def criar_conta(data: CriarConta):
     finally:
         cursor.close()
         conn.close()
-
 
 
 
@@ -272,7 +272,6 @@ async def executar_transacao_data_api(payload: dict):
             detail="Timeout ao comunicar com a Data API"
         )
 
-
 @transacoes_router.post("/transacoes")
 async def criar_transacao(
     data: TransacaoCreate,
@@ -363,6 +362,69 @@ def listar_transacoes(current_user_id: int = Depends(get_current_user_id)):
 
         transacoes = cursor.fetchall()
         return transacoes
+
+    finally:
+        cursor.close()
+        conn.close()
+        
+        
+        
+# BLOCO DEPÓSITOS
+@deposit_router.post("/", response_model=DepositoResponse)
+async def realizar_deposito(
+    data: DepositoRequest,
+    user_id: int = Depends(get_current_user_id)
+):
+    conn = get_connection()
+    cursor = conn.cursor(dictionary=True)
+
+    try:
+        # 🔹 Buscar email do usuário autenticado
+        cursor.execute(
+            "SELECT email FROM usuarios WHERE id = %s",
+            (user_id,)
+        )
+        user = cursor.fetchone()
+
+        if not user:
+            raise HTTPException(
+                status_code=404,
+                detail="Usuário não encontrado"
+            )
+
+        # 🔹 Payload para a Data API (porta 8001)
+        data_api_payload = {
+            "email": user["email"],
+            "valor": data.valor
+        }
+
+        async with httpx.AsyncClient(timeout=15.0) as client:
+            response = await client.post(
+                f"{DATA_API_URL}/deposito",
+                json=data_api_payload,
+                headers={
+                    "X-Internal-Key": INTERNAL_KEY
+                }
+            )
+
+        if response.status_code != 200:
+            raise HTTPException(
+                status_code=500,
+                detail=f"Erro na Data API: {response.text}"
+            )
+
+        saldo_atualizado = response.json().get("saldo_atual")
+
+        return DepositoResponse(
+            saldo_atual=saldo_atualizado,
+            mensagem="Depósito realizado com sucesso"
+        )
+
+    except httpx.TimeoutException:
+        raise HTTPException(
+            status_code=504,
+            detail="Timeout ao comunicar com a Data API"
+        )
 
     finally:
         cursor.close()

@@ -197,6 +197,63 @@ document.addEventListener("DOMContentLoaded", async () => {
     }
 
     carregarTransacoes()
+
+
+    const depositDialog = document.getElementById("depositDialog")
+    const openDepositDialogBtn = document.getElementById("openDepositDialog")
+    const cancelDepositBtn = document.getElementById("cancelDeposit")
+    const confirmDepositBtn = document.getElementById("confirmDeposit")
+
+    openDepositDialogBtn.addEventListener("click", () => {
+        depositDialog.showModal()
+    })
+
+    cancelDepositBtn.addEventListener("click", () => {
+        depositDialog.close()
+    })
+
+    confirmDepositBtn.addEventListener("click", async () => {
+        const value = Number(document.getElementById("depositValue").value)
+
+        if (!value || value <= 0) {
+            Swal.fire("Erro", "Informe um valor válido", "error")
+            return
+        }
+        const originalText = confirmDepositBtn.innerText;
+        confirmDepositBtn.innerText = 'Processando...';
+        confirmDepositBtn.disabled = true;
+        const token = localStorage.getItem("access_token")
+
+        try {
+            const res = await fetch("http://127.0.0.1:8000/depositos/", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                    "Authorization": `Bearer ${token}`
+                },
+                body: JSON.stringify({ valor: value })
+            })
+
+            const data = await res.json()
+
+            if (!res.ok) {
+                Swal.fire("Erro", data.detail || "Erro ao depositar", "error")
+                return
+            }
+
+            Swal.fire("Sucesso", "Depósito realizado!", "success")
+            depositDialog.close()
+
+            // Atualiza saldo na tela
+            document.getElementById("current-balance").textContent =
+                `R$ ${Number(data.saldo_atual).toFixed(2)}`
+
+            document.getElementById("depositValue").value = ""
+
+        } catch (err) {
+            Swal.fire("Erro", "Erro de conexão", "error")
+        }
+    })
 })
 
 
