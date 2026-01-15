@@ -1,7 +1,27 @@
+document.addEventListener("DOMContentLoaded", () => {
+    const senhaInput = document.getElementById("senha")
+    const icon = document.getElementById("icons")
+
+    function showHidePassword() {
+        if (senhaInput.type === "password") {
+            senhaInput.type = "text"
+            icon.classList.add("show-password")
+        } else {
+            senhaInput.type = "password"
+            icon.classList.remove("show-password")
+        }
+    }
+
+    if (icon) {
+        icon.addEventListener("click", showHidePassword)
+    }
+})
+
 async function login() {
     const email = document.getElementById('email').value
     const senha = document.getElementById('senha').value
     const errorDiv = document.getElementById('error')
+    const loginButton = document.getElementById('loginButton')
 
     errorDiv.textContent = ""
 
@@ -10,16 +30,14 @@ async function login() {
         return
     }
 
+    loginButton.innerText = "Processando..."
+    loginButton.disabled = true
+
     try {
         const response = await fetch("http://127.0.0.1:8000/auth/login", {
             method: "POST",
-            headers: {
-                "Content-Type": "application/json"
-            },
-            body: JSON.stringify({
-                email: email,
-                senha: senha
-            })
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ email, senha })
         })
 
         const data = await response.json()
@@ -30,20 +48,17 @@ async function login() {
         }
 
         localStorage.setItem("access_token", data.access_token)
-        console.log("Login bem-sucedido! Redirecionando...")
         window.location.href = "home.html"
 
     } catch (error) {
         errorDiv.textContent = "Erro de conexão com o servidor"
-        console.error(error)
+    } finally {
+        loginButton.innerText = "Entrar"
+        loginButton.disabled = false
     }
 }
-const loginButton = document.getElementById('loginButton')
-loginButton.addEventListener('click', function(){
-    loginButton.innerText = 'Processando...'
-})
 
-document.getElementById('loginForm').addEventListener('submit', async (event) => {
+document.getElementById('loginForm').addEventListener('submit', (event) => {
     event.preventDefault()
-    await login()
+    login()
 })

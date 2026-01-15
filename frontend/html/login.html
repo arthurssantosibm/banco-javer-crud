@@ -20,12 +20,22 @@
             <input type="email" id="email" required>
         </div>
 
+    <section>
         <div class="form-group">
             <label for="senha">Senha</label>
-            <input type="password" id="senha" required minlength="6">
-        </div>
+                
+            <div class="input-icon-container">
+                <input
+                    type="password"
+                    id="senha"
+                    name="senha"
+                    required
+                    minlength="6"
+                >
+                <div id="icons"></div> 
+            </div>
 
-        <button type="submit" id="loginButton" onClick="login()">Entrar</button>
+        <button type="submit" id="loginButton">Entrar</button>
         <div class="error" id="error"></div>
         <div class="cad">
             <p>Ainda não tem uma conta? <a href="register.html">Cadastre-se</a></p>
