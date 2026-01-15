@@ -62,71 +62,58 @@ document.addEventListener("DOMContentLoaded", async () => {
     const scoreCanvas = document.getElementById("credit-score-chart")
     const scorePointsLabel = document.getElementById("score-points-display")
 
-    /* =======================
-       PLUGIN DO PONTEIRO
-    ======================== */
+
     const gaugeNeedle = {
     id: "gaugeNeedle",
     afterDatasetDraw(chart) {
         const { ctx } = chart;
-        const meta = chart.getDatasetMeta(0);
-        const centerX = meta.data[0].x;
-        const centerY = meta.data[0].y;
-        const radius = meta.data[0].outerRadius;
+        const meta = chart.getDatasetMeta(0)
+        const centerX = meta.data[0].x
+        const centerY = meta.data[0].y
+        const radius = meta.data[0].outerRadius
 
-        const value = chart.data.datasets[0].needleValue;
-        const max = chart.data.datasets[0].maxValue;
+        const value = chart.data.datasets[0].needleValue
+        const max = chart.data.datasets[0].maxValue
 
-        // Cálculo do ângulo (ajustado para iniciar na esquerda e terminar na direita)
-        const angle = Math.PI + (value / max) * Math.PI;
+        const angle = Math.PI + (value / max) * Math.PI
 
-        ctx.save();
-        ctx.translate(centerX, centerY);
-        ctx.rotate(angle);
+        ctx.save()
+        ctx.translate(centerX, centerY)
+        ctx.rotate(angle)
 
-        // 1. Sombra da agulha para dar profundidade
-        ctx.shadowColor = 'rgba(0, 0, 0, 0.4)';
-        ctx.shadowBlur = 5;
-        ctx.shadowOffsetX = 2;
-        ctx.shadowOffsetY = 2;
+        ctx.shadowColor = 'rgba(0, 0, 0, 0.4)'
+        ctx.shadowBlur = 5
+        ctx.shadowOffsetX = 2
+        ctx.shadowOffsetY = 2
 
-        // 2. Desenho da Agulha (Formato Triangular/Diamante)
-        ctx.beginPath();
-        ctx.fillStyle = "#333333"; // Cor principal da agulha
+        ctx.beginPath()
+        ctx.fillStyle = "#333333"
         
-        // Criando um triângulo fino que nasce do centro
-        ctx.moveTo(0, -5);           // Lado superior da base
-        ctx.lineTo(radius * 0.9, 0); // Ponta da agulha
-        ctx.lineTo(0, 5);            // Lado inferior da base
-        ctx.fill();
+        ctx.moveTo(0, -5)       
+        ctx.lineTo(radius * 0.9, 0)
+        ctx.lineTo(0, 5)            
+        ctx.fill()
 
-        // 3. Ponto Central (O "Eixo")
-        ctx.shadowBlur = 0; // Remove sombra para o círculo interno
-        ctx.shadowOffsetX = 0;
-        ctx.shadowOffsetY = 0;
+        ctx.shadowBlur = 0
+        ctx.shadowOffsetX = 0
+        ctx.shadowOffsetY = 0
 
-        // Círculo externo do eixo (borda)
         ctx.beginPath();
-        ctx.arc(0, 0, 10, 0, Math.PI * 2);
-        ctx.fillStyle = "#333333";
-        ctx.fill();
+        ctx.arc(0, 0, 10, 0, Math.PI * 2)
+        ctx.fillStyle = "#333333"
+        ctx.fill()
 
-        // Detalhe brilhante no centro (efeito metálico)
         ctx.beginPath();
-        ctx.arc(0, 0, 5, 0, Math.PI * 2);
-        ctx.fillStyle = "#e0e0e0";
-        ctx.fill();
+        ctx.arc(0, 0, 5, 0, Math.PI * 2)
+        ctx.fillStyle = "#e0e0e0"
+        ctx.fill()
 
-        ctx.restore();
+        ctx.restore()
     }
 };
 
     if (scoreCanvas && scorePointsLabel) {
-
-        // 🔹 pontos reais (10% do saldo, sem limite)
         const score = saldo * 0.1
-
-        // 🔹 métrica visual: proximidade de 1000
         const maxVisualScore = 1000
         const visualScore = Math.min(score, maxVisualScore)
 
@@ -155,7 +142,6 @@ document.addEventListener("DOMContentLoaded", async () => {
             plugins: [gaugeNeedle]
         })
 
-        // 🔹 apenas pontos (sem porcentagem)
         scorePointsLabel.textContent =
             `${score.toLocaleString("pt-BR", {
                 minimumFractionDigits: 2,
@@ -260,6 +246,6 @@ function dispararAlerta() {
             confirmButton: 'botao-confirmar-estilizado',
             title: 'titulo-customizado'
         }
-    });
+    })
 }
 

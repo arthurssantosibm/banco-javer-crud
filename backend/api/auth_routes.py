@@ -81,6 +81,9 @@ async def criar_conta(data: CriarConta):
         conn.close()
 
 
+
+
+
 # BLOCO LOGIN
 async def login_usuario(email: str):
     try:
@@ -135,7 +138,10 @@ async def login(data: LoginSchema):
         "token_type": "bearer"
     }
 
-# BLOCO USUÁRIO
+
+
+
+# BLOCO USUÁRIO E ATUALIZAÇÃO
 @user_router.get("/user")
 async def get_user(user_id: int = Depends(get_current_user_id)):
     conn = get_connection()
@@ -161,8 +167,6 @@ async def get_user(user_id: int = Depends(get_current_user_id)):
         cursor.close()
         conn.close()
 
-
-# BLOCO ATUALIZAÇÃO DE USUÁRIO
 async def update_user_data_api(user_id: int, payload: dict):
     try:
         async with httpx.AsyncClient(timeout=15.0) as client:
@@ -185,7 +189,6 @@ async def update_user_data_api(user_id: int, payload: dict):
             status_code=504,
             detail="Timeout ao comunicar com a Data API"
         )
-
 
 @user_router.put("/update_user")
 async def update_user(
@@ -241,12 +244,45 @@ async def update_user(
         cursor.close()
         conn.close()
         
-@transacoes_router.post("/transacoes")
-async def criar_transacao(data: TransacaoCreate, user_id: int = Depends(get_current_user_id)):
+        
+        
+        
+        
+# BLOCO TRANSAÇÕES   
+async def executar_transacao_data_api(payload: dict):
+    try:
+        async with httpx.AsyncClient(timeout=15.0) as client:
+            response = await client.post(
+                f"{DATA_API_URL}/transacoesUsuarios",
+                json=payload,
+                headers={
+                    "X-Internal-Key": INTERNAL_KEY
+                }
+            )
+
+        if response.status_code != 200:
+            raise HTTPException(
+                status_code=500,
+                detail=f"Erro na Data API: {response.text}"
+            )
+
+    except httpx.TimeoutException:
+        raise HTTPException(
+            status_code=504,
+            detail="Timeout ao comunicar com a Data API"
+        )
+
+
+@transacoes_router.post("/criar")
+async def criar_transacao(
+    data: TransacaoCreate,
+    user_id: int = Depends(get_current_user_id)
+):
     conn = get_connection()
     cursor = conn.cursor(dictionary=True)
 
     try:
+        # 🔹 Usuário origem
         cursor.execute(
             "SELECT email, saldo_cc FROM usuarios WHERE id = %s",
             (user_id,)
@@ -256,55 +292,36 @@ async def criar_transacao(data: TransacaoCreate, user_id: int = Depends(get_curr
         if not user_origin:
             raise HTTPException(status_code=404, detail="Usuário não encontrado")
 
-        saldo = user_origin["saldo_cc"]
-        email_origin = user_origin["email"]
-
         if data.valor <= 0:
             raise HTTPException(status_code=400, detail="Valor inválido")
 
-        if saldo < data.valor:
+        if user_origin["saldo_cc"] < data.valor:
             raise HTTPException(status_code=400, detail="Saldo insuficiente")
 
+        # 🔹 Usuário destino
         cursor.execute(
             "SELECT id FROM usuarios WHERE email = %s",
             (data.email_destination,)
         )
-        user_destination = cursor.fetchone()
+        user_dest = cursor.fetchone()
 
-        if not user_destination:
-            raise HTTPException(status_code=404, detail="Usuário de destino não encontrado")
-
-        cursor.execute(
-            """
-            INSERT INTO transacoes 
-                (email_origin, email_destination, valor, mensagem, create_time)
-            VALUES (%s, %s, %s, %s, NOW())
-            """,
-            (
-                email_origin,
-                data.email_destination,
-                data.valor,
-                data.mensagem
+        if not user_dest:
+            raise HTTPException(
+                status_code=404,
+                detail="Usuário de destino não encontrado"
             )
-        )
-        
-        cursor.execute(
-            "UPDATE usuarios SET saldo_cc = saldo_cc - %s WHERE id = %s",
-            (data.valor, user_id)
-        )
 
-        cursor.execute(
-            "UPDATE usuarios SET saldo_cc = saldo_cc + %s WHERE email = %s",
-            (data.valor, data.email_destination)
-        )
+        payload = {
+            "email_origin": user_origin["email"],
+            "email_destination": data.email_destination,
+            "valor": data.valor,
+            "mensagem": data.mensagem,
+            "user_origin_id": user_id
+        }
 
-        conn.commit()
+        await executar_transacao_data_api(payload)
 
-        return {"mensagem": "Transação realizada com sucesso!"}
-
-    except mysql.connector.Error as e:
-        conn.rollback()
-        raise HTTPException(status_code=500, detail="Erro no banco de dados")
+        return {"message": "Transação realizada com sucesso"}
 
     finally:
         cursor.close()
