@@ -140,3 +140,52 @@ document.addEventListener("DOMContentLoaded", async () => {
         window.location.href = "login.html"
     })
 })
+
+function dispararAlerta() {
+    Swal.fire({
+        title: '<span style="color: #F7934C; font-weight: 800; font-size: 28px;">BankJaver</span>',
+        html: `
+            <div style="padding: 10px;">
+                <p style="font-size: 1.1rem; color: #333; margin-bottom: 20px;">
+                    Bem-vindo(a) à sua conta digital.
+                </p>
+                <div style="background: #f8f9fa; border-radius: 12px; padding: 15px; border-left: 5px solid #F7934C; text-align: left;">
+                    <div style="margin-bottom: 8px;">
+                        <strong style="color: #1F1300;">Versão:</strong> 
+                        <span style="color: #666;">1.2.1</span>
+                    </div>
+                    <div style="font-size: 0.85rem; line-height: 1.4; color: #888;">
+                        All rights reserved to <br>
+                        <strong style="color: #1F1300;">Arthur Santana dos Santos ©</strong>
+                    </div>
+                </div>
+            </div>
+        `,
+        icon: "info",
+        iconColor: "#F7934C",
+        confirmButtonText: "ACESSAR CONTA",
+        confirmButtonColor: "#F7934C",
+        background: "#ffffff",
+        color: "#1F1300",
+        padding: "2em",
+        width: '400px',
+        showClass: {
+            popup: `
+                animate__animated
+                animate__fadeInUp
+                animate__faster
+            `
+        },
+        hideClass: {
+            popup: `
+                animate__animated
+                animate__fadeOutDown
+                animate__faster
+            `
+        },
+        customClass: {
+            confirmButton: 'botao-confirmar-estilizado',
+            title: 'titulo-customizado'
+        }
+    })
+}
