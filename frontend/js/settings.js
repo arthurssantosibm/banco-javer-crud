@@ -160,6 +160,51 @@ document.addEventListener("DOMContentLoaded", async () => {
         localStorage.removeItem("access_token")
         window.location.href = "login.html"
     })
+
+    /* ================================
+       EXIBIR / OCULTAR SENHA (ADICIONADO)
+    ================================= */
+
+    const passwordFields = [
+        "current_password",
+        "new_password",
+        "confirm_password"
+    ]
+
+    passwordFields.forEach(fieldId => {
+        const input = document.getElementById(fieldId)
+        if (!input) return
+
+        const wrapper = document.createElement("div")
+        wrapper.style.position = "relative"
+        input.parentNode.insertBefore(wrapper, input)
+        wrapper.appendChild(input)
+
+        const icon = document.createElement("div")
+        icon.style.position = "absolute"
+        icon.style.top = "50%"
+        icon.style.right = "12px"
+        icon.style.transform = "translateY(-50%)"
+        icon.style.width = "22px"
+        icon.style.height = "22px"
+        icon.style.cursor = "pointer"
+        icon.style.backgroundImage = "url('../img/disable.png')"
+        icon.style.backgroundSize = "cover"
+
+        wrapper.appendChild(icon)
+        input.style.paddingRight = "45px"
+
+        icon.addEventListener("click", () => {
+            if (input.type === "password") {
+                input.type = "text"
+                icon.style.backgroundImage = "url('../img/enable.png')"
+            } else {
+                input.type = "password"
+                icon.style.backgroundImage = "url('../img/disable.png')"
+            }
+        })
+    })
+
 })
 
 function dispararAlerta() {
