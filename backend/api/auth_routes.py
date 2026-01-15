@@ -248,7 +248,7 @@ async def update_user(
         
         
         
-# BLOCO TRANSAÇÕES   
+# BLOCO TRANSAÇÕES
 async def executar_transacao_data_api(payload: dict):
     try:
         async with httpx.AsyncClient(timeout=15.0) as client:
@@ -273,7 +273,7 @@ async def executar_transacao_data_api(payload: dict):
         )
 
 
-@transacoes_router.post("/criar")
+@transacoes_router.post("/transacoes")
 async def criar_transacao(
     data: TransacaoCreate,
     user_id: int = Depends(get_current_user_id)
@@ -311,12 +311,13 @@ async def criar_transacao(
                 detail="Usuário de destino não encontrado"
             )
 
+        # 🔹 Payload INTERNO (Core → Data API)
         payload = {
             "email_origin": user_origin["email"],
+            "user_origin_id": user_id,
             "email_destination": data.email_destination,
             "valor": data.valor,
             "mensagem": data.mensagem,
-            "user_origin_id": user_id
         }
 
         await executar_transacao_data_api(payload)

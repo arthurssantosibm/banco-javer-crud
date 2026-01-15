@@ -19,7 +19,7 @@ document.addEventListener("DOMContentLoaded", async () => {
         document.getElementById("nome").value = user.nome
         document.getElementById("email").value = user.email
         document.getElementById("saldo").value = `R$ ${Number(user.saldo_cc).toFixed(2)}`
-        document.getElementById("score").value = `${(Number(user.saldo_cc) * 0.1).toFixed(0)} pontos`
+        document.getElementById("score").value = `${(Number(user.saldo_cc) * 0.1).toFixed(2)} pontos`
 
     } catch (err) {
         console.error(err)
