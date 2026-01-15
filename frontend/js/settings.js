@@ -23,7 +23,12 @@ document.addEventListener("DOMContentLoaded", async () => {
 
     } catch (err) {
         console.error(err)
-        alert("Erro ao carregar dados do usuário")
+        Swal.fire({
+            icon: "error",
+            title: "Erro",
+            text: "Erro ao carregar dados do usuário",
+            confirmButtonColor: "#F7934C"
+        })
     }
 
     const newPasswordInput = document.getElementById("new_password")
@@ -117,18 +122,34 @@ document.addEventListener("DOMContentLoaded", async () => {
             const data = await res.json()
 
             if (!res.ok) {
-                alert(data.detail || "Erro ao atualizar")
+                Swal.fire({
+                    icon: "error",
+                    title: "Erro",
+                    text: data.detail || "Erro ao atualizar",
+                    confirmButtonColor: "#F7934C"
+                })
                 return
             }
 
-            alert("Dados atualizados com sucesso!")
+            Swal.fire({
+                icon: "success",
+                title: "Sucesso!",
+                text: "Dados atualizados com sucesso!",
+                confirmButtonColor: "#F7934C"
+            })
+
             document.getElementById("current_password").value = ""
             newPasswordInput.value = ""
             confirmPasswordInput.value = ""
             senhaError.innerHTML = ""
 
         } catch (err) {
-            alert("Erro de conexão com o servidor")
+            Swal.fire({
+                icon: "error",
+                title: "Erro de conexão",
+                text: "Erro de conexão com o servidor",
+                confirmButtonColor: "#F7934C"
+            })
         } finally {
             submitButton.innerText = "Salvar"
             submitButton.disabled = false
@@ -164,28 +185,6 @@ function dispararAlerta() {
         icon: "info",
         iconColor: "#F7934C",
         confirmButtonText: "ACESSAR CONTA",
-        confirmButtonColor: "#F7934C",
-        background: "#ffffff",
-        color: "#1F1300",
-        padding: "2em",
-        width: '400px',
-        showClass: {
-            popup: `
-                animate__animated
-                animate__fadeInUp
-                animate__faster
-            `
-        },
-        hideClass: {
-            popup: `
-                animate__animated
-                animate__fadeOutDown
-                animate__faster
-            `
-        },
-        customClass: {
-            confirmButton: 'botao-confirmar-estilizado',
-            title: 'titulo-customizado'
-        }
+        confirmButtonColor: "#F7934C"
     })
 }

@@ -32,39 +32,59 @@ document.addEventListener("DOMContentLoaded", async () => {
 
         const emailDestino = document.getElementById("emailDestino").value
         const valor = parseFloat(document.getElementById("valorTransferencia").value)
-        const mensagem = document.getElementById("mensagem").value;
+        const mensagem = document.getElementById("mensagem").value
 
         try {
-            const response = await fetch("http://127.0.0.1:8000/transacoes/transacoes", {
-                method: "POST",
-                headers,
-                body: JSON.stringify({
-                    email_origin: user.email,
-                    email_destination: emailDestino,
-                    valor: valor,
-                    mensagem: mensagem
-                })
-            })
+            const response = await fetch(
+                "http://127.0.0.1:8000/transacoes/transacoes",
+                {
+                    method: "POST",
+                    headers,
+                    body: JSON.stringify({
+                        email_origin: user.email,
+                        email_destination: emailDestino,
+                        valor,
+                        mensagem
+                    })
+                }
+            )
 
             const data = await response.json()
 
             if (!response.ok) {
-                alert(data.detail || "Erro ao realizar transferência")
+                Swal.fire({
+                    icon: "error",
+                    title: "Erro na transferência",
+                    text: data.detail || "Erro ao realizar transferência",
+                    confirmButtonColor: "#CC5803"
+                })
                 return
             }
 
-            alert("Transferência realizada com sucesso!")
-            document.getElementById("transferForm").reset()
-            carregarTransacoes()
+            Swal.fire({
+                icon: "success",
+                title: "Transferência concluída",
+                text: "Transferência realizada com sucesso!",
+                confirmButtonColor: "#47d998"
+            }).then(() => {
+                document.getElementById("transferForm").reset()
+                carregarTransacoes()
+            })
 
         } catch (err) {
             console.error("Erro na transferência", err)
-            alert("Erro ao realizar transferência")
+
+            Swal.fire({
+                icon: "error",
+                title: "Erro inesperado",
+                text: "Erro ao realizar transferência",
+                confirmButtonColor: "#CC5803"
+            })
+
         } finally {
-        transferButton.innerText = "Transferir"
-        transferButton.disabled = false
-            }
-        })
+            transferButton.innerText = "Transferir"
+            transferButton.disabled = false
+        }
     })
 
     async function carregarTransacoes() {
@@ -108,6 +128,7 @@ document.addEventListener("DOMContentLoaded", async () => {
         localStorage.removeItem("access_token")
         window.location.href = "login.html"
     })
+})
 
 function dispararAlerta() {
     Swal.fire({
@@ -132,28 +153,6 @@ function dispararAlerta() {
         icon: "info",
         iconColor: "#F7934C",
         confirmButtonText: "ACESSAR CONTA",
-        confirmButtonColor: "#F7934C",
-        background: "#ffffff",
-        color: "#1F1300",
-        padding: "2em",
-        width: '400px',
-        showClass: {
-            popup: `
-                animate__animated
-                animate__fadeInUp
-                animate__faster
-            `
-        },
-        hideClass: {
-            popup: `
-                animate__animated
-                animate__fadeOutDown
-                animate__faster
-            `
-        },
-        customClass: {
-            confirmButton: 'botao-confirmar-estilizado',
-            title: 'titulo-customizado'
-        }
+        confirmButtonColor: "#F7934C"
     })
 }
