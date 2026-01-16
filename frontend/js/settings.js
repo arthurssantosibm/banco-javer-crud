@@ -204,6 +204,70 @@ document.addEventListener("DOMContentLoaded", async () => {
             }
         })
     })
+    /* ================================
+    SUSPENDER CONTA
+    ================================ */
+
+    const suspenderBtn = document.getElementById("suspender-conta-btn")
+
+    if (suspenderBtn) {
+        suspenderBtn.addEventListener("click", async () => {
+            const confirm = await Swal.fire({
+                icon: "warning",
+                title: "Suspender conta?",
+                text: "Sua conta será inativada e você não poderá acessar até reativar.",
+                showCancelButton: true,
+                confirmButtonText: "Sim, suspender",
+                cancelButtonText: "Cancelar",
+                confirmButtonColor: "#CC5803",
+                cancelButtonColor: "#999"
+            })
+
+            if (!confirm.isConfirmed) return
+
+            try {
+                const res = await fetch(`http://127.0.0.1:8000/user/suspender`, {
+                    method: "PUT",
+                    headers: {
+                        "Authorization": `Bearer ${token}`,
+                        "Content-Type": "application/json"
+                    }
+                })
+
+
+                const data = await res.json()
+
+                if (!res.ok) {
+                    Swal.fire({
+                        icon: "error",
+                        title: "Erro",
+                        text: data.detail || "Erro ao suspender conta",
+                        confirmButtonColor: "#F7934C"
+                    })
+                    return
+                }
+
+                await Swal.fire({
+                    icon: "success",
+                    title: "Conta suspensa",
+                    text: "Sua conta foi suspensa com sucesso.",
+                    confirmButtonColor: "#F7934C"
+                })
+
+                // 🔒 Remove token e redireciona
+                localStorage.removeItem("access_token")
+                window.location.href = "login.html"
+
+            } catch (err) {
+                Swal.fire({
+                    icon: "error",
+                    title: "Erro de conexão",
+                    text: "Não foi possível suspender a conta.",
+                    confirmButtonColor: "#F7934C"
+                })
+            }
+        })
+    }
 
 })
 

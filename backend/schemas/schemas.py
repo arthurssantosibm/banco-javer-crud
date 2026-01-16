@@ -2,13 +2,14 @@ from pydantic import BaseModel, EmailStr, Field
 from datetime import datetime
 from typing import Optional
 
-class LoginSchema(BaseModel):
+class LoginSchema(BaseModel, extra="ignore"):
     email: EmailStr
     senha: str
+
+
+class ReativarSchema(BaseModel):
+    email: EmailStr
     
-    class Config:
-        from_attributes = True
-        
 class HomeSchema(BaseModel):
     nome: str
     email: EmailStr

@@ -4,7 +4,7 @@ import httpx
 from mysql.connector import Error
 from models.core.db_javer import get_connection
 from models.core.security import bcrypt_context
-from schemas.schemas import LoginSchema, UpdateUserSchema, CriarConta, TransacaoCreate, DepositoRequest, DepositoResponse
+from schemas.schemas import LoginSchema, UpdateUserSchema, CriarConta, TransacaoCreate, DepositoRequest, DepositoResponse, ReativarSchema
 from api.jwt import create_access_token, get_current_user_id
 
 
@@ -85,59 +85,28 @@ async def criar_conta(data: CriarConta):
 
 
 # BLOCO LOGIN
-async def login_usuario(email: str):
-    try:
-        async with httpx.AsyncClient(timeout=5.0) as client:
-            response = await client.post(
-                f"{DATA_API_URL}/loginUsuarios",
-                json={"email": email},
-                headers={
-                    "X-Internal-Key": INTERNAL_KEY
-                }
-            )
 
-    except httpx.ConnectError:
-        raise HTTPException(
-            status_code=503,
-            detail="API indisponível"
-        )
-
-    except httpx.TimeoutException:
-        raise HTTPException(
-            status_code=504,
-            detail="Timeout ao conectar com API"
-        )
-
-    if response.status_code == 404:
-        raise HTTPException(status_code=401, detail="Credenciais inválidas")
-
-    if response.status_code == 422:
-        raise HTTPException(status_code=400, detail="Dados inválidos")
-
-    if response.status_code >= 500:
-        raise HTTPException(status_code=502, detail="Erro interno da API")
-
-    return response.json()
 
 @auth_router.post("/login")
 async def login(data: LoginSchema):
-    user = await login_usuario(data.email)
-
-    if not bcrypt_context.verify(data.senha, user["senha"]):
-        raise HTTPException(
-            status_code=401,
-            detail="Credenciais inválidas"
+    async with httpx.AsyncClient() as client:
+        response = await client.post(
+            "http://127.0.0.1:8001/loginUsuarios",
+            json=data.dict(),
+            headers={"X-Internal-Key": "INTERNAL_SECRET"}
         )
 
-    token = create_access_token(
-        data={"sub": str(user["id"])}
-    )
+    if response.status_code == 403:
+        raise HTTPException(status_code=403, detail="CONTA_INATIVA")
 
-    return {
-        "access_token": token,
-        "token_type": "bearer"
-    }
+    user = response.json()
 
+    if not bcrypt_context.verify(data.senha, user["senha"]):
+        raise HTTPException(status_code=401, detail="Credenciais inválidas")
+
+
+    token = create_access_token({"sub": str(user["id"])})
+    return {"access_token": token}
 
 
 
@@ -429,3 +398,44 @@ async def realizar_deposito(
     finally:
         cursor.close()
         conn.close()
+
+
+
+
+
+# BLOCO SUSPENDER
+@user_router.put("/suspender")
+async def suspender_conta(user_id: int = Depends(get_current_user_id)):
+    async with httpx.AsyncClient(timeout=10) as client:
+        response = await client.put(
+            f"{DATA_API_URL}/updateUsuarios/suspender/{user_id}",
+            headers={"X-Internal-Key": INTERNAL_KEY}
+        )
+        if response.status_code != 200:
+            raise HTTPException(status_code=response.status_code, detail=response.text)
+        return response.json()
+
+
+# BLOCO REATIVAR
+@user_router.put("/reativar")
+async def reativar_conta(data: ReativarSchema):
+    email = data.email.strip().lower()
+
+    async with httpx.AsyncClient(timeout=10) as client:
+        response = await client.put(
+            f"{DATA_API_URL}/updateUsuarios/reativar_por_email/",
+            json={"email": email},
+            headers={
+                "X-Internal-Key": INTERNAL_KEY,
+                "Content-Type": "application/json"
+            }
+        )
+
+    if response.status_code != 200:
+        raise HTTPException(
+            status_code=response.status_code,
+            detail=response.text
+        )
+
+    return response.json()
+
