@@ -37,7 +37,6 @@ async function login() {
     loginButton.disabled = true;
 
     try {
-        // 🔐 LOGIN NORMAL
         const response = await fetch("http://127.0.0.1:8000/auth/login", {
             method: "POST",
             headers: { "Content-Type": "application/json" },
@@ -45,8 +44,6 @@ async function login() {
         });
 
         const data = await response.json();
-
-        // 🚫 CONTA INATIVA
         if (response.status === 403 && data.detail === "CONTA_INATIVA") {
             const result = await Swal.fire({
                 title: "Conta Inativa",
@@ -59,7 +56,6 @@ async function login() {
 
             if (!result.isConfirmed) return;
 
-            // 🔁 REATIVAR CONTA
             const reactivateResponse = await fetch(
                 "http://127.0.0.1:8000/user/reativar",
                 {
@@ -84,32 +80,28 @@ async function login() {
                 "Agora você pode entrar normalmente.",
                 "success"
             );
-
-            // 🔁 TENTA LOGIN AUTOMATICAMENTE
             return login();
         }
 
-        // ❌ OUTROS ERROS
         if (!response.ok) {
-            errorDiv.textContent = data.detail || "Erro ao fazer login";
+            errorDiv.textContent = data.detail || "Erro ao fazer login"
             return;
         }
 
-        // ✅ LOGIN OK
-        localStorage.setItem("access_token", data.access_token);
-        window.location.href = "home.html";
+        localStorage.setItem("access_token", data.access_token)
+        window.location.href = "home.html"
 
     } catch (err) {
-        errorDiv.textContent = "Erro de conexão com o servidor";
+        errorDiv.textContent = "Erro de conexão com o servidor"
     } finally {
-        loginButton.innerText = "Entrar";
-        loginButton.disabled = false;
+        loginButton.innerText = "Entrar"
+        loginButton.disabled = false
     }
 }
 
 document
     .getElementById("loginForm")
     .addEventListener("submit", (event) => {
-        event.preventDefault();
-        login();
-    });
+        event.preventDefault()
+        login()
+    })

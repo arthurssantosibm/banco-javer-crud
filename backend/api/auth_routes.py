@@ -85,8 +85,6 @@ async def criar_conta(data: CriarConta):
 
 
 # BLOCO LOGIN
-
-
 @auth_router.post("/login")
 async def login(data: LoginSchema):
     async with httpx.AsyncClient() as client:
