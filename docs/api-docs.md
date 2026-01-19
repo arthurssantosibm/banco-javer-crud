@@ -1,4 +1,4 @@
-# 📘 Guia de Funcionamento da API (FastAPI) – Projeto Banco Javer
+   # 📘 Guia de Funcionamento da API (FastAPI) – Projeto Banco Javer
 
 O projeto **Banco Javer** utiliza o framework **FastAPI** para construção de uma arquitetura de APIs REST, separadas por responsabilidade e organizadas em **duas portas diferentes**, garantindo segurança, escalabilidade e clareza no fluxo de dados.
 
