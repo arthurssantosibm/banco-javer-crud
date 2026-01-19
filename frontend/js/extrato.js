@@ -73,6 +73,8 @@ document.addEventListener("DOMContentLoaded", async () => {
                     title: "Erro na transferência",
                     text: data.detail || "Erro ao realizar transferência",
                     confirmButtonColor: "#CC5803"
+                }).then(() => {
+                    window.location.reload()
                 });
                 return;
             }
@@ -84,14 +86,17 @@ document.addEventListener("DOMContentLoaded", async () => {
                 confirmButtonColor: "#47d998"
             }).then(() => {
                 document.getElementById("transferForm").reset();
-
                 carregarDadosUsuario(); 
                 carregarTransacoes();
+                window.location.reload()
             });
+        
 
         } catch (err) {
             console.error("Erro na transferência", err)
-            Swal.fire("Erro", "Erro ao realizar transferência", "error")
+            Swal.fire("Erro", "Erro ao realizar transferência", "error").then(() => {
+                window.location.reload()
+            });
         } finally {
             transferButton.innerText = "Transferir"
             transferButton.disabled = false
