@@ -193,3 +193,89 @@ a:hover {
         transform: translateY(0);
     }
 }
+
+/* ===============================
+   OVERLAY LOADING COM BLUR
+================================ */
+.loading-overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(255, 246, 229, 0.6);
+    backdrop-filter: blur(6px);
+    -webkit-backdrop-filter: blur(6px);
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    z-index: 9999;
+}
+
+/* Esconde o overlay */
+.hidden {
+    display: none;
+}
+
+/* Desabilita interação quando carregando */
+body.loading-active {
+    overflow: hidden;
+}
+
+/* Ajuste de cores do loading para seu tema */
+.loading {
+    --speed-of-animation: 0.9s;
+    --gap: 6px;
+    --first-color: #CC5803;
+    --second-color: #F7934C;
+    --third-color: #F7B05B;
+    --fourth-color: #CC5803;
+    --fifth-color: #F7934C;
+
+    display: flex;
+    justify-content: center;
+    align-items: center;
+
+    width: 100px;
+    height: 100px;
+    gap: 6px;
+
+    position: relative;
+    z-index: 10000;
+}
+
+.loading span {
+    width: 4px;
+    height: 50px;
+    background: var(--first-color);
+    animation: scale var(--speed-of-animation) ease-in-out infinite;
+}
+
+.loading span:nth-child(2) {
+    background: var(--second-color);
+    animation-delay: -0.8s;
+}
+
+.loading span:nth-child(3) {
+    background: var(--third-color);
+    animation-delay: -0.7s;
+}
+
+.loading span:nth-child(4) {
+    background: var(--fourth-color);
+    animation-delay: -0.6s;
+}
+
+.loading span:nth-child(5) {
+    background: var(--fifth-color);
+    animation-delay: -0.5s;
+}
+
+@keyframes scale {
+    0%, 40%, 100% {
+        transform: scaleY(0.05);
+    }
+    20% {
+        transform: scaleY(1);
+    }
+}
+

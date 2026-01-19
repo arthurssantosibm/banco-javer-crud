@@ -104,6 +104,17 @@ document.addEventListener("DOMContentLoaded", () => {
     telefoneInput.addEventListener('input', () => validateTelefone(telefoneInput.value))
     senhaInput.addEventListener('input', () => validateSenha(senhaInput.value))
 
+    function showLoading() {
+        const overlay = document.getElementById("loadingOverlay")
+        if (overlay) overlay.classList.remove("hidden")
+        document.body.classList.add("loading-active")
+    }
+
+    function hideLoading() {
+        const overlay = document.getElementById("loadingOverlay")
+        if (overlay) overlay.classList.add("hidden")
+        document.body.classList.remove("loading-active")
+    }
     cadastroForm.addEventListener("submit", async (event) => {
         event.preventDefault()
 
@@ -137,6 +148,8 @@ document.addEventListener("DOMContentLoaded", () => {
         }
 
         try {
+            showLoading()
+
             submitButton.disabled = true
             submitButton.innerText = "Cadastrando..."
 
@@ -149,6 +162,7 @@ document.addEventListener("DOMContentLoaded", () => {
             const result = await response.json()
 
             if (response.ok) {
+                hideLoading()
                 await Swal.fire({
                     icon: "success",
                     title: "Cadastro realizado!",
@@ -159,6 +173,7 @@ document.addEventListener("DOMContentLoaded", () => {
                 window.location.href = "login.html"
 
             } else {
+                hideLoading()
                 const errorMessage = result.detail || result.message || "Erro desconhecido."
 
                 if (errorMessage.includes("Email já cadastrado")) {
@@ -179,6 +194,7 @@ document.addEventListener("DOMContentLoaded", () => {
             }
 
         } catch (error) {
+            hideLoading()
             console.error("Erro de rede:", error)
 
             Swal.fire({
@@ -188,6 +204,8 @@ document.addEventListener("DOMContentLoaded", () => {
             })
 
         } finally {
+            hideLoading()
+            
             submitButton.disabled = false
             submitButton.innerText = "Cadastrar Cliente"
         }

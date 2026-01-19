@@ -17,6 +17,19 @@ document.addEventListener("DOMContentLoaded", () => {
     }
 })
 
+
+function showLoading() {
+    const overlay = document.getElementById("loadingOverlay")
+    if (overlay) overlay.classList.remove("hidden")
+    document.body.classList.add("loading-active")
+}
+
+function hideLoading() {
+    const overlay = document.getElementById("loadingOverlay")
+    if (overlay) overlay.classList.add("hidden")
+    document.body.classList.remove("loading-active")
+}
+
 async function login() {
     const emailInput = document.getElementById("email")
     const senhaInput = document.getElementById("senha")
@@ -33,6 +46,9 @@ async function login() {
         return
     }
 
+
+    showLoading()
+
     loginButton.innerText = "Processando..."
     loginButton.disabled = true
 
@@ -44,7 +60,10 @@ async function login() {
         })
 
         const data = await response.json()
+
         if (response.status === 403 && data.detail === "CONTA_INATIVA") {
+            hideLoading() // 🔹 ADD (antes do Swal)
+
             const result = await Swal.fire({
                 title: "Conta Inativa",
                 text: "Sua conta está suspensa. Deseja reativá-la agora?",
@@ -55,6 +74,8 @@ async function login() {
             })
 
             if (!result.isConfirmed) return
+
+            showLoading() // 🔹 ADD
 
             const reactivateResponse = await fetch(
                 "http://127.0.0.1:8000/user/reativar",
@@ -67,6 +88,7 @@ async function login() {
 
             if (!reactivateResponse.ok) {
                 const err = await reactivateResponse.json()
+                hideLoading() // 🔹 ADD
                 Swal.fire(
                     "Erro",
                     err.detail || "Não foi possível reativar a conta",
@@ -75,6 +97,7 @@ async function login() {
                 return
             }
 
+            hideLoading() // 🔹 ADD
             await Swal.fire(
                 "Conta reativada!",
                 "Agora você pode entrar normalmente.",
@@ -94,6 +117,9 @@ async function login() {
     } catch (err) {
         errorDiv.textContent = "Erro de conexão com o servidor"
     } finally {
+        /* 🔹 ADD */
+        hideLoading()
+
         loginButton.innerText = "Entrar"
         loginButton.disabled = false
     }
