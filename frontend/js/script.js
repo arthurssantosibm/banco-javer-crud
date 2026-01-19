@@ -66,7 +66,7 @@ document.addEventListener("DOMContentLoaded", async () => {
     const gaugeNeedle = {
     id: "gaugeNeedle",
     afterDatasetDraw(chart) {
-        const { ctx } = chart;
+        const { ctx } = chart
         const meta = chart.getDatasetMeta(0)
         const centerX = meta.data[0].x
         const centerY = meta.data[0].y
@@ -98,19 +98,19 @@ document.addEventListener("DOMContentLoaded", async () => {
         ctx.shadowOffsetX = 0
         ctx.shadowOffsetY = 0
 
-        ctx.beginPath();
+        ctx.beginPath()
         ctx.arc(0, 0, 10, 0, Math.PI * 2)
         ctx.fillStyle = "#333333"
         ctx.fill()
 
-        ctx.beginPath();
+        ctx.beginPath()
         ctx.arc(0, 0, 5, 0, Math.PI * 2)
         ctx.fillStyle = "#e0e0e0"
         ctx.fill()
 
         ctx.restore()
     }
-};
+}
 
     if (scoreCanvas && scorePointsLabel) {
         const score = saldo * 0.1
@@ -219,9 +219,9 @@ document.addEventListener("DOMContentLoaded", async () => {
             Swal.fire("Erro", "Informe um valor válido", "error")
             return
         }
-        const originalText = confirmDepositBtn.innerText;
-        confirmDepositBtn.innerText = 'Processando...';
-        confirmDepositBtn.disabled = true;
+        const originalText = confirmDepositBtn.innerText
+        confirmDepositBtn.innerText = 'Processando...'
+        confirmDepositBtn.disabled = true
         const token = localStorage.getItem("access_token")
 
         try {
@@ -259,20 +259,20 @@ document.addEventListener("DOMContentLoaded", async () => {
 
 function dispararAlerta() {
     Swal.fire({
-        title: '<span style="color: #F7934C; font-weight: 800; font-size: 28px;">BankJaver</span>',
+        title: '<span style="color: #F7934C font-weight: 800 font-size: 28px">BankJaver</span>',
         html: `
-            <div style="padding: 10px;">
-                <p style="font-size: 1.1rem; color: #333; margin-bottom: 20px;">
+            <div style="padding: 10px">
+                <p style="font-size: 1.1rem color: #333 margin-bottom: 20px">
                     Bem-vindo(a) à sua conta digital.
                 </p>
-                <div style="background: #f8f9fa; border-radius: 12px; padding: 15px; border-left: 5px solid #F7934C; text-align: left;">
-                    <div style="margin-bottom: 8px;">
-                        <strong style="color: #1F1300;">Versão:</strong> 
-                        <span style="color: #666;">1.2.1</span>
+                <div style="background: #f8f9fa border-radius: 12px padding: 15px border-left: 5px solid #F7934C text-align: left">
+                    <div style="margin-bottom: 8px">
+                        <strong style="color: #1F1300">Versão:</strong> 
+                        <span style="color: #666">1.2.1</span>
                     </div>
-                    <div style="font-size: 0.85rem; line-height: 1.4; color: #888;">
+                    <div style="font-size: 0.85rem line-height: 1.4 color: #888">
                         All rights reserved to <br>
-                        <strong style="color: #1F1300;">Arthur Santana dos Santos ©</strong>
+                        <strong style="color: #1F1300">Arthur Santana dos Santos ©</strong>
                     </div>
                 </div>
             </div>

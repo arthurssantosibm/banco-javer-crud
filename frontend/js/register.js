@@ -76,7 +76,7 @@ document.addEventListener("DOMContentLoaded", () => {
         let erros = []
 
         if (senha.length < 8) erros.push("Mínimo de 8 caracteres.")
-        if (!/[!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?]+/.test(senha))
+        if (!/[!@#$%^&*()_+\-=\[\]{}':"\\|,.<>\/?]+/.test(senha))
             erros.push("Deve conter um caractere especial.")
         if (/[çáàãâéèêíìîóòõôúùû]/.test(senha.toLowerCase()))
             erros.push('Não pode conter "ç" ou acentos.')

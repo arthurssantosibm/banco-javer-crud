@@ -1,49 +1,49 @@
 document.addEventListener("DOMContentLoaded", () => {
-    const senhaInput = document.getElementById("senha");
-    const icon = document.getElementById("icons");
+    const senhaInput = document.getElementById("senha")
+    const icon = document.getElementById("icons")
 
     function showHidePassword() {
         if (senhaInput.type === "password") {
-            senhaInput.type = "text";
-            icon.classList.add("show-password");
+            senhaInput.type = "text"
+            icon.classList.add("show-password")
         } else {
-            senhaInput.type = "password";
-            icon.classList.remove("show-password");
+            senhaInput.type = "password"
+            icon.classList.remove("show-password")
         }
     }
 
     if (icon) {
-        icon.addEventListener("click", showHidePassword);
+        icon.addEventListener("click", showHidePassword)
     }
-});
+})
 
 async function login() {
-    const emailInput = document.getElementById("email");
-    const senhaInput = document.getElementById("senha");
-    const errorDiv = document.getElementById("error");
-    const loginButton = document.getElementById("loginButton");
+    const emailInput = document.getElementById("email")
+    const senhaInput = document.getElementById("senha")
+    const errorDiv = document.getElementById("error")
+    const loginButton = document.getElementById("loginButton")
 
-    const email = emailInput.value.trim().toLowerCase();
-    const senha = senhaInput.value;
+    const email = emailInput.value.trim().toLowerCase()
+    const senha = senhaInput.value
 
-    errorDiv.textContent = "";
+    errorDiv.textContent = ""
 
     if (!email || !senha) {
-        errorDiv.textContent = "Preencha todos os campos";
-        return;
+        errorDiv.textContent = "Preencha todos os campos"
+        return
     }
 
-    loginButton.innerText = "Processando...";
-    loginButton.disabled = true;
+    loginButton.innerText = "Processando..."
+    loginButton.disabled = true
 
     try {
         const response = await fetch("http://127.0.0.1:8000/auth/login", {
             method: "POST",
             headers: { "Content-Type": "application/json" },
             body: JSON.stringify({ email, senha })
-        });
+        })
 
-        const data = await response.json();
+        const data = await response.json()
         if (response.status === 403 && data.detail === "CONTA_INATIVA") {
             const result = await Swal.fire({
                 title: "Conta Inativa",
@@ -52,9 +52,9 @@ async function login() {
                 showCancelButton: true,
                 confirmButtonText: "Sim, reativar",
                 cancelButtonText: "Cancelar"
-            });
+            })
 
-            if (!result.isConfirmed) return;
+            if (!result.isConfirmed) return
 
             const reactivateResponse = await fetch(
                 "http://127.0.0.1:8000/user/reativar",
@@ -63,29 +63,29 @@ async function login() {
                     headers: { "Content-Type": "application/json" },
                     body: JSON.stringify({ email })
                 }
-            );
+            )
 
             if (!reactivateResponse.ok) {
-                const err = await reactivateResponse.json();
+                const err = await reactivateResponse.json()
                 Swal.fire(
                     "Erro",
                     err.detail || "Não foi possível reativar a conta",
                     "error"
-                );
-                return;
+                )
+                return
             }
 
             await Swal.fire(
                 "Conta reativada!",
                 "Agora você pode entrar normalmente.",
                 "success"
-            );
-            return login();
+            )
+            return login()
         }
 
         if (!response.ok) {
             errorDiv.textContent = data.detail || "Erro ao fazer login"
-            return;
+            return
         }
 
         localStorage.setItem("access_token", data.access_token)

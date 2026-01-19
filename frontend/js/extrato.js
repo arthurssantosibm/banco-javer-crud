@@ -1,9 +1,9 @@
 document.addEventListener("DOMContentLoaded", async () => {
-    const token = localStorage.getItem("access_token");
+    const token = localStorage.getItem("access_token")
 
     if (!token) {
-        window.location.href = "login.html";
-        return;
+        window.location.href = "login.html"
+        return
     }
 
     const headers = {
@@ -15,14 +15,14 @@ document.addEventListener("DOMContentLoaded", async () => {
 
     async function carregarDadosUsuario() {
         try {
-            const res = await fetch("http://127.0.0.1:8000/user/user", { headers });
+            const res = await fetch("http://127.0.0.1:8000/user/user", { headers })
             
-            if (!res.ok) throw new Error("Erro ao buscar dados");
+            if (!res.ok) throw new Error("Erro ao buscar dados")
 
-            user = await res.json();
-            const saldo = Number(user.saldo_cc) || 0;
+            user = await res.json()
+            const saldo = Number(user.saldo_cc) || 0
 
-            document.getElementById("client-name").textContent = `Olá, ${user.nome}`;
+            document.getElementById("client-name").textContent = `Olá, ${user.nome}`
         
             document.getElementById("saldo-atual").textContent =
                 saldo.toLocaleString("pt-BR", {
@@ -31,28 +31,27 @@ document.addEventListener("DOMContentLoaded", async () => {
                 })
 
         } catch (err) {
-            console.error("Erro ao carregar usuário", err);
+            console.error("Erro ao carregar usuário", err)
         }
     }
 
-    // Chamada inicial
-    await carregarDadosUsuario();
+    await carregarDadosUsuario()
 
     document.getElementById("transferForm").addEventListener("submit", async (e) => {
-        e.preventDefault();
+        e.preventDefault()
 
         if (!user) {
-            Swal.fire("Erro", "Não foi possível identificar o usuário originário.", "error");
+            Swal.fire("Erro", "Não foi possível identificar o usuário originário.", "error")
             return;
         }
 
-        const transferButton = document.getElementById("transfBtn");
-        transferButton.innerText = "Transferindo...";
-        transferButton.disabled = true;
+        const transferButton = document.getElementById("transfBtn")
+        transferButton.innerText = "Transferindo..."
+        transferButton.disabled = true
 
-        const emailDestino = document.getElementById("emailDestino").value;
-        const valor = parseFloat(document.getElementById("valorTransferencia").value);
-        const mensagem = document.getElementById("mensagem").value;
+        const emailDestino = document.getElementById("emailDestino").value
+        const valor = parseFloat(document.getElementById("valorTransferencia").value)
+        const mensagem = document.getElementById("mensagem").value
 
         try {
             const response = await fetch("http://127.0.0.1:8000/transacoes/transacoes", {
@@ -66,7 +65,7 @@ document.addEventListener("DOMContentLoaded", async () => {
                 })
             });
 
-            const data = await response.json();
+            const data = await response.json()
 
             if (!response.ok) {
                 Swal.fire({
@@ -91,11 +90,11 @@ document.addEventListener("DOMContentLoaded", async () => {
             });
 
         } catch (err) {
-            console.error("Erro na transferência", err);
-            Swal.fire("Erro", "Erro ao realizar transferência", "error");
+            console.error("Erro na transferência", err)
+            Swal.fire("Erro", "Erro ao realizar transferência", "error")
         } finally {
-            transferButton.innerText = "Transferir";
-            transferButton.disabled = false;
+            transferButton.innerText = "Transferir"
+            transferButton.disabled = false
         }
     });
 
