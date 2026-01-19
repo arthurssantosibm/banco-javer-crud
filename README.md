@@ -1,6 +1,6 @@
 # 🏦 Banco Javer – CRUD de Clientes
 
-LINK DO REPOSITORIO DA API 2: [text](https://github.com/arthurssantosibm/api_client.git)
+LINK DO REPOSITORIO DA API 2: https://github.com/arthurssantosibm/api_client.git
 
 Projeto desafio desenvolvido com **Python**, **FastAPI** e **AWS**, cujo objetivo é criar um **CRUD completo de clientes** para um sistema bancário fictício chamado **Banco Javer**.
 
