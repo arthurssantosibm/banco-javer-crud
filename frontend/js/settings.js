@@ -161,10 +161,6 @@ document.addEventListener("DOMContentLoaded", async () => {
         window.location.href = "login.html"
     })
 
-    /* ================================
-       EXIBIR / OCULTAR SENHA (ADICIONADO)
-    ================================= */
-
     const passwordFields = [
         "current_password",
         "new_password",
@@ -204,9 +200,6 @@ document.addEventListener("DOMContentLoaded", async () => {
             }
         })
     })
-    /* ================================
-    SUSPENDER CONTA
-    ================================ */
 
     const suspenderBtn = document.getElementById("suspender-conta-btn")
 
@@ -254,7 +247,6 @@ document.addEventListener("DOMContentLoaded", async () => {
                     confirmButtonColor: "#F7934C"
                 })
 
-                // 🔒 Remove token e redireciona
                 localStorage.removeItem("access_token")
                 window.location.href = "login.html"
 
