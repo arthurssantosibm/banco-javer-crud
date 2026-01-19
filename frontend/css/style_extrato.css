@@ -4,7 +4,6 @@
 :root {
     --primary-color: #CC5803;
     --accent-color: #F7934C;
-
     --bg-color: #FFF6E5;
     --card-bg: #FFFFFF;
     --text-color: #1F1300;
@@ -29,10 +28,12 @@ body {
     display: flex;
     min-height: 100vh;
 }
+
 .logo-img {
     height: 60px;
     margin-right: 15px;
 }
+
 /* =====================================================
    SIDEBAR
 ===================================================== */
@@ -106,7 +107,6 @@ body {
     flex-grow: 1;
     padding: 30px 0 30px 0;
     overflow-y: auto;
-    
 }
 
 .header {
@@ -145,55 +145,31 @@ body {
 .icon-button:hover {
     background-color: rgba(255, 255, 255, 0.2);
 }
-
-
-/* =====================================================
-   ANIMAÇÕES
-===================================================== */
-@keyframes fadeInSlideUp {
-    from {
-        opacity: 0;
-        transform: translateY(20px);
-    }
-    to {
-        opacity: 1;
-        transform: translateY(0);
-    }
-}
-
-.animate-in {
-    opacity: 0;
-    animation: fadeInSlideUp 0.8s ease-out forwards;
-}
-
-.delay-1 { animation-delay: 0.1s; }
-.delay-2 { animation-delay: 0.2s; }
-.delay-3 { animation-delay: 0.3s; }
-
 a{
     text-decoration: none;
     color: inherit;
 }
 
+/* =====================================================
+   FORMULÁRIO E SALDO (CORRIGIDO)
+===================================================== */
 #transferForm {
     background-color: var(--card-bg);
     padding: 30px;
     border-radius: 12px;
-    box-shadow: 5px 5px 15px #333333;
-    max-width: 420px;
+    box-shadow: 5px 5px 15px rgba(0, 0, 0, 0.2);
+    max-width: 450px; /* Aumentado levemente para caber o saldo lateral */
     width: 100%;
     margin: 0 auto;
     animation: fadeInSlideUp 0.6s ease-out;
 }
 
-/* Grupo de campos */
 .form-group {
     display: flex;
     flex-direction: column;
     margin-bottom: 20px;
 }
 
-/* Labels */
 .form-group label {
     font-size: 0.9em;
     font-weight: 600;
@@ -201,7 +177,37 @@ a{
     margin-bottom: 8px;
 }
 
-/* Inputs */
+.saldo-box {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.saldo-info {
+    display: flex;
+    flex-direction: column;
+    background: #f8f9fa;
+    border-left: 4px solid #F7934C;
+    padding: 8px 12px;
+    border-radius: 6px;
+    min-width: 140px;
+    height: 48px;
+}
+
+.saldo-label {
+    font-size: 0.75rem;
+    color: #666;
+    font-weight: 600;
+    text-transform: uppercase;
+    margin-bottom: 2px;
+}
+
+#saldo-atual {
+    font-size: 1.05rem;
+    font-weight: 700;
+    color: #1F1300;
+}
+
 .form-group input {
     padding: 12px 14px;
     border-radius: 8px;
@@ -210,28 +216,18 @@ a{
     color: var(--text-color);
     background-color: #fff;
     transition: border-color 0.3s, box-shadow 0.3s;
+    height: 45px;
 }
 
-/* Remove setas do input number */
-.form-group input[type="number"]::-webkit-inner-spin-button,
-.form-group input[type="number"]::-webkit-outer-spin-button {
-    -webkit-appearance: none;
-    margin: 0;
-}
-
-/* Focus nos inputs */
 .form-group input:focus {
     outline: none;
     border-color: var(--primary-color);
-    box-shadow: 0 0 0 3px rgba(0, 123, 255, 0.15);
+    box-shadow: 0 0 0 3px rgba(204, 88, 3, 0.15);
 }
 
-/* Placeholder (caso use depois) */
-.form-group input::placeholder {
-    color: #aaa;
-}
-
-/* Botão de submit */
+/* =====================================================
+   BOTÕES E OUTROS
+===================================================== */
 .submit-btn {
     width: 100%;
     padding: 14px;
@@ -245,47 +241,13 @@ a{
     transition: transform 0.2s, box-shadow 0.2s, opacity 0.2s;
 }
 
-/* Hover botão */
 .submit-btn:hover {
     transform: translateY(-2px);
-    box-shadow: 0 8px 20px rgba(0, 123, 255, 0.3);
+    box-shadow: 0 8px 20px rgba(204, 88, 3, 0.3);
     opacity: 0.95;
 }
 
-/* Botão pressionado */
-.submit-btn:active {
-    transform: translateY(0);
-    box-shadow: none;
-}
-
-/* =====================================================
-   RESPONSIVIDADE
-===================================================== */
-@media (max-width: 1024px) {
-    .dashboard-grid {
-        grid-template-columns: repeat(2, 1fr);
-    }
-}
-
-@media (max-width: 768px) {
-    body {
-        flex-direction: column;
-    }
-
-    .sidebar {
-        width: 100%;
-        flex-direction: row;
-        justify-content: space-around;
-        padding: 10px 0;
-    }
-
-    .user-info {
-        display: none;
-    }
-
-
-
-    .transactions-chart-card {
-        height: 300px;
-    }
+@keyframes fadeInSlideUp {
+    from { opacity: 0; transform: translateY(20px); }
+    to { opacity: 1; transform: translateY(0); }
 }

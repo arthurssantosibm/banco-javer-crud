@@ -86,20 +86,20 @@ document.addEventListener("DOMContentLoaded", async () => {
             if (!currentPassword) {
                 senhaError.textContent = "Informe a senha atual."
                 submitButton.disabled = false
-                submitButton.innerText = "Salvar"
+                submitButton.innerText = "Salvar Alterações"
                 return
             }
 
             if (newPassword !== confirmPassword) {
                 senhaError.textContent = "As senhas não coincidem."
                 submitButton.disabled = false
-                submitButton.innerText = "Salvar"
+                submitButton.innerText = "Salvar Alterações"
                 return
             }
 
             if (!validateSenha(newPassword)) {
                 submitButton.disabled = false
-                submitButton.innerText = "Salvar"
+                submitButton.innerText = "Salvar Alterações"
                 return
             }
         }
@@ -151,7 +151,7 @@ document.addEventListener("DOMContentLoaded", async () => {
                 confirmButtonColor: "#F7934C"
             })
         } finally {
-            submitButton.innerText = "Salvar"
+            submitButton.innerText = "Salvar Alterações"
             submitButton.disabled = false
         }
     })
