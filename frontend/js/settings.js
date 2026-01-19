@@ -35,6 +35,18 @@ document.addEventListener("DOMContentLoaded", async () => {
     const confirmPasswordInput = document.getElementById("confirm_password")
     const senhaError = document.getElementById("senhaError")
 
+    function showLoading() {
+        const overlay = document.getElementById("loadingOverlay")
+        if (overlay) overlay.classList.remove("hidden")
+        document.body.classList.add("loading-active")
+    }
+
+    function hideLoading() {
+        const overlay = document.getElementById("loadingOverlay")
+        if (overlay) overlay.classList.add("hidden")
+        document.body.classList.remove("loading-active")
+    }
+
     const nomesProprios = ["joao", "maria", "pedro", "ana", "luiz", "carlos", "sofia", "antonio", "gabriel", "rafael"]
 
     function validateSenha(senha) {
@@ -71,9 +83,12 @@ document.addEventListener("DOMContentLoaded", async () => {
         }
     })
 
+
+
     document.getElementById("settingsForm").addEventListener("submit", async (e) => {
         e.preventDefault()
 
+        showLoading()
         const submitButton = document.getElementById("submitBtn")
         submitButton.innerText = "Salvando..."
         submitButton.disabled = true
@@ -82,8 +97,11 @@ document.addEventListener("DOMContentLoaded", async () => {
         const newPassword = newPasswordInput.value
         const confirmPassword = confirmPasswordInput.value
 
+        
+
         if (newPassword) {
             if (!currentPassword) {
+                hideLoading()
                 senhaError.textContent = "Informe a senha atual."
                 submitButton.disabled = false
                 submitButton.innerText = "Salvar Alterações"
@@ -91,6 +109,7 @@ document.addEventListener("DOMContentLoaded", async () => {
             }
 
             if (newPassword !== confirmPassword) {
+                hideLoading()
                 senhaError.textContent = "As senhas não coincidem."
                 submitButton.disabled = false
                 submitButton.innerText = "Salvar Alterações"
@@ -98,6 +117,7 @@ document.addEventListener("DOMContentLoaded", async () => {
             }
 
             if (!validateSenha(newPassword)) {
+                hideLoading()
                 submitButton.disabled = false
                 submitButton.innerText = "Salvar Alterações"
                 return
@@ -122,6 +142,7 @@ document.addEventListener("DOMContentLoaded", async () => {
             const data = await res.json()
 
             if (!res.ok) {
+                hideLoading()
                 Swal.fire({
                     icon: "error",
                     title: "Erro",
@@ -130,7 +151,7 @@ document.addEventListener("DOMContentLoaded", async () => {
                 })
                 return
             }
-
+            hideLoading()
             Swal.fire({
                 icon: "success",
                 title: "Sucesso!",
@@ -142,7 +163,8 @@ document.addEventListener("DOMContentLoaded", async () => {
             newPasswordInput.value = ""
             confirmPasswordInput.value = ""
             senhaError.innerHTML = ""
-
+        
+        hideLoading()
         } catch (err) {
             Swal.fire({
                 icon: "error",
@@ -217,6 +239,7 @@ document.addEventListener("DOMContentLoaded", async () => {
             })
 
             if (!confirm.isConfirmed) return
+                showLoading()
 
             try {
                 const res = await fetch(`http://127.0.0.1:8000/user/suspender`, {
@@ -231,6 +254,7 @@ document.addEventListener("DOMContentLoaded", async () => {
                 const data = await res.json()
 
                 if (!res.ok) {
+                    hideLoading()
                     Swal.fire({
                         icon: "error",
                         title: "Erro",
@@ -240,6 +264,7 @@ document.addEventListener("DOMContentLoaded", async () => {
                     return
                 }
 
+                hideLoading()
                 await Swal.fire({
                     icon: "success",
                     title: "Conta suspensa",
@@ -249,7 +274,8 @@ document.addEventListener("DOMContentLoaded", async () => {
 
                 localStorage.removeItem("access_token")
                 window.location.href = "login.html"
-
+            
+            hideLoading()
             } catch (err) {
                 Swal.fire({
                     icon: "error",

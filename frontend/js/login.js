@@ -103,8 +103,11 @@ async function login() {
                 "Agora você pode entrar normalmente.",
                 "success"
             )
-            return login()
-        }
+            showLoading()
+            setTimeout(() => {
+                return login()
+                }, 50)}
+            
 
         if (!response.ok) {
             errorDiv.textContent = data.detail || "Erro ao fazer login"

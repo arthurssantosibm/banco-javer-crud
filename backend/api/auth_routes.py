@@ -295,7 +295,7 @@ async def criar_transacao(
         conn.close()
 
 @transacoes_router.get("/listar_transacoes")
-def listar_transacoes(current_user_id: int = Depends(get_current_user_id)):
+async def listar_transacoes(current_user_id: int = Depends(get_current_user_id)):
     conn = get_connection()
     cursor = conn.cursor(dictionary=True)
 
