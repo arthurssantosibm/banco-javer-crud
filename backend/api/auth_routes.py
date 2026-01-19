@@ -22,7 +22,7 @@ BCRYPT_MAX_BYTES = 72
 async def insert_usuario(data: dict):
     async with httpx.AsyncClient(timeout=5.0) as client:
         response = await client.post(
-            f"{DATA_API_URL}/loginUsuarios",
+            f"{DATA_API_URL}/usuarios",
             json=data,
             headers={
                 "X-Internal-Key": INTERNAL_KEY
