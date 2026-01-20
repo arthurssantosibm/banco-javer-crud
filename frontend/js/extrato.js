@@ -37,14 +37,28 @@ document.addEventListener("DOMContentLoaded", async () => {
 
     await carregarDadosUsuario()
 
+    function showLoading() {
+        const overlay = document.getElementById("loadingOverlay")
+        if (overlay) overlay.classList.remove("hidden")
+        document.body.classList.add("loading-active")
+    }
+
+    function hideLoading() {
+        const overlay = document.getElementById("loadingOverlay")
+        if (overlay) overlay.classList.add("hidden")
+        document.body.classList.remove("loading-active")
+    }
+
     document.getElementById("transferForm").addEventListener("submit", async (e) => {
         e.preventDefault()
+
 
         if (!user) {
             Swal.fire("Erro", "Não foi possível identificar o usuário originário.", "error")
             return;
         }
 
+        showLoading()
         const transferButton = document.getElementById("transfBtn")
         transferButton.innerText = "Transferindo..."
         transferButton.disabled = true
@@ -68,6 +82,7 @@ document.addEventListener("DOMContentLoaded", async () => {
             const data = await response.json()
 
             if (!response.ok) {
+                hideLoading()
                 Swal.fire({
                     icon: "error",
                     title: "Erro na transferência",
@@ -79,6 +94,7 @@ document.addEventListener("DOMContentLoaded", async () => {
                 return;
             }
 
+            hideLoading()
             Swal.fire({
                 icon: "success",
                 title: "Transferência concluída",
@@ -93,6 +109,7 @@ document.addEventListener("DOMContentLoaded", async () => {
         
 
         } catch (err) {
+            hideLoading()
             console.error("Erro na transferência", err)
             Swal.fire("Erro", "Erro ao realizar transferência", "error").then(() => {
                 window.location.reload()
