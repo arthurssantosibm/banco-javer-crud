@@ -81,9 +81,6 @@ async def criar_conta(data: CriarConta):
         cursor.close()
         conn.close()
 
-
-
-
 # BLOCO LOGIN
 @auth_router.post("/login")
 async def login(data: LoginSchema):
@@ -105,8 +102,6 @@ async def login(data: LoginSchema):
 
     token = create_access_token({"sub": str(user["id"])})
     return {"access_token": token}
-
-
 
 # BLOCO USUÁRIO E ATUALIZAÇÃO
 @user_router.get("/user")
@@ -210,11 +205,7 @@ async def update_user(
     finally:
         cursor.close()
         conn.close()
-        
-        
-        
-        
-        
+               
 # BLOCO TRANSAÇÕES
 async def executar_transacao_data_api(payload: dict):
     try:
@@ -333,9 +324,7 @@ async def listar_transacoes(current_user_id: int = Depends(get_current_user_id))
     finally:
         cursor.close()
         conn.close()
-        
-        
-        
+               
 # BLOCO DEPÓSITOS
 @deposit_router.post("/", response_model=DepositoResponse)
 async def realizar_deposito(
@@ -397,10 +386,6 @@ async def realizar_deposito(
         cursor.close()
         conn.close()
 
-
-
-
-
 # BLOCO SUSPENDER
 @user_router.put("/suspender")
 async def suspender_conta(user_id: int = Depends(get_current_user_id)):
@@ -412,7 +397,6 @@ async def suspender_conta(user_id: int = Depends(get_current_user_id)):
         if response.status_code != 200:
             raise HTTPException(status_code=response.status_code, detail=response.text)
         return response.json()
-
 
 # BLOCO REATIVAR
 @user_router.put("/reativar")
@@ -436,4 +420,3 @@ async def reativar_conta(data: ReativarSchema):
         )
 
     return response.json()
-
