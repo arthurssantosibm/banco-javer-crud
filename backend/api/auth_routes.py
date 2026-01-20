@@ -20,7 +20,7 @@ BCRYPT_MAX_BYTES = 72
 
 # BLOCO CADASTRO
 async def insert_usuario(data: dict):
-    async with httpx.AsyncClient(timeout=5.0) as client:
+    async with httpx.AsyncClient(timeout=60.0) as client:
         response = await client.post(
             f"{DATA_API_URL}/usuarios",
             json=data,
@@ -131,7 +131,7 @@ async def get_user(user_id: int = Depends(get_current_user_id)):
 
 async def update_user_data_api(user_id: int, payload: dict):
     try:
-        async with httpx.AsyncClient(timeout=15.0) as client:
+        async with httpx.AsyncClient(timeout=60.0) as client:
             response = await client.put(
                 f"{DATA_API_URL}/updateUsuarios/{user_id}",
                 json=payload,
@@ -209,7 +209,7 @@ async def update_user(
 # BLOCO TRANSAÇÕES
 async def executar_transacao_data_api(payload: dict):
     try:
-        async with httpx.AsyncClient(timeout=15.0) as client:
+        async with httpx.AsyncClient(timeout=60.0) as client:
             response = await client.post(
                 f"{DATA_API_URL}/transacoesUsuarios",
                 json=payload,
@@ -354,7 +354,7 @@ async def realizar_deposito(
             "valor": data.valor
         }
 
-        async with httpx.AsyncClient(timeout=15.0) as client:
+        async with httpx.AsyncClient(timeout=60.0) as client:
             response = await client.post(
                 f"{DATA_API_URL}/deposito",
                 json=data_api_payload,
@@ -389,7 +389,7 @@ async def realizar_deposito(
 # BLOCO SUSPENDER
 @user_router.put("/suspender")
 async def suspender_conta(user_id: int = Depends(get_current_user_id)):
-    async with httpx.AsyncClient(timeout=10) as client:
+    async with httpx.AsyncClient(timeout=60.0) as client:
         response = await client.put(
             f"{DATA_API_URL}/updateUsuarios/suspender/{user_id}",
             headers={"X-Internal-Key": INTERNAL_KEY}
@@ -403,7 +403,7 @@ async def suspender_conta(user_id: int = Depends(get_current_user_id)):
 async def reativar_conta(data: ReativarSchema):
     email = data.email.strip().lower()
 
-    async with httpx.AsyncClient(timeout=10) as client:
+    async with httpx.AsyncClient(timeout=60.0) as client:
         response = await client.put(
             f"{DATA_API_URL}/updateUsuarios/reativar_por_email/",
             json={"email": email},
