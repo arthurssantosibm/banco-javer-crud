@@ -41,3 +41,10 @@ class DepositoRequest(BaseModel):
 class DepositoResponse(BaseModel):
     saldo_atual: float
     mensagem: str
+
+class SaqueRequest(BaseModel):
+    valor: float = Field(..., gt=0, description="Valor do depósito")
+    
+class SaqueResponse(BaseModel):
+    saldo_atual: float
+    mensagem: str

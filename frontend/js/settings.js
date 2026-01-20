@@ -14,13 +14,14 @@ document.addEventListener("DOMContentLoaded", async () => {
     try {
         const res = await fetch("http://127.0.0.1:8000/user/user", { headers })
         const user = await res.json()
-
+        
         document.getElementById("client-name").textContent = `Olá, ${user.nome}`
         document.getElementById("nome").value = user.nome
         document.getElementById("email").value = user.email
         document.getElementById("saldo").value = `R$ ${Number(user.saldo_cc).toFixed(2)}`
         document.getElementById("score").value = `${(Number(user.saldo_cc) * 0.1).toFixed(2)} pontos`
-
+        saldo = Number(user.saldo_cc) || 0
+        
     } catch (err) {
         console.error(err)
         Swal.fire({
@@ -227,6 +228,17 @@ document.addEventListener("DOMContentLoaded", async () => {
 
     if (suspenderBtn) {
         suspenderBtn.addEventListener("click", async () => {
+
+            if (saldo > 0) {
+                Swal.fire({
+                    icon: "error",
+                    title: "Saldo não zerado",
+                    text: `Você precisa zerar o saldo antes de suspender a conta. Saldo atual: R$ ${saldo.toLocaleString("pt-BR", { minimumFractionDigits: 2 })}`,
+                    confirmButtonColor: "#F7934C"
+                })
+                return
+            }
+
             const confirm = await Swal.fire({
                 icon: "warning",
                 title: "Suspender conta?",
@@ -239,7 +251,8 @@ document.addEventListener("DOMContentLoaded", async () => {
             })
 
             if (!confirm.isConfirmed) return
-                showLoading()
+
+            showLoading()
 
             try {
                 const res = await fetch(`http://127.0.0.1:8000/user/suspender`, {
@@ -249,7 +262,6 @@ document.addEventListener("DOMContentLoaded", async () => {
                         "Content-Type": "application/json"
                     }
                 })
-
 
                 const data = await res.json()
 
@@ -274,9 +286,9 @@ document.addEventListener("DOMContentLoaded", async () => {
 
                 localStorage.removeItem("access_token")
                 window.location.href = "login.html"
-            
-            hideLoading()
+
             } catch (err) {
+                hideLoading()
                 Swal.fire({
                     icon: "error",
                     title: "Erro de conexão",

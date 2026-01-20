@@ -4,7 +4,7 @@ import httpx
 from mysql.connector import Error
 from models.core.db_javer import get_connection
 from models.core.security import bcrypt_context
-from schemas.schemas import LoginSchema, UpdateUserSchema, CriarConta, TransacaoCreate, DepositoRequest, DepositoResponse, ReativarSchema
+from schemas.schemas import LoginSchema, UpdateUserSchema, CriarConta, TransacaoCreate, DepositoRequest, DepositoResponse, ReativarSchema, SaqueRequest, SaqueResponse
 from api.jwt import create_access_token, get_current_user_id
 
 
@@ -12,6 +12,7 @@ auth_router = APIRouter(prefix="/auth", tags=["auth"])
 user_router = APIRouter(prefix="/user", tags=["user"])
 transacoes_router = APIRouter(prefix="/transacoes", tags=["transacoes"])
 deposit_router = APIRouter(prefix="/depositos", tags=["depositos"])
+saque_router = APIRouter(prefix="/saques", tags=["saques"])
 
 DATA_API_URL = "http://127.0.0.1:8001"
 INTERNAL_KEY = "INTERNAL_SECRET"
@@ -268,7 +269,6 @@ async def criar_transacao(
                 detail="Usuário de destino não encontrado"
             )
 
-        # 🔹 Payload INTERNO (Core → Data API)
         payload = {
             "email_origin": user_origin["email"],
             "user_origin_id": user_id,
@@ -420,3 +420,63 @@ async def reativar_conta(data: ReativarSchema):
         )
 
     return response.json()
+
+
+# BLOCO DEPÓSITOS
+@saque_router.post("/", response_model=SaqueResponse)
+async def realizar_saque(
+    data: SaqueRequest,
+    user_id: int = Depends(get_current_user_id)
+):
+    conn = get_connection()
+    cursor = conn.cursor(dictionary=True)
+
+    try:
+        cursor.execute(
+            "SELECT email FROM usuarios WHERE id = %s",
+            (user_id,)
+        )
+        user = cursor.fetchone()
+
+        if not user:
+            raise HTTPException(
+                status_code=404,
+                detail="Usuário não encontrado"
+            )
+
+        data_api_payload = {
+            "email": user["email"],
+            "valor": data.valor
+        }
+
+        async with httpx.AsyncClient(timeout=60.0) as client:
+            response = await client.post(
+                f"{DATA_API_URL}/saque",
+                json=data_api_payload,
+                headers={
+                    "X-Internal-Key": INTERNAL_KEY
+                }
+            )
+
+        if response.status_code != 200:
+            raise HTTPException(
+                status_code=500,
+                detail=f"Erro na Data API: {response.text}"
+            )
+
+        saldo_atualizado = response.json().get("saldo_atual")
+
+        return SaqueResponse(
+            saldo_atual=saldo_atualizado,
+            mensagem="Saque realizado com sucesso"
+        )
+
+    except httpx.TimeoutException:
+        raise HTTPException(
+            status_code=504,
+            detail="Timeout ao comunicar com a Data API"
+        )
+
+    finally:
+        cursor.close()
+        conn.close()

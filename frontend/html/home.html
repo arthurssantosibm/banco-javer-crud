@@ -66,6 +66,9 @@
                     <button class="view-statement-btn" id="openDepositDialog">
                         Depositar
                     </button>
+                    <button class="view-statement-btn" id="openSaqueDialog">
+                        Saque
+                    </button>
                 </div>
             </div>
 
@@ -108,6 +111,24 @@
         <div class="dialog-actions">
             <button id="cancelDeposit">Cancelar</button>
             <button id="confirmDeposit">Depositar</button>
+        </div>
+    </dialog>
+
+
+    <dialog id="saqueDialog">
+        <h3>Realizar Saque</h3>
+
+        <input
+            type="number"
+            id="saqueValue"
+            placeholder="Valor do saque"
+            min="1"
+            step="0.01"
+        >
+
+        <div class="dialog-actions">
+            <button id="cancelSaque">Cancelar</button>
+            <button id="confirmSaque">Efetuar saque</button>
         </div>
     </dialog>
 

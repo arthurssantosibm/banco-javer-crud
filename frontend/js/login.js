@@ -62,7 +62,7 @@ async function login() {
         const data = await response.json()
 
         if (response.status === 403 && data.detail === "CONTA_INATIVA") {
-            hideLoading() // 🔹 ADD (antes do Swal)
+            hideLoading()
 
             const result = await Swal.fire({
                 title: "Conta Inativa",
