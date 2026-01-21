@@ -1,39 +1,36 @@
-/* =====================================================
-    PALETA BANKJAVER (LIGHT + DARK)
-===================================================== */
 :root {
     /* LIGHT MODE */
-    --primary-color: #CC5803;
-    --accent-color: #F7934C;
+    --primary-color: #04b197;
+    --accent-color: #00d1b2;
 
-    --bg-color: #FFF6E5;
-    --card-bg: #FFFFFF;
+    --bg-color: #121212;
+    --card-bg: #1e1e1e;
 
     --text-color: #1F1300;
     --light-text: #3A2600;
 
     --shadow-new: 0 8px 30px rgba(31, 19, 0, 0.15);
-    --border-light: #F7B05B;
+    --border-light: #00d1b2;
 
-    --transaction-in: #4CAF50;
-    --transaction-out: #CC5803;
+    --transaction-in: #00d1b2;
+    --transaction-out: #d43426;
 
-    --header-gradient-end: #F7B05B;
+    --header-gradient-end: #00d1b2;
 
     /* DARK MODE */
     --dark-bg: #1F1300;
     --dark-card: #2A1A05;
 
-    --dark-text: #FFC15E;
-    --dark-light-text: #F7B05B;
+    --dark-text: #00d1b2;
+    --dark-light-text: #00d1b2;
 
     --dark-shadow: 0 10px 40px rgba(0, 0, 0, 0.7);
     --dark-border: #3A2600;
 
     --dark-primary-color: #1F1300;
-    --dark-accent-color: #FFC15E;
+    --dark-accent-color: #04ffd9;
 
-    --dark-transaction-in: #81C784;
+    --dark-transaction-in: #00d1b2;
     --dark-transaction-out: #FF8A50;
 }
 
@@ -55,7 +52,7 @@
     --transaction-in: var(--dark-transaction-in);
     --transaction-out: var(--dark-transaction-out);
 
-    --header-gradient-end: #F7934C;
+    --header-gradient-end: #00d1b2;
 }
 
 /* =====================================================
@@ -86,7 +83,7 @@ a {
 ===================================================== */
 .sidebar {
     width: 250px;
-    background: var(--primary-color);
+    background: #000;
     color: #fff;
     padding: 20px 0;
     display: flex;
@@ -224,7 +221,7 @@ a {
 .card-title {
     font-size: 1.1rem;
     margin-bottom: 15px;
-    color: var(--light-text);
+    color: #fff;
 }
 
 .card-icon {
@@ -265,7 +262,7 @@ a {
 }
 
 .view-statement-btn:hover {
-    background: #e07a32;
+    background: var(--primary-color);
     transform: translateY(-2px);
 }
 
@@ -284,11 +281,11 @@ a {
 }
 
 .transaction-list li.entrada {
-    color: green;
+    color: var(--accent-color);
 }
 
 .transaction-list li.saida {
-    color: red;
+    color: var(--transaction-out);
 }
 
 .transaction-list .empty {
@@ -326,11 +323,11 @@ a {
     transform: translate(-50%, -50%);
     font-size: 4rem;
     font-weight: 200;
-    color: var(--primary-color);
+    color: var(--dark-text);
 }
 .score-points {
     font-size: 0.9rem;
-    color: var(--light-text);
+    color: #fff;
     margin-top: -55px;
     font-weight: bold;
     display: block;
@@ -358,7 +355,7 @@ a {
 
 .botao-confirmar-estilizado:hover {
     transform: scale(1.05);
-    box-shadow: 0 5px 15px rgba(247, 147, 76, 0.4) !important;
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.4) !important;
 }
 /* =====================================================
     ANIMAÇÕES
@@ -406,7 +403,7 @@ dialog#depositDialog {
 
 /* Remove o estilo feio padrão do browser */
 dialog::backdrop {
-    background: rgba(31, 19, 0, 0.45);
+    background: rgba(0, 0, 0, 0.5);
     backdrop-filter: blur(6px);
 }
 
@@ -435,7 +432,7 @@ dialog#depositDialog input {
 
 dialog#depositDialog input:focus {
     border-color: var(--accent-color);
-    box-shadow: 0 0 0 3px rgba(247, 147, 76, 0.25);
+    box-shadow: 0 0 0 3px rgba(0, 209, 178, 0.2)
 }
 
 /* Área dos botões */
@@ -460,8 +457,8 @@ dialog#depositDialog button {
 /* Botão cancelar */
 #cancelDeposit {
     background: transparent;
-    color: var(--light-text);
-    border: 1px solid var(--border-light);
+    color: var(--accent-color);
+    border: 1px solid var(--primary-color);
 }
 
 #cancelDeposit:hover {
@@ -551,7 +548,7 @@ dialog#saqueDialog {
 
 /* Remove o estilo feio padrão do browser */
 dialog::backdrop {
-    background: rgba(31, 19, 0, 0.45);
+    background: rgba(0, 0, 0, 0.5);
     backdrop-filter: blur(6px);
 }
 
@@ -580,7 +577,7 @@ dialog#saqueDialog input {
 
 dialog#saqueDialog input:focus {
     border-color: var(--accent-color);
-    box-shadow: 0 0 0 3px rgba(247, 147, 76, 0.25);
+   box-shadow: 0 0 0 3px rgba(0, 209, 178, 0.2);
 }
 
 /* Área dos botões */
@@ -605,7 +602,7 @@ dialog#saqueDialog button {
 /* Botão cancelar */
 #cancelSaque {
     background: transparent;
-    color: var(--light-text);
+    color: var(--accent-color);
     border: 1px solid var(--border-light);
 }
 

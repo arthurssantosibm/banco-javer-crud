@@ -72,7 +72,7 @@ document.addEventListener("DOMContentLoaded", async () => {
             ctx.shadowOffsetY = 2
 
             ctx.beginPath()
-            ctx.fillStyle = "#333333"
+            ctx.fillStyle = "#000000"
             ctx.moveTo(0, -5)
             ctx.lineTo(radius * 0.9, 0)
             ctx.lineTo(0, 5)
@@ -255,12 +255,12 @@ document.addEventListener("DOMContentLoaded", async () => {
 
 function dispararAlerta() {
     Swal.fire({
-        title: '<span style="color:#F7934C;font-weight:800;font-size:28px">BankJaver</span>',
+        title: '<span style="color:#000;font-weight:800;font-size:28px">BankPY</span>',
         html: `<div style="padding:10px">
                 <p style="font-size:1.1rem;color:#333;margin-bottom:20px">
                     Bem-vindo(a) à sua conta digital.
                 </p>
-                <div style="background:#f8f9fa;border-radius:12px;padding:15px;border-left:5px solid #F7934C;text-align:left">
+                <div style="background:#f8f9fa;border-radius:12px;padding:15px;border-left:5px solid #04b197;text-align:left">
                     <div style="margin-bottom:8px">
                         <strong style="color:#1F1300">Versão:</strong> 
                         <span style="color:#666">1.2.1</span>
@@ -272,11 +272,11 @@ function dispararAlerta() {
                 </div>
                </div>`,
         icon:"info",
-        iconColor:"#F7934C",
+        iconColor:"#04b197",
         confirmButtonText:"ACESSAR CONTA",
-        confirmButtonColor:"#F7934C",
+        confirmButtonColor:"#04b197",
         background:"#ffffff",
-        color:"#1F1300",
+        color:"#000000",
         padding:"2em",
         width:"400px",
         showClass:{popup:"animate__animated animate__fadeInUp animate__faster"},
