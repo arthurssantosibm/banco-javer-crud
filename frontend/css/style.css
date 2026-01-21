@@ -6,7 +6,7 @@
     --bg-color: #121212;
     --card-bg: #1e1e1e;
 
-    --text-color: #1F1300;
+    --text-color: #ffffff;
     --light-text: #3A2600;
 
     --shadow-new: 0 8px 30px rgba(31, 19, 0, 0.15);
@@ -423,7 +423,7 @@ dialog#depositDialog input {
     font-size: 1.1rem;
     outline: none;
     background: transparent;
-    color: var(--text-color);
+    color: #fff;
     transition: 0.3s;
     width: 100%;
     margin-top: 10px;
