@@ -4,7 +4,7 @@ import httpx
 from mysql.connector import Error
 from models.core.db_javer import get_connection
 from models.core.security import bcrypt_context
-from schemas.schemas import LoginSchema, UpdateUserSchema, CriarConta, TransacaoCreate, DepositoRequest, DepositoResponse, ReativarSchema, SaqueRequest, SaqueResponse
+from schemas.schemas import LoginSchema, UpdateUserSchema, CriarConta, TransacaoCreate, DepositoRequest, DepositoResponse, ReativarSchema, SaqueRequest, SaqueResponse, HomeSchema
 from api.jwt import create_access_token, get_current_user_id
 
 
@@ -105,7 +105,7 @@ async def login(data: LoginSchema):
     return {"access_token": token}
 
 # BLOCO USUÁRIO E ATUALIZAÇÃO
-@user_router.get("/user")
+@user_router.get("/user", response_model=HomeSchema)
 async def get_user(user_id: int = Depends(get_current_user_id)):
     conn = get_connection()
     cursor = conn.cursor(dictionary=True)
@@ -192,12 +192,20 @@ async def update_user(
 
             nova_senha_hash = bcrypt_context.hash(data.new_password)
 
-        payload = {
-            "nome": data.nome,
-            "email": data.email,
-            "telefone": data.telefone,
-            "senha": nova_senha_hash
-        }
+        payload = {}
+
+        if data.nome is not None:
+            payload["nome"] = data.nome
+
+        if data.email is not None:
+            payload["email"] = data.email
+
+        if data.telefone is not None:
+            payload["telefone"] = data.telefone
+
+        if nova_senha_hash is not None:
+            payload["senha"] = nova_senha_hash
+
 
         await update_user_data_api(user_id, payload)
 

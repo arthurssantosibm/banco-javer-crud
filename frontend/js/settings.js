@@ -18,6 +18,7 @@ document.addEventListener("DOMContentLoaded", async () => {
         document.getElementById("client-name").textContent = `Olá, ${user.nome}`
         document.getElementById("nome").value = user.nome
         document.getElementById("email").value = user.email
+        document.getElementById("telefone").value = user.telefone
         document.getElementById("saldo").value = `R$ ${Number(user.saldo_cc).toFixed(2)}`
         document.getElementById("score").value = `${(Number(user.saldo_cc) * 0.1).toFixed(2)} pontos`
         saldo = Number(user.saldo_cc) || 0
@@ -128,7 +129,7 @@ document.addEventListener("DOMContentLoaded", async () => {
         const payload = {
             nome: document.getElementById("nome").value,
             email: document.getElementById("email").value,
-            telefone: "",
+            telefone: document.getElementById("telefone").value,
             current_password: currentPassword || null,
             new_password: newPassword || null
         }
