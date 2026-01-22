@@ -1,15 +1,37 @@
-/* =====================================================
-   VARIÁVEIS DE CORES
-===================================================== */
 :root {
-    --primary-color: #CC5803;
-    --accent-color: #F7934C;
-    --bg-color: #FFF6E5;
-    --card-bg: #FFFFFF;
-    --text-color: #1F1300;
-    --light-text: #3A2600;
-    --shadow-light: 0 8px 30px rgba(31, 19, 0, 0.15);
-    --header-gradient-end: #F7B05B;
+    /* LIGHT MODE */
+    --primary-color: #04b197;
+    --accent-color: #00d1b2;
+
+    --bg-color: #121212;
+    --card-bg: #1e1e1e;
+
+    --text-color: #ffffff;
+    --light-text: #ffffff;
+
+    --shadow-new: 0 8px 30px rgba(31, 19, 0, 0.15);
+    --border-light: #00d1b2;
+
+    --transaction-in: #00d1b2;
+    --transaction-out: #d43426;
+
+    --header-gradient-end: #00d1b2;
+
+    /* DARK MODE */
+    --dark-bg: #1F1300;
+    --dark-card: #2A1A05;
+
+    --dark-text: #00d1b2;
+    --dark-light-text: #00d1b2;
+
+    --dark-shadow: 0 10px 40px rgba(0, 0, 0, 0.7);
+    --dark-border: #3A2600;
+
+    --dark-primary-color: #1F1300;
+    --dark-accent-color: #04ffd9;
+
+    --dark-transaction-in: #00d1b2;
+    --dark-transaction-out: #FF8A50;
 }
 
 /* =====================================================
@@ -39,7 +61,7 @@ body {
 ===================================================== */
 .sidebar {
     width: 250px;
-    background: var(--primary-color);
+    background: #000;
     color: white;
     padding: 20px 0;
     display: flex;
@@ -86,7 +108,6 @@ body {
 .nav-item:hover {
     background-color: rgba(255, 255, 255, 0.1);
     border-left-color: var(--accent-color);
-    transform: translateX(5px);
 }
 
 .nav-item.active {
@@ -186,8 +207,8 @@ a{
 .saldo-info {
     display: flex;
     flex-direction: column;
-    background: #f8f9fa;
-    border-left: 4px solid #F7934C;
+    background: var(--bg-color);
+    border-left: 4px solid var(--accent-color);
     padding: 8px 12px;
     border-radius: 6px;
     min-width: 140px;
@@ -195,9 +216,9 @@ a{
 }
 
 .saldo-label {
-    font-size: 0.75rem;
-    color: #666;
-    font-weight: 600;
+    font-size: 0.65rem;
+    color: #fff;
+    font-weight: 500;
     text-transform: uppercase;
     margin-bottom: 2px;
 }
@@ -205,7 +226,7 @@ a{
 #saldo-atual {
     font-size: 1.05rem;
     font-weight: 700;
-    color: #1F1300;
+    color: #ffffff;
 }
 
 .form-group input {
@@ -214,7 +235,7 @@ a{
     border: 1px solid #7b7b7b;
     font-size: 1em;
     color: var(--text-color);
-    background-color: #fff;
+    background-color: var(--bg-color);
     transition: border-color 0.3s, box-shadow 0.3s;
     height: 45px;
 }
@@ -222,7 +243,7 @@ a{
 .form-group input:focus {
     outline: none;
     border-color: var(--primary-color);
-    box-shadow: 0 0 0 3px rgba(204, 88, 3, 0.15);
+    box-shadow: 0 0 0 3px rgba(3, 73, 204, 0.15);
 }
 
 /* =====================================================
@@ -243,7 +264,7 @@ a{
 
 .submit-btn:hover {
     transform: translateY(-2px);
-    box-shadow: 0 8px 20px rgba(204, 88, 3, 0.3);
+    box-shadow: 0 8px 20px rgba(3, 181, 204, 0.3);
     opacity: 0.95;
 }
 
@@ -257,7 +278,7 @@ a{
 .loading-overlay {
     position: fixed;
     inset: 0;
-    background: rgba(255, 246, 229, 0.6);
+    background: rgba(229, 255, 251, 0.6);
     backdrop-filter: blur(6px);
     -webkit-backdrop-filter: blur(6px);
 
@@ -282,11 +303,11 @@ body.loading-active {
 .loading {
     --speed-of-animation: 0.9s;
     --gap: 6px;
-    --first-color: #CC5803;
-    --second-color: #F7934C;
-    --third-color: #F7B05B;
-    --fourth-color: #CC5803;
-    --fifth-color: #F7934C;
+    --first-color: #20B2AA;
+    --second-color: #40E0D0;
+    --third-color: #7FFFD4;
+    --fourth-color: #00CED1;
+    --fifth-color: #008B8B;
 
     display: flex;
     justify-content: center;
