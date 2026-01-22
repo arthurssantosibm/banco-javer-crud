@@ -1,20 +1,42 @@
-/* Variáveis de Cores (Mantendo a identidade do Dashboard) */
 :root {
-    --primary-color: #CC5803;
-    --accent-color: #F7934C;
+    /* LIGHT MODE */
+    --primary-color: #04b197;
+    --accent-color: #00d1b2;
 
-    --bg-color: #FFF6E5;
-    --card-bg: #FFFFFF;
+    --bg-color: #121212;
+    --card-bg: #1e1e1e;
 
-    --text-color: #1F1300;
-    --light-text: #3A2600;
-    --shadow: 0 8px 30px rgba(31, 19, 0, 0.15);
+    --text-color: #ffffff;
+    --light-text: #ffffff;
+
+    --shadow-new: 0 8px 30px rgba(31, 19, 0, 0.15);
+    --border-light: #00d1b2;
+
+    --transaction-in: #00d1b2;
+    --transaction-out: #d43426;
+
+    --header-gradient-end: #00d1b2;
+
+    /* DARK MODE */
+    --dark-bg: #1F1300;
+    --dark-card: #2A1A05;
+
+    --dark-text: #00d1b2;
+    --dark-light-text: #00d1b2;
+
+    --dark-shadow: 0 10px 40px rgba(0, 0, 0, 0.7);
+    --dark-border: #3A2600;
+
+    --dark-primary-color: #1F1300;
+    --dark-accent-color: #04ffd9;
+
+    --dark-transaction-in: #00d1b2;
+    --dark-transaction-out: #FF8A50;
 }
-
 /* Estilização Base */
 body {
     font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-    background-color: var(--bg-color);
+    background-color: #000;
     color: var(--text-color);
     display: flex;
     flex-direction: column;
@@ -72,37 +94,21 @@ a button {
     font-size: 1.2em;
     font-weight: 600;
     cursor: pointer;
-    box-shadow: 0 4px 15px rgba(255, 111, 0, 0.4);
+    box-shadow: 0 4px 15px rgba(0, 255, 242, 0.4);
     transition: background-color 0.3s, transform 0.2s, box-shadow 0.3s;
     margin-top: 10px;
 }
 
 a button:hover {
-    background-color: #cc5c00; /* Laranja um pouco mais escuro */
+    background-color: var(--accent-color); /* Laranja um pouco mais escuro */
     transform: translateY(-3px);
-    box-shadow: 0 6px 20px rgba(255, 111, 0, 0.6);
+    box-shadow: 0 6px 20px rgba(0, 255, 255, 0.6);
 }
 
 a button:active {
     transform: translateY(0);
 }
 
-/* Rodapé */
-footer {
-    width: 100%;
-    position: absolute;
-    bottom: 0;
-    padding: 15px 0;
-    background-color: rgba(255, 255, 255, 0.7); /* Fundo semi-transparente */
-    border-top: 1px solid #eee;
-}
-
-.copyright {
-    margin: 0;
-    font-size: 0.9em;
-    text-align: center;
-    color: var(--light-text);
-}
 
 /* Animação para o título */
 @keyframes fadeInDown {
