@@ -1,21 +1,43 @@
-/* Variáveis de Cores (Consistência com o BankFlow) */
 :root {
-    --primary-color: #CC5803;
-    --accent-color: #F7934C;
+    /* LIGHT MODE */
+    --primary-color: #04b197;
+    --accent-color: #00d1b2;
 
-    --bg-color: #FFF6E5;
-    --card-bg: #FFFFFF;
+    --bg-color: #121212;
+    --card-bg: #1e1e1e;
 
-    --text-color: #1F1300;
-    --light-text: #3A2600;
-    --shadow: 0 8px 30px rgba(31, 19, 0, 0.15);
-    --input-focus: #F7B05B; /* Azul claro para foco */
+    --text-color: #ffffff;
+    --light-text: #ffffff;
+
+    --shadow-new: 0 8px 30px rgba(31, 19, 0, 0.15);
+    --border-light: #00d1b2;
+
+    --transaction-in: #00d1b2;
+    --transaction-out: #d43426;
+
+    --header-gradient-end: #00d1b2;
+
+    /* DARK MODE */
+    --dark-bg: #1F1300;
+    --dark-card: #2A1A05;
+
+    --dark-text: #00d1b2;
+    --dark-light-text: #00d1b2;
+
+    --dark-shadow: 0 10px 40px rgba(0, 0, 0, 0.7);
+    --dark-border: #3A2600;
+
+    --dark-primary-color: #1F1300;
+    --dark-accent-color: #04ffd9;
+
+    --dark-transaction-in: #00d1b2;
+    --dark-transaction-out: #FF8A50;
 }
 
 /* Base e Layout */
 body {
     font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-    background-color: var(--bg-color);
+    background-color: #000;
     color: var(--text-color);
     display: flex;
     justify-content: center; /* Centraliza horizontalmente */
@@ -28,6 +50,7 @@ body {
 .error-message {
         color: red;
         font-size: 0.9em;
+        margin-top: 5px;
         display: block; /* Garante que a mensagem fique em sua própria linha */
     }
 
@@ -75,12 +98,13 @@ input[type="tel"],
 input[type="number"],
 input[type="password"] {
     width: 100%;
+    background-color: var(--text-color);
     padding: 12px 15px;
     border: 1px solid #ddd;
     border-radius: 8px;
     box-sizing: border-box;
     font-size: 1em;
-    color: var(--text-color);
+    color: var(--bg-color);
     transition: border-color 0.3s, box-shadow 0.3s;
 }
 
@@ -167,15 +191,15 @@ button[type="submit"] {
     font-size: 1.1em;
     font-weight: 600;
     cursor: pointer;
-    box-shadow: 0 4px 15px rgba(255, 111, 0, 0.4);
+    box-shadow: 0 4px 15px rgba(0, 255, 234, 0.4);
     transition: background-color 0.3s, transform 0.2s, box-shadow 0.3s;
     margin-top: 15px;
 }
 
 button[type="submit"]:hover {
-    background-color: #cc5c00; /* Laranja mais escuro */
+    background-color: var(--accent-color); /* Laranja mais escuro */
     transform: translateY(-2px);
-    box-shadow: 0 6px 20px rgba(255, 111, 0, 0.6);
+    box-shadow: 0 6px 20px rgba(0, 225, 255, 0.6);
 }
 
 button[type="submit"]:active {
@@ -213,7 +237,7 @@ a{
 .loading-overlay {
     position: fixed;
     inset: 0;
-    background: rgba(255, 246, 229, 0.6);
+    background: rgba(229, 255, 251, 0.6);
     backdrop-filter: blur(6px);
     -webkit-backdrop-filter: blur(6px);
 
@@ -238,11 +262,11 @@ body.loading-active {
 .loading {
     --speed-of-animation: 0.9s;
     --gap: 6px;
-    --first-color: #CC5803;
-    --second-color: #F7934C;
-    --third-color: #F7B05B;
-    --fourth-color: #CC5803;
-    --fifth-color: #F7934C;
+    --first-color: #20B2AA;
+    --second-color: #40E0D0;
+    --third-color: #7FFFD4;
+    --fourth-color: #00CED1;
+    --fifth-color: #008B8B;
 
     display: flex;
     justify-content: center;
