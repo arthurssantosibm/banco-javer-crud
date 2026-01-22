@@ -1,15 +1,58 @@
-/* =====================================================
-   VARIÁVEIS DE CORES
-===================================================== */
 :root {
-    --primary-color: #CC5803;
-    --accent-color: #F7934C;
-    --bg-color: #FFF6E5;
-    --card-bg: #FFFFFF;
-    --text-color: #1F1300;
-    --light-text: #3A2600;
-    --shadow-light: 0 8px 30px rgba(31, 19, 0, 0.15);
-    --header-gradient-end: #F7B05B;
+    /* LIGHT MODE */
+    --primary-color: #04b197;
+    --accent-color: #00d1b2;
+
+    --bg-color: #121212;
+    --card-bg: #1e1e1e;
+
+    --text-color: #ffffff;
+    --light-text: #ffffff;
+
+    --shadow-new: 0 8px 30px rgba(31, 19, 0, 0.15);
+    --border-light: #00d1b2;
+
+    --transaction-in: #00d1b2;
+    --transaction-out: #d43426;
+
+    --header-gradient-end: #00d1b2;
+
+    /* DARK MODE */
+    --dark-bg: #1F1300;
+    --dark-card: #2A1A05;
+
+    --dark-text: #00d1b2;
+    --dark-light-text: #00d1b2;
+
+    --dark-shadow: 0 10px 40px rgba(0, 0, 0, 0.7);
+    --dark-border: #3A2600;
+
+    --dark-primary-color: #1F1300;
+    --dark-accent-color: #04ffd9;
+
+    --dark-transaction-in: #00d1b2;
+    --dark-transaction-out: #FF8A50;
+}
+
+/* =====================================================
+    DARK MODE
+===================================================== */
+.dark-mode {
+    --bg-color: var(--dark-bg);
+    --card-bg: var(--dark-card);
+    --text-color: var(--dark-text);
+    --light-text: var(--dark-light-text);
+
+    --border-light: var(--dark-border);
+    --shadow-new: var(--dark-shadow);
+
+    --primary-color: var(--dark-primary-color);
+    --accent-color: var(--dark-accent-color);
+
+    --transaction-in: var(--dark-transaction-in);
+    --transaction-out: var(--dark-transaction-out);
+
+    --header-gradient-end: #00d1b2;
 }
 
 /* =====================================================
@@ -42,7 +85,7 @@ a{
 ===================================================== */
 .sidebar {
     width: 250px;
-    background: var(--primary-color);
+    background: #000;
     color: white;
     padding: 20px 0;
     display: flex;
@@ -89,7 +132,6 @@ a{
 .nav-item:hover {
     background-color: rgba(255, 255, 255, 0.1);
     border-left-color: var(--accent-color);
-    transform: translateX(5px);
 }
 
 .nav-item.active {
@@ -152,6 +194,7 @@ a{
     /* Adiciona margem lateral para afastar o card das bordas do main-content */
     margin-left: 30px;
     margin-right: 30px;
+    margin-top: 30px;
     
     /* Estilos base do card */
     background-color: var(--card-bg);
@@ -201,7 +244,7 @@ a{
     border-radius: 8px;
     font-size: 1em;
     color: var(--text-color);
-    background-color: #fcfcfc;
+    background-color: var(--bg-color);
     transition: all 0.3s ease;
 }
 
@@ -277,7 +320,7 @@ button:active {
     border-radius: 8px;
     font-size: 1em;
     color: var(--text-color);
-    background-color: #fcfcfc;
+    background-color: var(--bg-color);
     transition: all 0.3s ease;
 }
 
@@ -351,7 +394,7 @@ button:active {
 .loading-overlay {
     position: fixed;
     inset: 0;
-    background: rgba(255, 246, 229, 0.6);
+    background: rgba(229, 255, 251, 0.6);
     backdrop-filter: blur(6px);
     -webkit-backdrop-filter: blur(6px);
 
@@ -376,11 +419,11 @@ body.loading-active {
 .loading {
     --speed-of-animation: 0.9s;
     --gap: 6px;
-    --first-color: #CC5803;
-    --second-color: #F7934C;
-    --third-color: #F7B05B;
-    --fourth-color: #CC5803;
-    --fifth-color: #F7934C;
+    --first-color: #20B2AA;
+    --second-color: #40E0D0;
+    --third-color: #7FFFD4;
+    --fourth-color: #00CED1;
+    --fifth-color: #008B8B;
 
     display: flex;
     justify-content: center;

@@ -1,18 +1,58 @@
-/* ===============================
-   VARIÁVEIS DE CORES (BankFlow)
-================================ */
 :root {
-    --primary-color: #CC5803;
-    --accent-color: #F7934C;
+    /* LIGHT MODE */
+    --primary-color: #04b197;
+    --accent-color: #00d1b2;
 
-    --bg-color: #FFF6E5;
-    --card-bg: #FFFFFF;
+    --bg-color: #121212;
+    --card-bg: #1e1e1e;
 
-    --text-color: #1F1300;
-    --light-text: #3A2600;
+    --text-color: #ffffff;
+    --light-text: #ffffff;
 
-    --input-focus: #F7B05B;
-    --shadow: 0 8px 30px rgba(31, 19, 0, 0.15);
+    --shadow-new: 0 8px 30px rgba(0, 29, 31, 0.15);
+    --border-light: #00d1b2;
+
+    --transaction-in: #00d1b2;
+    --transaction-out: #d43426;
+
+    --header-gradient-end: #00d1b2;
+
+    /* DARK MODE */
+    --dark-bg: #1F1300;
+    --dark-card: #2A1A05;
+
+    --dark-text: #00d1b2;
+    --dark-light-text: #00d1b2;
+
+    --dark-shadow: 0 10px 40px rgba(0, 0, 0, 0.7);
+    --dark-border: #3A2600;
+
+    --dark-primary-color: #1F1300;
+    --dark-accent-color: #04ffd9;
+
+    --dark-transaction-in: #00d1b2;
+    --dark-transaction-out: #FF8A50;
+}
+
+/* =====================================================
+    DARK MODE
+===================================================== */
+.dark-mode {
+    --bg-color: var(--dark-bg);
+    --card-bg: var(--dark-card);
+    --text-color: var(--dark-text);
+    --light-text: var(--dark-light-text);
+
+    --border-light: var(--dark-border);
+    --shadow-new: var(--dark-shadow);
+
+    --primary-color: var(--dark-primary-color);
+    --accent-color: var(--dark-accent-color);
+
+    --transaction-in: var(--dark-transaction-in);
+    --transaction-out: var(--dark-transaction-out);
+
+    --header-gradient-end: #00d1b2;
 }
 
 /* ===============================
@@ -45,7 +85,7 @@ body {
     background: var(--card-bg);
     padding: 35px;
     border-radius: 12px;
-    box-shadow: var(--shadow);
+    
     animation: fadeIn 0.6s ease-out;
 }
 
@@ -89,7 +129,7 @@ input[type="text"] {
 
 input:focus {
     border-color: var(--input-focus);
-    box-shadow: 0 0 0 3px rgba(247, 176, 91, 0.3);
+    box-shadow: 0 0 0 3px rgba(91, 224, 247, 0.3);
     outline: none;
 }
 
@@ -140,12 +180,12 @@ button[type="submit"] {
     cursor: pointer;
     margin-top: 25px;
 
-    box-shadow: 0 4px 15px rgba(247, 147, 76, 0.5);
+    box-shadow: 0 4px 15px rgba(76, 227, 247, 0.5);
     transition: background-color 0.3s, transform 0.2s;
 }
 
 button[type="submit"]:hover {
-    background-color: #cc5c00;
+    background-color: #00ccc2;
     transform: translateY(-2px);
 }
 
@@ -200,7 +240,7 @@ a:hover {
 .loading-overlay {
     position: fixed;
     inset: 0;
-    background: rgba(255, 246, 229, 0.6);
+    background: rgba(229, 255, 251, 0.6);
     backdrop-filter: blur(6px);
     -webkit-backdrop-filter: blur(6px);
 
@@ -225,11 +265,11 @@ body.loading-active {
 .loading {
     --speed-of-animation: 0.9s;
     --gap: 6px;
-    --first-color: #CC5803;
-    --second-color: #F7934C;
-    --third-color: #F7B05B;
-    --fourth-color: #CC5803;
-    --fifth-color: #F7934C;
+    --first-color: #20B2AA;
+    --second-color: #40E0D0;
+    --third-color: #7FFFD4;
+    --fourth-color: #00CED1;
+    --fifth-color: #008B8B;
 
     display: flex;
     justify-content: center;
