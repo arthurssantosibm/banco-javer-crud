@@ -495,43 +495,33 @@ async def realizar_saque(
 async def buscar_ativo(ticker: str):
     try:
         ticker = ticker.upper().strip()
-
         ativo = yf.Ticker(ticker)
 
-        # 🔹 Histórico curto e seguro
-        hist = ativo.history(period="7d", interval="1d")
+        hist = ativo.history(period="max", interval="1d")
 
-        if hist is None or hist.empty or "Close" not in hist:
+        if hist.empty:
             raise HTTPException(status_code=404, detail="Ativo não encontrado")
 
-        closes = hist["Close"].dropna()
 
-        if len(closes) < 2:
-            raise HTTPException(status_code=404, detail="Dados insuficientes")
+        historico_grafico = {
+            "datas": hist.index.strftime('%Y-%m-%d').tolist(),
+            "precos": hist["Close"].round(2).tolist()
+        }
 
-        preco_atual = round(float(closes.iloc[-1]), 2)
-        preco_anterior = round(float(closes.iloc[-2]), 2)
+        ultimo_fechamento = hist["Close"].iloc[-1]
+        fechamento_anterior = hist["Close"].iloc[-2] if len(hist) > 1 else ultimo_fechamento
+        variacao = round(((ultimo_fechamento - fechamento_anterior) / fechamento_anterior) * 100, 2)
 
-        variacao = round(
-            ((preco_atual - preco_anterior) / preco_anterior) * 100,
-            2
-        )
-
-        # 🔹 fast_info é mais estável
-        fast = ativo.fast_info or {}
         info = ativo.info or {}
 
         return {
             "ticker": ticker,
             "nome": info.get("longName") or info.get("shortName") or "Nome indisponível",
-            "preco": preco_atual,
+            "preco": round(ultimo_fechamento, 2),
             "variacao": variacao,
-            "market_cap": fast.get("marketCap") or info.get("marketCap"),
-            "setor": info.get("sector", "Indefinido")
+            "historico": historico_grafico
         }
 
-    except HTTPException:
-        raise
     except Exception as e:
-        print("ERRO ATIVO:", e)
-        raise HTTPException(status_code=500, detail="Erro ao buscar ativo")
+        print("ERRO:", e)
+        raise HTTPException(status_code=500, detail="Erro ao buscar histórico")

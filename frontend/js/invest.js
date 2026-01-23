@@ -38,17 +38,17 @@ document.addEventListener("DOMContentLoaded", async () => {
 
     await carregarDadosUsuario()
 
-    function showLoading() {
-        const overlay = document.getElementById("loadingOverlay")
-        if (overlay) overlay.classList.remove("hidden")
-        document.body.classList.add("loading-active")
-    }
+    window.showLoading = function () {
+        const overlay = document.getElementById("loadingOverlay");
+        if (overlay) overlay.classList.remove("hidden");
+        document.body.classList.add("loading-active");
+    };
 
-    function hideLoading() {
-        const overlay = document.getElementById("loadingOverlay")
-        if (overlay) overlay.classList.add("hidden")
-        document.body.classList.remove("loading-active")
-    }
+    window.hideLoading = function () {
+        const overlay = document.getElementById("loadingOverlay");
+        if (overlay) overlay.classList.add("hidden");
+        document.body.classList.remove("loading-active");
+    };
 
     document.querySelector(".logout").addEventListener("click", (e) => {
         e.preventDefault()
@@ -89,46 +89,137 @@ function dispararAlerta() {
     })
 }
 
+let chartInstance = null; // Para controlar o gráfico existente
+
 async function buscarAtivo() {
-    const ticker = document.getElementById("ticker").value.trim().toUpperCase()
-    const resultado = document.getElementById("resultado")
+    const ticker = document.getElementById("ticker").value.trim().toUpperCase();
+    const resultado = document.getElementById("resultado");
+    const canvasElement = document.getElementById("meuGrafico");
+    const ctx = canvasElement.getContext("2d");
 
-    if (!ticker) {
-        resultado.classList.remove("hidden")
-        resultado.innerHTML = "❌ Digite um ticker válido"
-        return
-    }
+    if (!ticker) return;
 
-    resultado.classList.remove("hidden")
-    resultado.innerHTML = "Buscando..."
+    showLoading()
 
     try {
-        const res = await fetch(`http://127.0.0.1:8000/ativos/${ticker}`)
+        const res = await fetch(`http://127.0.0.1:8000/ativos/${ticker}`);
+        if (!res.ok) throw new Error("Erro");
+        const data = await res.json();
 
-        if (!res.ok) {
-            throw new Error("Ativo não encontrado")
+        resultado.classList.remove("hidden");
+        resultado.innerHTML = `
+            <h3>${data.ticker} - ${data.nome}</h3>
+            <p>
+              Preço Atual:
+              <strong style="color:var(--primary)">
+                R$ ${data.preco}
+              </strong>
+              (${data.variacao}%)
+            </p>
+            <button class="btn-buy">Comprar</button>
+        `;
+
+        if (window.chartInstance) {
+            window.chartInstance.destroy();
         }
 
-        const data = await res.json()
+        const labels = data.historico.datas;
+        const ultimaData = labels[labels.length - 1];
 
-        const classe = data.variacao >= 0 ? "positivo" : "negativo"
-        const sinal =
-            data.variacao <= -2
-                ? "Oportunidade de compra"
-                : data.variacao >= 2
-                ? "Forte valorização"
-                : "Aguardar"
+        // Adicionamos labels vazios ao final para criar o "espaço em branco" na borda direita
+        const labelsComFolga = [...labels, "", "", ""]; 
 
-        resultado.innerHTML = `
-            <h3>${data.ticker}</h3>
-            <p>${data.nome}</p>
-            <p>Preço: R$ ${data.preco}</p>
-            <p class="${classe}">Variação: ${data.variacao}%</p>
-            <p><strong>${sinal}</strong></p>
-            <button class="btn-buy">Comprar</button>
-        `
+        window.chartInstance = new Chart(ctx, {
+            type: "line",
+            data: {
+                labels: labelsComFolga, // Usamos as labels com espaço extra
+                datasets: [{
+                    label: `Histórico ${data.ticker}`,
+                    data: data.historico.precos,
+                    borderColor: "#00d1b2",
+                    backgroundColor: "rgba(0, 209, 178, 0.12)",
+                    fill: true,
+                    tension: 0.25,
+                    pointRadius: 2, // Aumentado levemente para destacar os pontos
+                    pointHoverRadius: 5,
+                    borderWidth: 2
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                layout: {
+                    padding: {
+                        right: 30, // Folga interna no canvas
+                        left: 10,
+                        top: 30 // Espaço para a label "Hoje" não cortar
+                    }
+                },
+                plugins: {
+                    legend: { display: false }, // Oculto para ganhar espaço, opcional
+                    zoom: {
+                        pan: {
+                            enabled: true,
+                            mode: "x", // Foco no movimento horizontal para histórico
+                            modifierKey: 'ctrl' // Permite arrastar sem precisar de CTRL
+                        },
+                        zoom: {
+                            wheel: { enabled: true, speed: 0.08 },
+                            pinch: { enabled: true },
+                            mode: "x"
+                        }
+                    },
+                    annotation: {
+                        annotations: {
+                            hoje: {
+                                type: "line",
+                                scaleID: "x",
+                                value: ultimaData,
+                                borderColor: "#00d1b2",
+                                borderWidth: 2,
+                                borderDash: [6, 4],
+                                label: {
+                                    display: true,
+                                    content: "Agora",
+                                    position: "start", // Posiciona no topo da linha
+                                    backgroundColor: "#00d1b2",
+                                    color: "#000",
+                                    font: { size: 11, weight: "bold" },
+                                    yAdjust: -10 // Ajuste fino para não colar na linha do gráfico
+                                }
+                            }
+                        }
+                    }
+                },
+                scales: {
+                    x: {
+                        offset: true, 
+                        grid: { display: false },
+                        ticks: {
+                            color: "#a0a0a0",
+                            maxTicksLimit: 8
+                        },
+                        // Define limites para o pan não "perder" o gráfico de vista
+                        min: labels[Math.max(0, labels.length - 20)], // Começa focado nos últimos 20 dias
+                    },
+                    y: {
+                        beginAtZero: false,
+                        grid: { color: "rgba(255,255,255,0.05)" },
+                        ticks: {
+                            color: "#a0a0a0",
+                            callback: value => `R$ ${value}`
+                        }
+                    }
+                }
+            }
+        });
+
+        document.getElementById("grafico-container").classList.add("grafico-ativo");
+
     } catch (err) {
-        resultado.innerHTML = "Ativo inválido ou erro na consulta"
-        console.error(err)
+        resultado.innerHTML = "Erro ao carregar dados do ativo.";
+        console.error(err);
+    } finally {
+        hideLoading()
     }
 }

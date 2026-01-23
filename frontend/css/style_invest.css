@@ -191,41 +191,47 @@ a {
   margin-top: 15px;
 }
 
-.btn-buy {
+.btn-buy, .btn-reset {
   position: relative;
   overflow: hidden;
+  z-index: 1;
   cursor: pointer;
-  transition: 0.3s ease all;
   text-transform: uppercase;
   font-weight: bold;
-  font-size: 10px;
-  padding: 8px 12px;
   border-radius: 4px;
   border: 2px solid var(--primary);
   color: var(--primary);
   background: transparent;
+  padding: 8px 12px;
+  transition: color 0.3s ease;
 }
-
-.btn-buy::before {
-  content: "";
+.btn-buy::before, .btn-reset::before {
+  content: '';
   position: absolute;
-  inset: 0;
-  background: var(--primary);
-  opacity: 0;
+  inset: 0; /* top:0; left:0; right:0; bottom:0 */
+  background-color: var(--primary);
   z-index: -1;
-  transition: 0.3s;
+  transform: scaleX(0); /* começa invisível */
+  transform-origin: left; /* preenche da esquerda para a direita */
+  transition: transform 0.4s ease;
 }
 
-.btn-buy:hover {
+/* Hover - preenche completamente */
+.btn-buy:hover::before, .btn-reset:hover::before {
+  transform: scaleX(1);
+}
+
+/* Hover - muda a cor do texto */
+.btn-buy:hover, .btn-reset:hover {
   color: #000;
 }
 
-.btn-buy:hover::before {
-  opacity: 1;
-}
-
+/* Clique - efeito de apertar */
 .btn-buy:active {
   transform: scale(0.95);
+}
+.btn-reset {
+  display: none;
 }
 
 /* ================= LOADING OVERLAY ================= */
@@ -363,4 +369,36 @@ a {
   font-size: 10px;
   padding: 8px 12px;
   letter-spacing: 1px;
+}
+#grafico-container {
+  background: var(--card-bg);
+  border-radius: 12px;
+  padding: 0;
+  box-shadow: none;
+  width: 100%;
+  height: 0;                /* 🔥 COLAPSADO */
+  overflow: hidden;
+  opacity: 0;
+  margin-top: 0;
+  transition: 
+    height 0.4s ease,
+    opacity 0.3s ease,
+    margin-top 0.3s ease,
+    box-shadow 0.3s ease,
+    padding 0.3s ease;
+}
+
+/* Quando o gráfico existir */
+#grafico-container.grafico-ativo {
+  height: 450px;            /* 🔥 SÓ AGORA CRESCE */
+  padding: 20px;
+  opacity: 1;
+  margin-top: 20px;
+  box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+}
+
+#meuGrafico {
+    width: 100% !important;
+    height: 100% !important;
+    cursor: pointer;
 }

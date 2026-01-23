@@ -89,6 +89,10 @@
                 </button>
             </div>
             <div id="resultado" class="hidden"></div>
+            <div id="grafico-container" style="width: 100%; margin-top: 20px;">
+                <canvas id="meuGrafico"></canvas>
+                <button onclick="chartInstance.resetZoom()" class="btn-reset">Resetar Zoom</button>
+            </div>
         </div>
 
     </main>
@@ -104,6 +108,9 @@
         </div>
     </div>
 
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-zoom"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-annotation"></script>
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <script src="../js/invest.js"></script>
 </body>
