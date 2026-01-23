@@ -1,0 +1,267 @@
+/* ================= VARIÁVEIS E RESET ================= */
+:root {
+  --primary: #00d1b2;
+  --dark-bg: #121212;
+  --card-bg: #1e1e1e;
+  --text: #ffffff;
+  --text-dim: #a0a0a0;
+  --border: #333;
+  --success: #00d1b2;
+  --danger: #ff3860;
+  --shadow-new: 0 4px 15px rgba(0,0,0,0.3);
+}
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+  background-color: var(--dark-bg);
+  color: var(--text);
+  display: flex;
+  height: 100vh;
+  overflow: hidden;
+}
+
+a {
+  text-decoration: none;
+  color: inherit;
+}
+
+/* =====================================================
+   SIDEBAR
+===================================================== */
+.sidebar {
+    width: 250px;
+    background: #000;
+    color: white;
+    padding: 20px 0;
+    display: flex;
+    flex-direction: column;
+    box-shadow: 2px 0 10px rgba(0, 0, 0, 0.1);
+}
+
+.user-info {
+    text-align: center;
+    padding: 20px;
+    margin-bottom: 20px;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.user-info .material-icons {
+    font-size: 48px;
+    margin-bottom: 5px;
+    color: var(--accent-color);
+}
+
+.user-info h3 {
+    font-weight: 500;
+    font-size: 1.1em;
+}
+
+.sidebar-nav {
+    flex-grow: 1;
+}
+
+.nav-item {
+    display: flex;
+    align-items: center;
+    padding: 15px 20px;
+    color: white;
+    text-decoration: none;
+    transition: background-color 0.3s, border-left 0.3s, transform 0.2s;
+    border-left: 5px solid transparent;
+}
+
+.nav-item .material-icons {
+    margin-right: 15px;
+}
+
+.nav-item:hover {
+    background-color: rgba(255, 255, 255, 0.1);
+    border-left-color: var(--accent-color);
+}
+
+.nav-item.active {
+    background-color: rgba(255, 255, 255, 0.2);
+    border-left-color: var(--accent-color);
+    font-weight: bold;
+}
+
+.logout {
+    margin-top: auto;
+    border-top: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+/* ================= MAIN CONTENT ================= */
+.main-content {
+  flex: 1;
+  padding: 30px;
+  overflow-y: auto;
+}
+
+/* ================= HEADER ================= */
+.header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 20px 30px;
+  background: linear-gradient(90deg, var(--primary), #00a896);
+  color: white;
+  box-shadow: var(--shadow-new);
+  border-radius: 0 0 20px 20px;
+  margin: -30px -30px 25px -30px;
+}
+
+.logo-img {
+  height: 55px;
+}
+
+.bank-logo {
+  font-size: 1.8rem;
+  font-weight: 700;
+}
+
+.highlight {
+  color: var(--card-bg);
+}
+
+.header-actions {
+  display: flex;
+  gap: 10px;
+}
+
+.icon-button {
+  background: none;
+  border: none;
+  color: white;
+  cursor: pointer;
+  padding: 10px;
+  border-radius: 50%;
+  transition: 0.3s;
+  display: flex;
+  align-items: center;
+}
+
+.icon-button:hover {
+  background: rgba(255,255,255,0.2);
+}
+
+/* ================= CARDS ================= */
+.card {
+  background: var(--card-bg);
+  padding: 20px;
+  border-radius: 14px;
+  border: 1px solid var(--border);
+  box-shadow: var(--shadow-new);
+}
+
+.top-cards {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  gap: 20px;
+}
+
+.mini-card {
+  display: flex;
+  gap: 15px;
+  align-items: center;
+}
+
+.primary-gradient {
+  background: linear-gradient(135deg, var(--primary), #009e86);
+  color: #000;
+}
+
+.card-icon {
+  background: rgba(255,255,255,0.1);
+  padding: 12px;
+  border-radius: 10px;
+  display: flex;
+  align-items: center;
+}
+
+/* ================= BOTÕES ================= */
+.buttons {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-top: 15px;
+}
+
+.btn-buy {
+  position: relative;
+  overflow: hidden;
+  cursor: pointer;
+  transition: 0.3s ease all;
+  text-transform: uppercase;
+  font-weight: bold;
+  font-size: 10px;
+  padding: 8px 12px;
+  border-radius: 4px;
+  border: 2px solid var(--primary);
+  color: var(--primary);
+  background: transparent;
+}
+
+.btn-buy::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: var(--primary);
+  opacity: 0;
+  z-index: -1;
+  transition: 0.3s;
+}
+
+.btn-buy:hover {
+  color: #000;
+}
+
+.btn-buy:hover::before {
+  opacity: 1;
+}
+
+.btn-buy:active {
+  transform: scale(0.95);
+}
+
+/* ================= LOADING OVERLAY ================= */
+.loading-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.85);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 9999;
+}
+
+.loading-overlay.hidden {
+  display: none;
+}
+
+.loading {
+  display: flex;
+  gap: 6px;
+}
+
+.loading span {
+  width: 8px;
+  height: 30px;
+  background: var(--primary);
+  animation: pulse 1s infinite ease-in-out;
+}
+
+.loading span:nth-child(2) { animation-delay: 0.1s; }
+.loading span:nth-child(3) { animation-delay: 0.2s; }
+.loading span:nth-child(4) { animation-delay: 0.3s; }
+.loading span:nth-child(5) { animation-delay: 0.4s; }
+.loading span:nth-child(6) { animation-delay: 0.5s; }
+
+@keyframes pulse {
+  0%, 100% { transform: scaleY(0.4); opacity: 0.5; }
+  50% { transform: scaleY(1); opacity: 1; }
+}

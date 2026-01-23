@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="icon" href="../img/bank.png" type="image/png">
+    <link rel="stylesheet" href="../css/style_invest.css">
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+    <title>Dashboard de Investimentos PY</title>
+</head>
+
+<body>
+
+    <aside class="sidebar">
+        <div class="user-info">
+            <span class="material-icons">account_circle</span>
+            <h3 id="client-name">Olá</h3>
+        </div>
+
+        <nav class="sidebar-nav">
+            <a href="home.html" class="nav-item">
+                <span class="material-icons">home</span> Dashboard
+            </a>
+            <a href="settings.html" class="nav-item">
+                <span class="material-icons">settings</span> Configurações
+            </a>
+            <a href="extrato.html" class="nav-item">
+                <span class="material-icons">payments</span> Transferências
+            </a>
+            <a href="" class="nav-item invest active" id="invest-btn">
+                <span class="material-icons">currency_exchange</span> Investimentos
+            </a>
+            <a href="login.html" class="nav-item logout">
+                <span class="material-icons">logout</span> Sair
+            </a>
+        </nav>
+    </aside>
+
+    <main class="main-content">
+
+        <header class="header">
+            <a href="home.html">
+                <img src="../img/bank.png" alt="Logo BankFlow" class="logo-img">
+            </a>
+            <a href="home.html">
+                <div class="bank-logo">Bank<span class="highlight">PY</span></div>
+            </a>
+            <div class="header-actions">
+                <!-- <button class="icon-button" id="theme-toggle"><span class="material-icons">contrast</span></button> -->
+                <!-- <button class="icon-button"><span class="material-icons">notifications</span></button> -->
+                <button class="icon-button" onclick="dispararAlerta()"><span class="material-icons">help</span></button>
+            </div>
+        </header>
+
+        <section class="top-cards">
+            <div class="card mini-card">
+                <div class="card-icon">
+                    <span class="material-icons">account_balance</span>
+                </div>
+                <div>
+                    <small>Saldo Disponível</small>
+                    <h2 id="saldo-disponivel"></h2>
+                    <div class="buttons">
+                        <button class="btn-buy btn-effect" onclick="openModal('RENDA_FIXA')">Renda Fixa</button>
+                        <button class="btn-buy btn-effect" onclick="openModal('ACOES')">Ações</button>
+                        <button class="btn-buy btn-effect" onclick="openModal('FUNDOS')">Fundos</button>
+                        <button class="btn-buy btn-effect" onclick="openModal('CRIPTO')">Cripto</button>
+                    </div>
+                </div>
+            </div>
+
+            <div class="card mini-card primary-gradient">
+                <div class="card-icon">
+                    <span class="material-icons">trending_up</span>
+                </div>
+                <div>
+                    <small>Patrimônio Total</small>
+                    <h2 id="total-patrimony"></h2>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <div id="loadingOverlay" class="loading-overlay hidden">
+        <div class="loading">
+            <span></span>
+            <span></span>
+            <span></span>
+            <span></span>
+            <span></span>
+            <span></span>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <script src="../js/invest.js"></script>
+</body>
+
+</html>

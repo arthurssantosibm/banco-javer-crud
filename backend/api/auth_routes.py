@@ -6,6 +6,7 @@ from models.core.db_javer import get_connection
 from models.core.security import bcrypt_context
 from schemas.schemas import LoginSchema, UpdateUserSchema, CriarConta, TransacaoCreate, DepositoRequest, DepositoResponse, ReativarSchema, SaqueRequest, SaqueResponse, HomeSchema
 from api.jwt import create_access_token, get_current_user_id
+import yfinance as yf
 
 
 auth_router = APIRouter(prefix="/auth", tags=["auth"])
@@ -13,6 +14,7 @@ user_router = APIRouter(prefix="/user", tags=["user"])
 transacoes_router = APIRouter(prefix="/transacoes", tags=["transacoes"])
 deposit_router = APIRouter(prefix="/depositos", tags=["depositos"])
 saque_router = APIRouter(prefix="/saques", tags=["saques"])
+buscar_ativos = APIRouter(prefix="/ativos", tags=["ativos"])
 
 DATA_API_URL = "http://127.0.0.1:8001"
 INTERNAL_KEY = "INTERNAL_SECRET"
@@ -488,3 +490,44 @@ async def realizar_saque(
     finally:
         cursor.close()
         conn.close()
+
+@buscar_ativos.get("/{ticker}")
+async def buscar_ativo(ticker: str):
+    try:
+        ticker = ticker.upper().strip()
+
+        ativo = yf.Ticker(ticker)
+        hist = ativo.history(period="5d")
+
+        if hist.empty or len(hist) < 2:
+            raise HTTPException(status_code=404, detail="Dados insuficientes")
+
+        close = hist["Close"].dropna()
+
+        if len(close) < 2:
+            raise HTTPException(status_code=404, detail="Sem dados de fechamento")
+
+        preco_atual = round(close.iloc[-1], 2)
+        preco_anterior = round(close.iloc[-2], 2)
+
+        variacao = round(
+            ((preco_atual - preco_anterior) / preco_anterior) * 100,
+            2
+        )
+
+        info = ativo.info or {}
+
+        return {
+            "ticker": ticker,
+            "nome": info.get("longName", "Nome indisponível"),
+            "preco": preco_atual,
+            "variacao": variacao,
+            "market_cap": info.get("marketCap"),
+            "setor": info.get("sector")
+        }
+
+    except HTTPException:
+        raise
+    except Exception as e:
+        print("ERRO:", e)
+        raise HTTPException(status_code=500, detail="Erro ao processar ativo")
