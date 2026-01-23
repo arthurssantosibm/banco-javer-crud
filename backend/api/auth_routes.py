@@ -497,37 +497,41 @@ async def buscar_ativo(ticker: str):
         ticker = ticker.upper().strip()
 
         ativo = yf.Ticker(ticker)
-        hist = ativo.history(period="5d")
 
-        if hist.empty or len(hist) < 2:
+        # 🔹 Histórico curto e seguro
+        hist = ativo.history(period="7d", interval="1d")
+
+        if hist is None or hist.empty or "Close" not in hist:
+            raise HTTPException(status_code=404, detail="Ativo não encontrado")
+
+        closes = hist["Close"].dropna()
+
+        if len(closes) < 2:
             raise HTTPException(status_code=404, detail="Dados insuficientes")
 
-        close = hist["Close"].dropna()
-
-        if len(close) < 2:
-            raise HTTPException(status_code=404, detail="Sem dados de fechamento")
-
-        preco_atual = round(close.iloc[-1], 2)
-        preco_anterior = round(close.iloc[-2], 2)
+        preco_atual = round(float(closes.iloc[-1]), 2)
+        preco_anterior = round(float(closes.iloc[-2]), 2)
 
         variacao = round(
             ((preco_atual - preco_anterior) / preco_anterior) * 100,
             2
         )
 
+        # 🔹 fast_info é mais estável
+        fast = ativo.fast_info or {}
         info = ativo.info or {}
 
         return {
             "ticker": ticker,
-            "nome": info.get("longName", "Nome indisponível"),
+            "nome": info.get("longName") or info.get("shortName") or "Nome indisponível",
             "preco": preco_atual,
             "variacao": variacao,
-            "market_cap": info.get("marketCap"),
-            "setor": info.get("sector")
+            "market_cap": fast.get("marketCap") or info.get("marketCap"),
+            "setor": info.get("sector", "Indefinido")
         }
 
     except HTTPException:
         raise
     except Exception as e:
-        print("ERRO:", e)
-        raise HTTPException(status_code=500, detail="Erro ao processar ativo")
+        print("ERRO ATIVO:", e)
+        raise HTTPException(status_code=500, detail="Erro ao buscar ativo")

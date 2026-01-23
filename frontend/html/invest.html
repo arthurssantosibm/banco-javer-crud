@@ -80,6 +80,17 @@
                 </div>
             </div>
         </section>
+        <div class="container-search">
+            <h1>Pesquisa de Ativos</h1>
+            <div class="search-row">
+                <input type="text" id="ticker" placeholder="Digite o ativo (ex: PETR4.SA)..." />
+                <button onclick="buscarAtivo()">
+                    <span class="material-icons">search</span> Pesquisar
+                </button>
+            </div>
+            <div id="resultado" class="hidden"></div>
+        </div>
+
     </main>
 
     <div id="loadingOverlay" class="loading-overlay hidden">

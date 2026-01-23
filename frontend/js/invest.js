@@ -21,7 +21,6 @@ document.addEventListener("DOMContentLoaded", async () => {
             if (!res.ok) throw new Error("Erro ao buscar dados")
 
             user = await res.json()
-
             saldo = Number(user.saldo_cc) || 0
 
             document.getElementById("client-name").textContent = `Olá, ${user.nome}`
@@ -36,7 +35,6 @@ document.addEventListener("DOMContentLoaded", async () => {
             console.error("Erro ao carregar usuário", err)
         }
     }
-
 
     await carregarDadosUsuario()
 
@@ -89,4 +87,48 @@ function dispararAlerta() {
         hideClass: { popup: "animate__animated animate__fadeOutDown animate__faster" },
         customClass: { confirmButton: 'botao-confirmar-estilizado', title: 'titulo-customizado' }
     })
+}
+
+async function buscarAtivo() {
+    const ticker = document.getElementById("ticker").value.trim().toUpperCase()
+    const resultado = document.getElementById("resultado")
+
+    if (!ticker) {
+        resultado.classList.remove("hidden")
+        resultado.innerHTML = "❌ Digite um ticker válido"
+        return
+    }
+
+    resultado.classList.remove("hidden")
+    resultado.innerHTML = "Buscando..."
+
+    try {
+        const res = await fetch(`http://127.0.0.1:8000/ativos/${ticker}`)
+
+        if (!res.ok) {
+            throw new Error("Ativo não encontrado")
+        }
+
+        const data = await res.json()
+
+        const classe = data.variacao >= 0 ? "positivo" : "negativo"
+        const sinal =
+            data.variacao <= -2
+                ? "Oportunidade de compra"
+                : data.variacao >= 2
+                ? "Forte valorização"
+                : "Aguardar"
+
+        resultado.innerHTML = `
+            <h3>${data.ticker}</h3>
+            <p>${data.nome}</p>
+            <p>Preço: R$ ${data.preco}</p>
+            <p class="${classe}">Variação: ${data.variacao}%</p>
+            <p><strong>${sinal}</strong></p>
+            <button class="btn-buy">Comprar</button>
+        `
+    } catch (err) {
+        resultado.innerHTML = "Ativo inválido ou erro na consulta"
+        console.error(err)
+    }
 }
