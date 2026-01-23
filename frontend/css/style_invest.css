@@ -234,42 +234,89 @@ a {
   display: none;
 }
 
-/* ================= LOADING OVERLAY ================= */
+/* ===============================
+   OVERLAY LOADING COM BLUR
+================================ */
 .loading-overlay {
-  position: fixed;
-  inset: 0;
-  background: rgba(0,0,0,0.85);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  z-index: 9999;
+    position: fixed;
+    inset: 0;
+    background: rgba(229, 255, 251, 0.6);
+    backdrop-filter: blur(6px);
+    -webkit-backdrop-filter: blur(6px);
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    z-index: 9999;
 }
 
-.loading-overlay.hidden {
-  display: none;
+/* Esconde o overlay */
+.hidden {
+    display: none;
 }
 
+/* Desabilita interação quando carregando */
+body.loading-active {
+    overflow: hidden;
+}
+
+/* Ajuste de cores do loading para seu tema */
 .loading {
-  display: flex;
-  gap: 6px;
+    --speed-of-animation: 0.9s;
+    --gap: 6px;
+    --first-color: #20B2AA;
+    --second-color: #40E0D0;
+    --third-color: #7FFFD4;
+    --fourth-color: #00CED1;
+    --fifth-color: #008B8B;
+
+    display: flex;
+    justify-content: center;
+    align-items: center;
+
+    width: 100px;
+    height: 100px;
+    gap: 6px;
+
+    position: relative;
+    z-index: 10000;
 }
 
 .loading span {
-  width: 8px;
-  height: 30px;
-  background: var(--primary);
-  animation: pulse 1s infinite ease-in-out;
+    width: 4px;
+    height: 50px;
+    background: var(--first-color);
+    animation: scale var(--speed-of-animation) ease-in-out infinite;
 }
 
-.loading span:nth-child(2) { animation-delay: 0.1s; }
-.loading span:nth-child(3) { animation-delay: 0.2s; }
-.loading span:nth-child(4) { animation-delay: 0.3s; }
-.loading span:nth-child(5) { animation-delay: 0.4s; }
-.loading span:nth-child(6) { animation-delay: 0.5s; }
+.loading span:nth-child(2) {
+    background: var(--second-color);
+    animation-delay: -0.8s;
+}
 
-@keyframes pulse {
-  0%, 100% { transform: scaleY(0.4); opacity: 0.5; }
-  50% { transform: scaleY(1); opacity: 1; }
+.loading span:nth-child(3) {
+    background: var(--third-color);
+    animation-delay: -0.7s;
+}
+
+.loading span:nth-child(4) {
+    background: var(--fourth-color);
+    animation-delay: -0.6s;
+}
+
+.loading span:nth-child(5) {
+    background: var(--fifth-color);
+    animation-delay: -0.5s;
+}
+
+@keyframes scale {
+    0%, 40%, 100% {
+        transform: scaleY(0.05);
+    }
+    20% {
+        transform: scaleY(1);
+    }
 }
 
 
