@@ -48,3 +48,6 @@ class SaqueRequest(BaseModel):
 class SaqueResponse(BaseModel):
     saldo_atual: float
     mensagem: str
+
+class InvestRegisterSchema(BaseModel):
+    perfil_investidor: str

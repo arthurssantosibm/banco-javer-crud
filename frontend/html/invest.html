@@ -114,5 +114,22 @@
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <script src="../js/invest.js"></script>
 </body>
+<div id="investorModal" class="modal hidden">
+    <div class="modal-content">
+        <h2>Perfil de Investidor</h2>
+        <p>Para acessar investimentos, selecione seu perfil:</p>
+
+        <select id="perfilInvestidor">
+            <option value="">Selecione</option>
+            <option value="CONSERVADOR">Conservador</option>
+            <option value="MODERADO">Moderado</option>
+            <option value="ARROJADO">Arrojado</option>
+        </select>
+
+        <button onclick="registrarInvestidor()" class="btn-confirm">
+            Confirmar Perfil
+        </button>
+    </div>
+</div>
 
 </html>

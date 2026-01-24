@@ -12,6 +12,7 @@ from api.auth_routes import transacoes_router
 from api.auth_routes import deposit_router
 from api.auth_routes import saque_router
 from api.auth_routes import buscar_ativos
+from api.auth_routes import invest_router
 
 app = FastAPI()
 
@@ -36,3 +37,4 @@ app.include_router(transacoes_router)
 app.include_router(deposit_router)
 app.include_router(saque_router)
 app.include_router(buscar_ativos)
+app.include_router(invest_router)

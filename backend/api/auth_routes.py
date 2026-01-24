@@ -4,7 +4,7 @@ import httpx
 from mysql.connector import Error
 from models.core.db_javer import get_connection
 from models.core.security import bcrypt_context
-from schemas.schemas import LoginSchema, UpdateUserSchema, CriarConta, TransacaoCreate, DepositoRequest, DepositoResponse, ReativarSchema, SaqueRequest, SaqueResponse, HomeSchema
+from schemas.schemas import LoginSchema, UpdateUserSchema, CriarConta, TransacaoCreate, DepositoRequest, DepositoResponse, ReativarSchema, SaqueRequest, SaqueResponse, HomeSchema, InvestRegisterSchema
 from api.jwt import create_access_token, get_current_user_id
 import yfinance as yf
 
@@ -15,6 +15,7 @@ transacoes_router = APIRouter(prefix="/transacoes", tags=["transacoes"])
 deposit_router = APIRouter(prefix="/depositos", tags=["depositos"])
 saque_router = APIRouter(prefix="/saques", tags=["saques"])
 buscar_ativos = APIRouter(prefix="/ativos", tags=["ativos"])
+invest_router = APIRouter(prefix="/invest", tags=["invest"])
 
 DATA_API_URL = "http://127.0.0.1:8001"
 INTERNAL_KEY = "INTERNAL_SECRET"
@@ -491,6 +492,8 @@ async def realizar_saque(
         cursor.close()
         conn.close()
 
+
+# BLOCO DE INVESTIMENTOS
 @buscar_ativos.get("/{ticker}")
 async def buscar_ativo(ticker: str):
     try:
@@ -525,3 +528,84 @@ async def buscar_ativo(ticker: str):
     except Exception as e:
         print("ERRO:", e)
         raise HTTPException(status_code=500, detail="Erro ao buscar histórico")
+
+
+@invest_router.get("/verify")
+async def verify_investor(user_id: int = Depends(get_current_user_id)):
+    conn = get_connection()
+    cursor = conn.cursor(dictionary=True)
+
+    try:
+        cursor.execute(
+            "SELECT email FROM usuarios WHERE id = %s",
+            (user_id,)
+        )
+        user = cursor.fetchone()
+
+        if not user:
+            raise HTTPException(status_code=404, detail="Usuário não encontrado")
+
+        cursor.execute(
+            "SELECT id FROM invest_client WHERE email = %s",
+            (user["email"],)
+        )
+        invest = cursor.fetchone()
+
+        return {
+            "is_investor": bool(invest)
+        }
+
+    finally:
+        cursor.close()
+        conn.close()
+
+@invest_router.post("/register")
+async def register_investor(
+    data: InvestRegisterSchema,
+    user_id: int = Depends(get_current_user_id)
+):
+    conn = get_connection()
+    cursor = conn.cursor(dictionary=True)
+
+    try:
+        cursor.execute(
+            "SELECT id, email FROM usuarios WHERE id = %s",
+            (user_id,)
+        )
+        user = cursor.fetchone()
+
+        if not user:
+            raise HTTPException(status_code=404, detail="Usuário não encontrado")
+
+        cursor.execute(
+            "SELECT id FROM invest_client WHERE email = %s",
+            (user["email"],)
+        )
+        exists = cursor.fetchone()
+
+        if exists:
+            raise HTTPException(
+                status_code=400,
+                detail="Usuário já é investidor"
+            )
+
+        cursor.execute(
+            """
+            INSERT INTO invest_client
+            (client_id, email, perfil_investidor, patrimonio_total)
+            VALUES (%s, %s, %s, 0)
+            """,
+            (
+                user["id"],
+                user["email"],
+                data.perfil_investidor.upper()
+            )
+        )
+
+        conn.commit()
+
+        return {"message": "Perfil investidor registrado com sucesso"}
+
+    finally:
+        cursor.close()
+        conn.close()

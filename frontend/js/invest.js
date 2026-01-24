@@ -1,61 +1,150 @@
+let headers = {};
+let user = null;
+let saldo = 0;
+
 document.addEventListener("DOMContentLoaded", async () => {
-    const token = localStorage.getItem("access_token")
+    const token = localStorage.getItem("access_token");
 
     if (!token) {
-        window.location.href = "login.html"
-        return
+        window.location.href = "login.html";
+        return;
     }
 
-    const headers = {
+    headers = {
         "Content-Type": "application/json",
         "Authorization": `Bearer ${token}`
     };
 
-    let user;
-    let saldo = 0
-
-    async function carregarDadosUsuario() {
-        try {
-            const res = await fetch("http://127.0.0.1:8000/user/user", { headers })
-
-            if (!res.ok) throw new Error("Erro ao buscar dados")
-
-            user = await res.json()
-            saldo = Number(user.saldo_cc) || 0
-
-            document.getElementById("client-name").textContent = `Olá, ${user.nome}`
-
-            document.getElementById("saldo-disponivel").textContent =
-                saldo.toLocaleString("pt-BR", {
-                    style: "currency",
-                    currency: "BRL"
-                })
-
-        } catch (err) {
-            console.error("Erro ao carregar usuário", err)
-        }
-    }
-
-    await carregarDadosUsuario()
-
-    window.showLoading = function () {
-        const overlay = document.getElementById("loadingOverlay");
-        if (overlay) overlay.classList.remove("hidden");
-        document.body.classList.add("loading-active");
-    };
-
-    window.hideLoading = function () {
-        const overlay = document.getElementById("loadingOverlay");
-        if (overlay) overlay.classList.add("hidden");
-        document.body.classList.remove("loading-active");
-    };
+    await carregarDadosUsuario();
+    await verificarInvestidor();
 
     document.querySelector(".logout").addEventListener("click", (e) => {
-        e.preventDefault()
-        localStorage.removeItem("access_token")
-        window.location.href = "login.html"
-    })
-})
+        e.preventDefault();
+        localStorage.removeItem("access_token");
+        window.location.href = "login.html";
+    });
+});
+
+/* ================= LOADING ================= */
+
+window.showLoading = function () {
+    const overlay = document.getElementById("loadingOverlay");
+    if (overlay) overlay.classList.remove("hidden");
+    document.body.classList.add("loading-active");
+};
+
+window.hideLoading = function () {
+    const overlay = document.getElementById("loadingOverlay");
+    if (overlay) overlay.classList.add("hidden");
+    document.body.classList.remove("loading-active");
+};
+
+/* ================= USUÁRIO ================= */
+
+async function carregarDadosUsuario() {
+    try {
+        const res = await fetch(
+            "http://127.0.0.1:8000/user/user",
+            { headers }
+        );
+
+        if (!res.ok) throw new Error("Erro ao buscar usuário");
+
+        user = await res.json();
+        saldo = Number(user.saldo_cc) || 0;
+
+        document.getElementById("client-name").textContent = `Olá, ${user.nome}`;
+        document.getElementById("saldo-disponivel").textContent =
+            saldo.toLocaleString("pt-BR", {
+                style: "currency",
+                currency: "BRL"
+            });
+
+    } catch (err) {
+        console.error(err);
+        Swal.fire("Erro", "Erro ao carregar dados do usuário", "error");
+    }
+}
+
+/* ================= INVESTIDOR ================= */
+
+async function verificarInvestidor() {
+    try {
+        showLoading();
+
+        const res = await fetch(
+            "http://127.0.0.1:8000/invest/verify",
+            { headers }
+        );
+
+        if (!res.ok) throw new Error("Erro na verificação");
+
+        const data = await res.json();
+
+        if (!data.is_investor) {
+            document
+                .getElementById("investorModal")
+                .classList.remove("hidden");
+        }
+
+    } catch (err) {
+        console.error(err);
+        Swal.fire("Erro", "Erro ao validar perfil investidor", "error");
+    } finally {
+        hideLoading();
+    }
+}
+
+/* ================= REGISTRAR INVESTIDOR ================= */
+
+async function registrarInvestidor() {
+    const perfil = document.getElementById("perfilInvestidor").value;
+
+    if (!perfil) {
+        Swal.fire("Atenção", "Selecione um perfil válido", "warning");
+        return;
+    }
+
+    try {
+        showLoading();
+
+        const res = await fetch(
+            "http://127.0.0.1:8000/invest/register",
+            {
+                method: "POST",
+                headers,
+                body: JSON.stringify({
+                    perfil_investidor: perfil
+                })
+            }
+        );
+
+        const data = await res.json();
+
+        if (!res.ok) {
+            throw new Error(data.detail || "Erro ao registrar investidor");
+        }
+
+        Swal.fire({
+            icon: "success",
+            title: "Cadastro realizado!",
+            text: "Perfil de investidor registrado com sucesso",
+            confirmButtonColor: "#04b197"
+        });
+
+        document
+            .getElementById("investorModal")
+            .classList.add("hidden");
+
+    } catch (err) {
+        console.error(err);
+        Swal.fire("Erro", err.message, "error");
+    } finally {
+        hideLoading();
+    }
+}
+
+/* ================= ALERTA ORIGINAL ================= */
 
 function dispararAlerta() {
     Swal.fire({
@@ -84,10 +173,11 @@ function dispararAlerta() {
         padding: "2em",
         width: "400px",
         showClass: { popup: "animate__animated animate__fadeInUp animate__faster" },
-        hideClass: { popup: "animate__animated animate__fadeOutDown animate__faster" },
-        customClass: { confirmButton: 'botao-confirmar-estilizado', title: 'titulo-customizado' }
-    })
+        hideClass: { popup: "animate__animated animate__fadeOutDown animate__faster" }
+    });
 }
+
+/* ================= BUSCAR ATIVO (ORIGINAL, INTACTO) ================= */
 
 let chartInstance = null;
 async function buscarAtivo() {
@@ -125,7 +215,7 @@ async function buscarAtivo() {
         const labels = data.historico.datas;
         const ultimaData = labels[labels.length - 1];
 
-        const labelsComFolga = [...labels, "", "", ""]; 
+        const labelsComFolga = [...labels, "", "", ""];
 
         window.chartInstance = new Chart(ctx, {
             type: "line",
@@ -179,11 +269,11 @@ async function buscarAtivo() {
                                 label: {
                                     display: true,
                                     content: "Agora",
-                                    position: "start", 
+                                    position: "start",
                                     backgroundColor: "#00d1b2",
                                     color: "#000",
                                     font: { size: 11, weight: "bold" },
-                                    yAdjust: -10 
+                                    yAdjust: -10
                                 }
                             }
                         }
@@ -191,14 +281,14 @@ async function buscarAtivo() {
                 },
                 scales: {
                     x: {
-                        offset: true, 
+                        offset: true,
                         grid: { display: false },
                         ticks: {
                             color: "#a0a0a0",
                             maxTicksLimit: 8
                         },
-                        
-                        min: labels[Math.max(0, labels.length - 20)], 
+
+                        min: labels[Math.max(0, labels.length - 20)],
                     },
                     y: {
                         beginAtZero: false,

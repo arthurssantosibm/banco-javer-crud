@@ -1,33 +1,33 @@
 /* ================= VARIÁVEIS E RESET ================= */
 :root {
-  --primary: #00d1b2;
-  --dark-bg: #121212;
-  --card-bg: #1e1e1e;
-  --text: #ffffff;
-  --text-dim: #a0a0a0;
-  --border: #333;
-  --success: #00d1b2;
-  --danger: #ff3860;
-  --shadow-new: 0 4px 15px rgba(0,0,0,0.3);
+    --primary: #00d1b2;
+    --dark-bg: #121212;
+    --card-bg: #1e1e1e;
+    --text: #ffffff;
+    --text-dim: #a0a0a0;
+    --border: #333;
+    --success: #00d1b2;
+    --danger: #ff3860;
+    --shadow-new: 0 4px 15px rgba(0, 0, 0, 0.3);
 }
 
 * {
-  box-sizing: border-box;
+    box-sizing: border-box;
 }
 
 body {
-  margin: 0;
-  font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
-  background-color: var(--dark-bg);
-  color: var(--text);
-  display: flex;
-  height: 100vh;
-  overflow: hidden;
+    margin: 0;
+    font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+    background-color: var(--dark-bg);
+    color: var(--text);
+    display: flex;
+    height: 100vh;
+    overflow: hidden;
 }
 
 a {
-  text-decoration: none;
-  color: inherit;
+    text-decoration: none;
+    color: inherit;
 }
 
 /* =====================================================
@@ -97,141 +97,155 @@ a {
 
 /* ================= MAIN CONTENT ================= */
 .main-content {
-  flex: 1;
-  padding: 30px;
-  overflow-y: auto;
+    flex: 1;
+    padding: 30px;
+    overflow-y: auto;
 }
 
 /* ================= HEADER ================= */
 .header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  padding: 20px 30px;
-  background: linear-gradient(90deg, var(--primary), #00a896);
-  color: white;
-  box-shadow: var(--shadow-new);
-  border-radius: 0 0 20px 20px;
-  margin: -30px -30px 25px -30px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 20px 30px;
+    background: linear-gradient(90deg, var(--primary), #00a896);
+    color: white;
+    box-shadow: var(--shadow-new);
+    border-radius: 0 0 20px 20px;
+    margin: -30px -30px 25px -30px;
 }
 
 .logo-img {
-  height: 55px;
+    height: 55px;
 }
 
 .bank-logo {
-  font-size: 1.8rem;
-  font-weight: 700;
+    font-size: 1.8rem;
+    font-weight: 700;
 }
 
 .highlight {
-  color: var(--card-bg);
+    color: var(--card-bg);
 }
 
 .header-actions {
-  display: flex;
-  gap: 10px;
+    display: flex;
+    gap: 10px;
 }
 
 .icon-button {
-  background: none;
-  border: none;
-  color: white;
-  cursor: pointer;
-  padding: 10px;
-  border-radius: 50%;
-  transition: 0.3s;
-  display: flex;
-  align-items: center;
+    background: none;
+    border: none;
+    color: white;
+    cursor: pointer;
+    padding: 10px;
+    border-radius: 50%;
+    transition: 0.3s;
+    display: flex;
+    align-items: center;
 }
 
 .icon-button:hover {
-  background: rgba(255,255,255,0.2);
+    background: rgba(255, 255, 255, 0.2);
 }
 
 /* ================= CARDS ================= */
 .card {
-  background: var(--card-bg);
-  padding: 20px;
-  border-radius: 14px;
-  border: 1px solid var(--border);
-  box-shadow: var(--shadow-new);
+    background: var(--card-bg);
+    padding: 20px;
+    border-radius: 14px;
+    border: 1px solid var(--border);
+    box-shadow: var(--shadow-new);
 }
 
 .top-cards {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-  gap: 20px;
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: 20px;
 }
 
 .mini-card {
-  display: flex;
-  gap: 15px;
-  align-items: center;
+    display: flex;
+    gap: 15px;
+    align-items: center;
 }
 
 .primary-gradient {
-  background: linear-gradient(135deg, var(--primary), #009e86);
-  color: #000;
+    background: linear-gradient(135deg, var(--primary), #009e86);
+    color: #000;
 }
 
 .card-icon {
-  background: rgba(255,255,255,0.1);
-  padding: 12px;
-  border-radius: 10px;
-  display: flex;
-  align-items: center;
+    background: rgba(255, 255, 255, 0.1);
+    padding: 12px;
+    border-radius: 10px;
+    display: flex;
+    align-items: center;
 }
 
 /* ================= BOTÕES ================= */
 .buttons {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 8px;
-  margin-top: 15px;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin-top: 15px;
 }
 
-.btn-buy, .btn-reset {
-  position: relative;
-  overflow: hidden;
-  z-index: 1;
-  cursor: pointer;
-  text-transform: uppercase;
-  font-weight: bold;
-  border-radius: 4px;
-  border: 2px solid var(--primary);
-  color: var(--primary);
-  background: transparent;
-  padding: 8px 12px;
-  transition: color 0.3s ease;
+.btn-buy,
+.btn-reset,
+.btn-confirm {
+    position: relative;
+    overflow: hidden;
+    z-index: 1;
+    cursor: pointer;
+    text-transform: uppercase;
+    font-weight: bold;
+    border-radius: 4px;
+    border: 2px solid var(--primary);
+    color: var(--primary);
+    background: transparent;
+    padding: 8px 12px;
+    transition: color 0.3s ease;
 }
-.btn-buy::before, .btn-reset::before {
-  content: '';
-  position: absolute;
-  inset: 0; /* top:0; left:0; right:0; bottom:0 */
-  background-color: var(--primary);
-  z-index: -1;
-  transform: scaleX(0); /* começa invisível */
-  transform-origin: left; /* preenche da esquerda para a direita */
-  transition: transform 0.4s ease;
+
+.btn-buy::before,
+.btn-reset::before,
+.btn-confirm::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    /* top:0; left:0; right:0; bottom:0 */
+    background-color: var(--primary);
+    z-index: -1;
+    transform: scaleX(0);
+    /* começa invisível */
+    transform-origin: left;
+    /* preenche da esquerda para a direita */
+    transition: transform 0.4s ease;
 }
 
 /* Hover - preenche completamente */
-.btn-buy:hover::before, .btn-reset:hover::before {
-  transform: scaleX(1);
+.btn-buy:hover::before,
+.btn-reset:hover::before,
+.btn-confirm:hover::before {
+    transform: scaleX(1);
 }
 
 /* Hover - muda a cor do texto */
-.btn-buy:hover, .btn-reset:hover {
-  color: #000;
+.btn-buy:hover,
+.btn-reset:hover,
+.btn-confirm:hover {
+    color: #000;
 }
 
 /* Clique - efeito de apertar */
-.btn-buy:active {
-  transform: scale(0.95);
+.btn-buy:active,
+.btn-confirm:active {
+    transform: scale(0.95);
 }
+
 .btn-reset {
-  display: none;
+    display: none;
 }
 
 /* ===============================
@@ -311,9 +325,13 @@ body.loading-active {
 }
 
 @keyframes scale {
-    0%, 40%, 100% {
+
+    0%,
+    40%,
+    100% {
         transform: scaleY(0.05);
     }
+
     20% {
         transform: scaleY(1);
     }
@@ -322,130 +340,199 @@ body.loading-active {
 
 /* ESTILIZAÇÃO DA PESQUISA DE ATIVOS */
 .container-search {
-  width: 100%;
-  max-width: 100%;
-  margin: 0;
-  padding: 20px;
-  display: flex;
-  flex-direction: column;
-  gap: 15px;
-  background: var(--card-bg);
-  padding: 20px;
-  border-radius: 14px;
-  border: 1px solid var(--border);
-  box-shadow: var(--shadow-new);
-  margin-top: 30px;
+    width: 100%;
+    max-width: 100%;
+    margin: 0;
+    padding: 20px;
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+    background: var(--card-bg);
+    padding: 20px;
+    border-radius: 14px;
+    border: 1px solid var(--border);
+    box-shadow: var(--shadow-new);
+    margin-top: 30px;
 }
 
 .container-search h1 {
-  font-size: 1.5rem;
-  margin-bottom: 20px;
-  color: var(--text);
-  font-weight: 500;
+    font-size: 1.5rem;
+    margin-bottom: 20px;
+    color: var(--text);
+    font-weight: 500;
 }
 
 .search-row {
-  display: flex;
-  background: var(--card-bg);
-  padding: 8px;
-  border-radius: 12px;
-  border: 1px solid var(--border);
-  transition: 0.3s;
-  box-shadow: var(--shadow-new);
+    display: flex;
+    background: var(--card-bg);
+    padding: 8px;
+    border-radius: 12px;
+    border: 1px solid var(--border);
+    transition: 0.3s;
+    box-shadow: var(--shadow-new);
 }
 
 .search-row:focus-within {
-  border-color: var(--primary);
-  box-shadow: 0 0 0 2px rgba(0, 209, 178, 0.2);
+    border-color: var(--primary);
+    box-shadow: 0 0 0 2px rgba(0, 209, 178, 0.2);
 }
 
 .search-row input {
-  flex: 1;
-  background: transparent;
-  border: none;
-  color: white;
-  padding: 12px 15px;
-  font-size: 1rem;
-  outline: none;
+    flex: 1;
+    background: transparent;
+    border: none;
+    color: white;
+    padding: 12px 15px;
+    font-size: 1rem;
+    outline: none;
 }
 
 .search-row button {
-  background: var(--primary);
-  color: #000;
-  border: none;
-  padding: 0 25px;
-  border-radius: 8px;
-  font-weight: 600;
-  cursor: pointer;
-  transition: 0.3s;
-  display: flex;
-  align-items: center;
-  gap: 8px;
+    background: var(--primary);
+    color: #000;
+    border: none;
+    padding: 0 25px;
+    border-radius: 8px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: 0.3s;
+    display: flex;
+    align-items: center;
+    gap: 8px;
 }
 
 .search-row button:hover {
-   transform: translateY(-1px);
+    transform: translateY(-1px);
 }
 
 /* RESULTADO DA BUSCA */
 #resultado {
-  margin-top: 20px;
-  transition: 0.4s;
+    margin-top: 20px;
+    transition: 0.4s;
 }
 
 .asset-result-card {
-  background: linear-gradient(145deg, #252525, #1e1e1e);
-  border: 1px solid var(--border);
-  border-radius: 16px;
-  padding: 25px;
-  display: grid;
-  grid-template-columns: 1fr auto;
-  align-items: center;
+    background: linear-gradient(145deg, #252525, #1e1e1e);
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    padding: 25px;
+    display: grid;
+    grid-template-columns: 1fr auto;
+    align-items: center;
 }
 
-.asset-info h2 { margin: 0; font-size: 1.8rem; color: var(--primary); }
-.asset-info p { color: var(--text-dim); margin: 5px 0 0 0; }
-
-.asset-price { text-align: right; }
-.price-value { font-size: 1.8rem; font-weight: bold; display: block; }
-.price-change { font-size: 0.9rem; font-weight: 600; }
-.up { color: var(--success); }
-.down { color: var(--danger); }
-
-.btn-buy{
-  font-size: 10px;
-  padding: 8px 12px;
-  letter-spacing: 1px;
+.asset-info h2 {
+    margin: 0;
+    font-size: 1.8rem;
+    color: var(--primary);
 }
+
+.asset-info p {
+    color: var(--text-dim);
+    margin: 5px 0 0 0;
+}
+
+.asset-price {
+    text-align: right;
+}
+
+.price-value {
+    font-size: 1.8rem;
+    font-weight: bold;
+    display: block;
+}
+
+.price-change {
+    font-size: 0.9rem;
+    font-weight: 600;
+}
+
+.up {
+    color: var(--success);
+}
+
+.down {
+    color: var(--danger);
+}
+
+.btn-buy, .btn-confirm {
+    font-size: 10px;
+    padding: 8px 12px;
+    letter-spacing: 1px;
+}
+
 #grafico-container {
-  background: var(--card-bg);
-  border-radius: 12px;
-  padding: 0;
-  box-shadow: none;
-  width: 100%;
-  height: 0;                /* 🔥 COLAPSADO */
-  overflow: hidden;
-  opacity: 0;
-  margin-top: 0;
-  transition: 
-    height 0.4s ease,
-    opacity 0.3s ease,
-    margin-top 0.3s ease,
-    box-shadow 0.3s ease,
-    padding 0.3s ease;
+    background: var(--card-bg);
+    border-radius: 12px;
+    padding: 0;
+    box-shadow: none;
+    width: 100%;
+    height: 0;
+    /* 🔥 COLAPSADO */
+    overflow: hidden;
+    opacity: 0;
+    margin-top: 0;
+    transition:
+        height 0.4s ease,
+        opacity 0.3s ease,
+        margin-top 0.3s ease,
+        box-shadow 0.3s ease,
+        padding 0.3s ease;
 }
 
 /* Quando o gráfico existir */
 #grafico-container.grafico-ativo {
-  height: 450px;            /* 🔥 SÓ AGORA CRESCE */
-  padding: 20px;
-  opacity: 1;
-  margin-top: 20px;
-  box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+    height: 450px;
+    /* 🔥 SÓ AGORA CRESCE */
+    padding: 20px;
+    opacity: 1;
+    margin-top: 20px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
 }
 
 #meuGrafico {
     width: 100% !important;
     height: 100% !important;
     cursor: pointer;
+}
+
+.modal {
+    position: fixed;
+    inset: 0;
+    background: rgba(0, 0, 0, .6);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 999;
+}
+
+.modal-content {
+    background: var(--card-bg);
+    padding: 25px;
+    border-radius: 14px;
+    width: 320px;
+    text-align: center;
+}
+
+.modal.hidden {
+    display: none;
+}
+
+#perfilInvestidor {
+    padding: 12px 16px;
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid var(--border);
+    border-radius: 5px;
+    margin-top: 5px;
+    color: #fff !important;
+    font-size: 14px;
+    appearance: none;
+    cursor: pointer;
+    outline: none;
+    transition: 0.3s;
+}
+
+#perfilInvestidor {
+    background-color: #1e1e1e;
+    color: #ffffff;
 }
