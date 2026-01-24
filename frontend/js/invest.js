@@ -89,8 +89,7 @@ function dispararAlerta() {
     })
 }
 
-let chartInstance = null; // Para controlar o gráfico existente
-
+let chartInstance = null;
 async function buscarAtivo() {
     const ticker = document.getElementById("ticker").value.trim().toUpperCase();
     const resultado = document.getElementById("resultado");
@@ -126,13 +125,12 @@ async function buscarAtivo() {
         const labels = data.historico.datas;
         const ultimaData = labels[labels.length - 1];
 
-        // Adicionamos labels vazios ao final para criar o "espaço em branco" na borda direita
         const labelsComFolga = [...labels, "", "", ""]; 
 
         window.chartInstance = new Chart(ctx, {
             type: "line",
             data: {
-                labels: labelsComFolga, // Usamos as labels com espaço extra
+                labels: labelsComFolga,
                 datasets: [{
                     label: `Histórico ${data.ticker}`,
                     data: data.historico.precos,
@@ -140,7 +138,7 @@ async function buscarAtivo() {
                     backgroundColor: "rgba(0, 209, 178, 0.12)",
                     fill: true,
                     tension: 0.25,
-                    pointRadius: 2, // Aumentado levemente para destacar os pontos
+                    pointRadius: 2,
                     pointHoverRadius: 5,
                     borderWidth: 2
                 }]
@@ -150,18 +148,18 @@ async function buscarAtivo() {
                 maintainAspectRatio: false,
                 layout: {
                     padding: {
-                        right: 30, // Folga interna no canvas
+                        right: 30,
                         left: 10,
-                        top: 30 // Espaço para a label "Hoje" não cortar
+                        top: 30
                     }
                 },
                 plugins: {
-                    legend: { display: false }, // Oculto para ganhar espaço, opcional
+                    legend: { display: false },
                     zoom: {
                         pan: {
                             enabled: true,
-                            mode: "x", // Foco no movimento horizontal para histórico
-                            modifierKey: 'ctrl' // Permite arrastar sem precisar de CTRL
+                            mode: "x",
+                            modifierKey: 'ctrl'
                         },
                         zoom: {
                             wheel: { enabled: true, speed: 0.08 },
@@ -181,11 +179,11 @@ async function buscarAtivo() {
                                 label: {
                                     display: true,
                                     content: "Agora",
-                                    position: "start", // Posiciona no topo da linha
+                                    position: "start", 
                                     backgroundColor: "#00d1b2",
                                     color: "#000",
                                     font: { size: 11, weight: "bold" },
-                                    yAdjust: -10 // Ajuste fino para não colar na linha do gráfico
+                                    yAdjust: -10 
                                 }
                             }
                         }
@@ -199,8 +197,8 @@ async function buscarAtivo() {
                             color: "#a0a0a0",
                             maxTicksLimit: 8
                         },
-                        // Define limites para o pan não "perder" o gráfico de vista
-                        min: labels[Math.max(0, labels.length - 20)], // Começa focado nos últimos 20 dias
+                        
+                        min: labels[Math.max(0, labels.length - 20)], 
                     },
                     y: {
                         beginAtZero: false,
