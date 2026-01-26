@@ -740,32 +740,27 @@ async def get_patrimony(user_id: int = Depends(get_current_user_id)):
     cursor = conn.cursor(dictionary=True)
 
     try:
-        # saldo do usuário
+        # saldo
         cursor.execute(
             "SELECT saldo_cc FROM usuarios WHERE id = %s",
             (user_id,)
         )
         user = cursor.fetchone()
+        saldo = Decimal(user["saldo_cc"] or 0)
 
-        if not user:
-            raise HTTPException(status_code=404, detail="Usuário não encontrado")
-
-        saldo = user["saldo_cc"] or 0
-
-        # soma dos ativos
         cursor.execute(
             """
-            SELECT COALESCE(SUM(valor_atual), 0) AS total_ativos
+            SELECT COALESCE(SUM(valor_investido), 0) AS total_investido
             FROM financial_transactions
             WHERE client_id = %s
             """,
             (user_id,)
         )
-        ativos = cursor.fetchone()
+        row = cursor.fetchone()
 
-        total_ativos = ativos["total_ativos"] or 0
+        total_ativos = Decimal(row["total_investido"] or 0)
 
-        patrimonio_total = saldo + total_ativos
+        patrimonio_total = total_ativos
 
         return {
             "saldo": float(saldo),
