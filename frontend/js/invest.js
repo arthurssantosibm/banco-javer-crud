@@ -1,6 +1,20 @@
+/* ================= VARIÁVEIS GLOBAIS ================= */
+
 let headers = {};
 let user = null;
 let saldo = 0;
+
+let chartInstance = null;
+let ativoSelecionado = null;
+let precoUnitarioAtual = 0;
+
+/* ================= REGISTRO DE PLUGINS (OBRIGATÓRIO NO CHART.JS v4) ================= */
+
+if (window.Chart && Chart.registry) {
+    Chart.register(ChartZoom);
+}
+
+/* ================= INIT ================= */
 
 document.addEventListener("DOMContentLoaded", async () => {
     const token = localStorage.getItem("access_token");
@@ -17,6 +31,7 @@ document.addEventListener("DOMContentLoaded", async () => {
 
     await carregarDadosUsuario();
     await verificarInvestidor();
+    await carregarPatrimonio();
 
     document.querySelector(".logout").addEventListener("click", (e) => {
         e.preventDefault();
@@ -66,6 +81,7 @@ async function carregarDadosUsuario() {
     }
 }
 
+
 /* ================= INVESTIDOR ================= */
 
 async function verificarInvestidor() {
@@ -113,9 +129,7 @@ async function registrarInvestidor() {
             {
                 method: "POST",
                 headers,
-                body: JSON.stringify({
-                    perfil_investidor: perfil
-                })
+                body: JSON.stringify({ perfil_investidor: perfil })
             }
         );
 
@@ -144,7 +158,30 @@ async function registrarInvestidor() {
     }
 }
 
-/* ================= ALERTA ORIGINAL ================= */
+async function carregarPatrimonio() {
+    try {
+        const res = await fetch(
+            "http://127.0.0.1:8000/invest/patrimony",
+            { headers }
+        );
+
+        if (!res.ok) throw new Error("Erro ao buscar patrimônio");
+
+        const data = await res.json();
+
+        document.getElementById("total-patrimony").textContent =
+            data.patrimonio_total.toLocaleString("pt-BR", {
+                style: "currency",
+                currency: "BRL"
+            });
+
+    } catch (err) {
+        console.error(err);
+    }
+}
+
+
+/* ================= ALERTA ================= */
 
 function dispararAlerta() {
     Swal.fire({
@@ -155,31 +192,20 @@ function dispararAlerta() {
                 </p>
                 <div style="background:#f8f9fa;border-radius:12px;padding:15px;border-left:5px solid #04b197;text-align:left">
                     <div style="margin-bottom:8px">
-                        <strong style="color:#1F1300">Versão:</strong> 
-                        <span style="color:#666">1.2.1</span>
+                        <strong>Versão:</strong> 1.2.1
                     </div>
-                    <div style="font-size:0.85rem;line-height:1.4;color:#888">
-                        All rights reserved to <br>
-                        <strong style="color:#1F1300">Arthur Santana dos Santos ©</strong>
+                    <div style="font-size:0.85rem;color:#888">
+                        Arthur Santana dos Santos ©
                     </div>
                 </div>
                </div>`,
         icon: "info",
-        iconColor: "#04b197",
-        confirmButtonText: "ACESSAR CONTA",
-        confirmButtonColor: "#04b197",
-        background: "#ffffff",
-        color: "#000000",
-        padding: "2em",
-        width: "400px",
-        showClass: { popup: "animate__animated animate__fadeInUp animate__faster" },
-        hideClass: { popup: "animate__animated animate__fadeOutDown animate__faster" }
+        confirmButtonColor: "#04b197"
     });
 }
 
-/* ================= BUSCAR ATIVO (ORIGINAL, INTACTO) ================= */
+/* ================= BUSCAR ATIVO (GRÁFICO RESTAURADO) ================= */
 
-let chartInstance = null;
 async function buscarAtivo() {
     const ticker = document.getElementById("ticker").value.trim().toUpperCase();
     const resultado = document.getElementById("resultado");
@@ -188,11 +214,12 @@ async function buscarAtivo() {
 
     if (!ticker) return;
 
-    showLoading()
+    showLoading();
 
     try {
         const res = await fetch(`http://127.0.0.1:8000/ativos/${ticker}`);
         if (!res.ok) throw new Error("Erro");
+
         const data = await res.json();
 
         resultado.classList.remove("hidden");
@@ -205,8 +232,12 @@ async function buscarAtivo() {
               </strong>
               (${data.variacao}%)
             </p>
-            <button class="btn-buy">Comprar</button>
+            <button class="btn-buy" onclick='abrirModalCompra(${JSON.stringify(data)})'>
+                Comprar
+            </button>
         `;
+
+        /* ================= GRÁFICO ================= */
 
         if (window.chartInstance) {
             window.chartInstance.destroy();
@@ -214,7 +245,6 @@ async function buscarAtivo() {
 
         const labels = data.historico.datas;
         const ultimaData = labels[labels.length - 1];
-
         const labelsComFolga = [...labels, "", "", ""];
 
         window.chartInstance = new Chart(ctx, {
@@ -249,7 +279,7 @@ async function buscarAtivo() {
                         pan: {
                             enabled: true,
                             mode: "x",
-                            modifierKey: 'ctrl'
+                            modifierKey: "ctrl"
                         },
                         zoom: {
                             wheel: { enabled: true, speed: 0.08 },
@@ -287,8 +317,7 @@ async function buscarAtivo() {
                             color: "#a0a0a0",
                             maxTicksLimit: 8
                         },
-
-                        min: labels[Math.max(0, labels.length - 20)],
+                        min: labels[Math.max(0, labels.length - 20)]
                     },
                     y: {
                         beginAtZero: false,
@@ -302,12 +331,101 @@ async function buscarAtivo() {
             }
         });
 
-        document.getElementById("grafico-container").classList.add("grafico-ativo");
+        /* 🔥 MOSTRA O CONTAINER (CSS) */
+        document
+            .getElementById("grafico-container")
+            .classList.add("grafico-ativo");
 
     } catch (err) {
-        resultado.innerHTML = "Erro ao carregar dados do ativo.";
         console.error(err);
+        resultado.innerHTML = "Erro ao carregar dados do ativo.";
     } finally {
-        hideLoading()
+        hideLoading();
+    }
+}
+
+
+/* ================= MODAL DE COMPRA ================= */
+
+function abrirModalCompra(ativo) {
+    ativoSelecionado = ativo;
+    precoUnitarioAtual = Number(ativo.preco);
+
+    document.getElementById("buy-nome-ativo").textContent = ativo.nome;
+    document.getElementById("buy-ticker").textContent = ativo.ticker;
+    document.getElementById("buy-preco-unitario").textContent =
+        precoUnitarioAtual.toLocaleString("pt-BR", {
+            style: "currency",
+            currency: "BRL"
+        });
+
+    document.getElementById("quantidadeAtivo").value = "";
+    document.getElementById("buy-total").textContent = "R$ 0,00";
+
+    document.getElementById("buyAssetModal").classList.remove("hidden");
+}
+
+function fecharModalCompra() {
+    document.getElementById("buyAssetModal").classList.add("hidden");
+}
+
+function calcularTotalCompra() {
+    const qtd = Number(document.getElementById("quantidadeAtivo").value);
+
+    if (!qtd || qtd <= 0) {
+        document.getElementById("buy-total").textContent = "R$ 0,00";
+        return;
+    }
+
+    const total = qtd * precoUnitarioAtual;
+
+    document.getElementById("buy-total").textContent =
+        total.toLocaleString("pt-BR", {
+            style: "currency",
+            currency: "BRL"
+        });
+}
+
+/* ================= CONFIRMAR COMPRA ================= */
+
+async function confirmarCompra() {
+    const quantidade = Number(document.getElementById("quantidadeAtivo").value);
+
+    if (!quantidade || quantidade <= 0) {
+        Swal.fire("Atenção", "Quantidade inválida", "warning");
+        return;
+    }
+
+    try {
+        showLoading();
+
+        const res = await fetch(
+            "http://127.0.0.1:8000/invest/buy",
+            {
+                method: "POST",
+                headers,
+                body: JSON.stringify({
+                    ticker: ativoSelecionado.ticker,
+                    quantidade
+                })
+            }
+        );
+
+        const data = await res.json();
+
+        if (!res.ok) {
+            throw new Error(data.detail || "Erro ao comprar ativo");
+        }
+
+        Swal.fire("Sucesso", "Ativo comprado com sucesso!", "success");
+
+        fecharModalCompra();
+        await carregarDadosUsuario();
+
+    } catch (err) {
+        console.error(err);
+        Swal.fire("Erro", err.message, "error");
+    } finally {
+        hideLoading();
     }
 }

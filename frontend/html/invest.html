@@ -61,12 +61,12 @@
                 <div>
                     <small>Saldo Disponível</small>
                     <h2 id="saldo-disponivel"></h2>
-                    <div class="buttons">
+                    <!--<div class="buttons">
                         <button class="btn-buy btn-effect" onclick="openModal('RENDA_FIXA')">Renda Fixa</button>
                         <button class="btn-buy btn-effect" onclick="openModal('ACOES')">Ações</button>
                         <button class="btn-buy btn-effect" onclick="openModal('FUNDOS')">Fundos</button>
                         <button class="btn-buy btn-effect" onclick="openModal('CRIPTO')">Cripto</button>
-                    </div>
+                    </div> -->
                 </div>
             </div>
 
@@ -107,6 +107,44 @@
             <span></span>
         </div>
     </div>
+<div id="buyAssetModal" class="modal hidden">
+    <div class="modal-content buy-modal">
+        <h2>Comprar Ativo</h2>
+
+        <div class="buy-info">
+            <p><strong>Ativo:</strong> <span id="buy-nome-ativo"></span></p>
+            <p><strong>Ticker:</strong> <span id="buy-ticker"></span></p>
+            <p><strong>Preço Unitário:</strong> 
+                <span id="buy-preco-unitario"></span>
+            </p>
+        </div>
+
+        <div class="buy-form">
+            <label for="quantidadeAtivo">Quantidade de cotas</label>
+            <input
+                type="number"
+                id="quantidadeAtivo"
+                min="1"
+                placeholder="Ex: 10"
+                oninput="calcularTotalCompra()"
+            />
+
+            <p class="total-preview">
+                Total da compra:
+                <strong id="buy-total">R$ 0,00</strong>
+            </p>
+        </div>
+
+        <div class="modal-actions">
+            <button class="btn-cancel" onclick="fecharModalCompra()">
+                Cancelar
+            </button>
+            <button class="btn-confirm" onclick="confirmarCompra()">
+                Confirmar Compra
+            </button>
+        </div>
+    </div>
+</div>
 
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-zoom"></script>

@@ -4,9 +4,11 @@ import httpx
 from mysql.connector import Error
 from models.core.db_javer import get_connection
 from models.core.security import bcrypt_context
-from schemas.schemas import LoginSchema, UpdateUserSchema, CriarConta, TransacaoCreate, DepositoRequest, DepositoResponse, ReativarSchema, SaqueRequest, SaqueResponse, HomeSchema, InvestRegisterSchema
+from schemas.schemas import LoginSchema, UpdateUserSchema, CriarConta, TransacaoCreate, DepositoRequest, DepositoResponse, ReativarSchema, SaqueRequest, SaqueResponse, HomeSchema, InvestRegisterSchema, ComprarAtivoSchema
 from api.jwt import create_access_token, get_current_user_id
+from decimal import Decimal
 import yfinance as yf
+import re
 
 
 auth_router = APIRouter(prefix="/auth", tags=["auth"])
@@ -505,15 +507,22 @@ async def buscar_ativo(ticker: str):
         if hist.empty:
             raise HTTPException(status_code=404, detail="Ativo não encontrado")
 
-
         historico_grafico = {
-            "datas": hist.index.strftime('%Y-%m-%d').tolist(),
-            "precos": hist["Close"].round(2).tolist()
+            "datas": hist.index.strftime("%Y-%m-%d").tolist(),
+            "precos": [float(v) for v in hist["Close"].round(2).tolist()]
         }
 
-        ultimo_fechamento = hist["Close"].iloc[-1]
-        fechamento_anterior = hist["Close"].iloc[-2] if len(hist) > 1 else ultimo_fechamento
-        variacao = round(((ultimo_fechamento - fechamento_anterior) / fechamento_anterior) * 100, 2)
+        ultimo_fechamento = float(hist["Close"].iloc[-1])
+        fechamento_anterior = (
+            float(hist["Close"].iloc[-2])
+            if len(hist) > 1
+            else ultimo_fechamento
+        )
+
+        variacao = round(
+            ((ultimo_fechamento - fechamento_anterior) / fechamento_anterior) * 100,
+            2
+        )
 
         info = ativo.info or {}
 
@@ -525,9 +534,12 @@ async def buscar_ativo(ticker: str):
             "historico": historico_grafico
         }
 
+    except HTTPException:
+        raise
     except Exception as e:
-        print("ERRO:", e)
+        print("ERRO buscar_ativo:", e)
         raise HTTPException(status_code=500, detail="Erro ao buscar histórico")
+
 
 
 @invest_router.get("/verify")
@@ -605,6 +617,161 @@ async def register_investor(
         conn.commit()
 
         return {"message": "Perfil investidor registrado com sucesso"}
+
+    finally:
+        cursor.close()
+        conn.close()
+
+
+def identificar_tipo_ativo(ticker: str) -> str:
+    ticker = ticker.upper()
+
+    if ticker.endswith("-USD") or ticker.endswith("BRL") or ticker in {
+        "BTC", "ETH", "SOL", "USDT"
+    }:
+        return "cripto"
+
+    units_acoes = {
+        "SULA11", "SANB11", "SAPR11", "KLBN11", "TAEE11",
+        "PINE11", "ALUP11", "BPAC11", "ENGI11", "TIET11"
+    }
+
+    if re.match(r"^[A-Z]{4}11$", ticker):
+        return "acoes" if ticker in units_acoes else "fundo"
+
+    if re.match(r"^[A-Z]{4}[3456]$", ticker):
+        return "acoes"
+
+    if re.match(r"^[A-Z]{4}(34|35|39)$", ticker):
+        return "acoes"
+
+    return "outros"
+
+
+@invest_router.post("/buy")
+async def comprar_ativo(
+    data: ComprarAtivoSchema,
+    user_id: int = Depends(get_current_user_id)
+):
+    conn = get_connection()
+    cursor = conn.cursor(dictionary=True)
+
+    try:
+        cursor.execute(
+            "SELECT id, email, saldo_cc FROM usuarios WHERE id = %s",
+            (user_id,)
+        )
+        user = cursor.fetchone()
+
+        if not user:
+            raise HTTPException(status_code=404, detail="Usuário não encontrado")
+
+        async with httpx.AsyncClient() as client:
+            res = await client.get(
+                f"http://127.0.0.1:8000/ativos/{data.ticker}"
+            )
+
+        if res.status_code != 200:
+            raise HTTPException(status_code=400, detail="Ativo inválido")
+
+        ativo = res.json()
+
+        preco_unitario = Decimal(str(ativo["preco"]))
+        quantidade = Decimal(str(data.quantidade))
+        valor_total = preco_unitario * quantidade
+
+        if user["saldo_cc"] < valor_total:
+            raise HTTPException(status_code=400, detail="Saldo insuficiente")
+
+        tipo_ativo = identificar_tipo_ativo(data.ticker)
+
+        novo_saldo = user["saldo_cc"] - valor_total
+
+        cursor.execute(
+            "UPDATE usuarios SET saldo_cc = %s WHERE id = %s",
+            (novo_saldo, user_id)
+        )
+        conn.commit()
+
+        payload = {
+            "client_id": user["id"],
+            "email": user["email"],
+            "nome_ativo": ativo["nome"],
+            "tipo_ativo": tipo_ativo,
+            "quantidade": int(data.quantidade),
+            "preco_unitario": float(preco_unitario),
+            "valor_investido": float(valor_total),
+            "valor_atual": float(valor_total),
+            "rentabilidade": 0.0
+        }
+
+        async with httpx.AsyncClient() as client:
+            res = await client.post(
+                "http://127.0.0.1:8001/invest/create",
+                headers={"X-Internal-Key": INTERNAL_KEY},
+                json=payload
+            )
+
+        if res.status_code != 201:
+            raise HTTPException(
+                status_code=500,
+                detail="Erro ao registrar transação"
+            )
+
+        return {
+            "message": "Ativo comprado com sucesso",
+            "valor_pago": float(round(valor_total, 2)),
+            "saldo_restante": float(round(novo_saldo, 2))
+        }
+
+    except HTTPException:
+        conn.rollback()
+        raise
+    except Exception as e:
+        conn.rollback()
+        raise HTTPException(status_code=500, detail=str(e))
+    finally:
+        cursor.close()
+        conn.close()
+
+@invest_router.get("/patrimony")
+async def get_patrimony(user_id: int = Depends(get_current_user_id)):
+    conn = get_connection()
+    cursor = conn.cursor(dictionary=True)
+
+    try:
+        # saldo do usuário
+        cursor.execute(
+            "SELECT saldo_cc FROM usuarios WHERE id = %s",
+            (user_id,)
+        )
+        user = cursor.fetchone()
+
+        if not user:
+            raise HTTPException(status_code=404, detail="Usuário não encontrado")
+
+        saldo = user["saldo_cc"] or 0
+
+        # soma dos ativos
+        cursor.execute(
+            """
+            SELECT COALESCE(SUM(valor_atual), 0) AS total_ativos
+            FROM financial_transactions
+            WHERE client_id = %s
+            """,
+            (user_id,)
+        )
+        ativos = cursor.fetchone()
+
+        total_ativos = ativos["total_ativos"] or 0
+
+        patrimonio_total = saldo + total_ativos
+
+        return {
+            "saldo": float(saldo),
+            "total_ativos": float(total_ativos),
+            "patrimonio_total": float(patrimonio_total)
+        }
 
     finally:
         cursor.close()

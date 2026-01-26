@@ -1,4 +1,4 @@
-from pydantic import BaseModel, EmailStr, Field
+from pydantic import BaseModel, EmailStr, Field, PositiveFloat
 from datetime import datetime
 from typing import Optional
 
@@ -51,3 +51,16 @@ class SaqueResponse(BaseModel):
 
 class InvestRegisterSchema(BaseModel):
     perfil_investidor: str
+    
+class ComprarAtivoSchema(BaseModel):
+    ticker: str = Field(
+        ...,
+        min_length=1,
+        max_length=20,
+        description="Ticker do ativo (ex: BTC, PETR4, MXRF11)"
+    )
+
+    quantidade: PositiveFloat = Field(
+        ...,
+        description="Quantidade de cotas/unidades que o usuário deseja comprar"
+    )
