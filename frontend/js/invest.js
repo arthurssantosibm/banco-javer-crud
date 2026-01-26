@@ -105,7 +105,9 @@ async function verificarInvestidor() {
 
     } catch (err) {
         console.error(err);
-        Swal.fire("Erro", "Erro ao validar perfil investidor", "error");
+        Swal.fire("Erro", "Erro ao validar Perfil de Investidor", "error").then(() => {
+            window.location.href = "../html/login.html"
+        })
     } finally {
         hideLoading();
     }
