@@ -1,6 +1,7 @@
-from pydantic import BaseModel, EmailStr, Field, PositiveFloat
+from pydantic import BaseModel, EmailStr, Field, PositiveFloat, field_validator
 from datetime import datetime
 from typing import Optional
+from decimal import Decimal
 
 class LoginSchema(BaseModel, extra="ignore"):
     email: EmailStr
@@ -60,7 +61,13 @@ class ComprarAtivoSchema(BaseModel):
         description="Ticker do ativo (ex: BTC, PETR4, MXRF11)"
     )
 
-    quantidade: PositiveFloat = Field(
+    quantidade: Decimal = Field(
         ...,
-        description="Quantidade de cotas/unidades que o usuário deseja comprar"
+        gt=0,
+        description="Quantidade de cotas/unidades a comprar"
     )
+
+    @field_validator("ticker")
+    @classmethod
+    def normalizar_ticker(cls, v: str) -> str:
+        return v.strip().upper()

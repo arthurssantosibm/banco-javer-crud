@@ -626,26 +626,20 @@ async def register_investor(
 def identificar_tipo_ativo(ticker: str) -> str:
     ticker = ticker.upper()
 
-    if ticker.endswith("-USD") or ticker.endswith("BRL") or ticker in {
-        "BTC", "ETH", "SOL", "USDT"
-    }:
+    # Criptos
+    if ticker in {"BTC", "ETH", "SOL", "BNB"} or ticker.endswith("-USD"):
         return "cripto"
 
-    units_acoes = {
-        "SULA11", "SANB11", "SAPR11", "KLBN11", "TAEE11",
-        "PINE11", "ALUP11", "BPAC11", "ENGI11", "TIET11"
-    }
+    # Fundos Imobiliários (B3)
+    if ticker.endswith("11"):
+        return "fii"
 
-    if re.match(r"^[A-Z]{4}11$", ticker):
-        return "acoes" if ticker in units_acoes else "fundo"
+    # Renda fixa (exemplo interno)
+    if ticker.startswith("TESOURO"):
+        return "renda_fixa"
 
-    if re.match(r"^[A-Z]{4}[3456]$", ticker):
-        return "acoes"
-
-    if re.match(r"^[A-Z]{4}(34|35|39)$", ticker):
-        return "acoes"
-
-    return "outros"
+    # Ações
+    return "acao"
 
 
 @invest_router.post("/buy")
@@ -696,14 +690,15 @@ async def comprar_ativo(
         payload = {
             "client_id": user["id"],
             "email": user["email"],
+            "ticker": data.ticker.upper(),          
             "nome_ativo": ativo["nome"],
             "tipo_ativo": tipo_ativo,
-            "quantidade": int(data.quantidade),
-            "preco_unitario": float(preco_unitario),
+            "quantidade": float(quantidade),
             "valor_investido": float(valor_total),
-            "valor_atual": float(valor_total),
+            "valor_atual": float(preco_unitario),  
             "rentabilidade": 0.0
         }
+
 
         async with httpx.AsyncClient() as client:
             res = await client.post(
@@ -740,7 +735,6 @@ async def get_patrimony(user_id: int = Depends(get_current_user_id)):
     cursor = conn.cursor(dictionary=True)
 
     try:
-        # saldo
         cursor.execute(
             "SELECT saldo_cc FROM usuarios WHERE id = %s",
             (user_id,)
@@ -750,24 +744,49 @@ async def get_patrimony(user_id: int = Depends(get_current_user_id)):
 
         cursor.execute(
             """
-            SELECT COALESCE(SUM(valor_investido), 0) AS total_investido
+            SELECT ticker, valor_investido, valor_atual
             FROM financial_transactions
             WHERE client_id = %s
             """,
             (user_id,)
         )
-        row = cursor.fetchone()
+        ativos = cursor.fetchall()
 
-        total_ativos = Decimal(row["total_investido"] or 0)
+        total_ativos = Decimal("0")
+
+        for ativo in ativos:
+            ticker = (ativo.get("ticker") or "").strip()
+
+            if not ticker:
+                continue 
+
+            yf_ativo = yf.Ticker(ticker)
+            hist = yf_ativo.history(period="1d")
+
+            if hist.empty:
+                continue
+
+            preco_hoje = Decimal(str(hist["Close"].iloc[-1]))
+            preco_compra = Decimal(str(ativo["valor_atual"]))
+            valor_investido = Decimal(str(ativo["valor_investido"]))
+
+            if preco_compra <= 0:
+                continue
+
+            fator = preco_hoje / preco_compra
+            valor_atualizado = valor_investido * fator
+
+            total_ativos += valor_atualizado
 
         patrimonio_total = total_ativos
 
         return {
             "saldo": float(saldo),
-            "total_ativos": float(total_ativos),
-            "patrimonio_total": float(patrimonio_total)
+            "total_ativos": float(round(total_ativos, 2)),
+            "patrimonio_total": float(round(patrimonio_total, 2))
         }
 
     finally:
         cursor.close()
         conn.close()
+
