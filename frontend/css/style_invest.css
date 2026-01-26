@@ -53,7 +53,7 @@ a {
 .user-info .material-icons {
     font-size: 48px;
     margin-bottom: 5px;
-    color: var(--accent-color);
+    color: var(--primary);
 }
 
 .user-info h3 {

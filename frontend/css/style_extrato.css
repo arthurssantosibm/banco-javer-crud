@@ -256,3 +256,121 @@ body.loading-active {
     }
 }
 
+/* =====================================================
+    FORMULÁRIO DE TRANSFERÊNCIA (CARD)
+===================================================== */
+.card {
+    background-color: var(--card-bg);
+    max-width: 600px;
+    margin: 0 auto;
+    padding: 30px;
+    border-radius: 15px;
+    box-shadow: var(--shadow-new);
+    border: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+.form-group {
+    margin-bottom: 20px;
+    display: flex;
+    flex-direction: column;
+}
+
+.form-group label {
+    margin-bottom: 8px;
+    font-size: 0.9em;
+    font-weight: 500;
+    color: var(--accent-color);
+}
+
+/* Row especial para Email + Saldo */
+.input-row.saldo-box {
+    display: flex;
+    gap: 15px;
+    align-items: flex-start;
+}
+
+.input-row.saldo-box input {
+    flex: 1;
+}
+
+.saldo-info {
+    background: rgba(4, 177, 151, 0.1); /* Variação do primary color */
+    padding: 8px 15px;
+    border-radius: 8px;
+    border: 1px dashed var(--accent-color);
+    min-width: 150px;
+    text-align: center;
+}
+
+.saldo-label {
+    display: block;
+    font-size: 0.7em;
+    text-transform: uppercase;
+    color: var(--accent-color);
+    margin-bottom: 2px;
+}
+
+#saldo-atual {
+    font-weight: bold;
+    font-size: 1.1em;
+    color: var(--text-color);
+}
+
+/* Estilização dos Inputs */
+input[type="email"],
+input[type="number"],
+input[type="text"] {
+    background-color: #2a2a2a;
+    border: 1px solid #3d3d3d;
+    padding: 12px 15px;
+    border-radius: 8px;
+    color: white;
+    font-size: 1em;
+    height: 58px;
+    transition: all 0.3s ease;
+}
+
+input:focus {
+    outline: none;
+    border-color: var(--accent-color);
+    box-shadow: 0 0 8px rgba(0, 209, 178, 0.2);
+}
+
+input::placeholder {
+    color: #666;
+}
+
+/* Botão de Envio */
+.submit-btn {
+    width: 100%;
+    background-color: var(--accent-color);
+    color: #000;
+    border: none;
+    padding: 15px;
+    border-radius: 8px;
+    font-size: 1.1em;
+    font-weight: bold;
+    cursor: pointer;
+    transition: transform 0.2s, background-color 0.3s;
+    margin-top: 10px;
+}
+
+.submit-btn:hover {
+    background-color: #00f2ce;
+    transform: translateY(-2px);
+}
+
+.submit-btn:active {
+    transform: translateY(0);
+}
+
+/* Responsividade */
+@media (max-width: 768px) {
+    .input-row.saldo-box {
+        flex-direction: column;
+    }
+    
+    .saldo-info {
+        width: 100%;
+    }
+}
