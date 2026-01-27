@@ -16,6 +16,7 @@
         <div class="user-info">
             <span class="material-icons">account_circle</span>
             <h3 id="client-name">Olá</h3>
+            <p class="invest-choice">Selecione seu tipo de investidor</p>
             <select class="invest-type" name="invest-type" id="perfilInvestidor">
                 <option value="" disabled selected>Selecionar</option>
                 <option value="ARROJADO">ARROJADO</option>
@@ -114,6 +115,10 @@
             <div id="grafico-container" style="width: 100%; margin-top: 20px;">
                 <canvas id="meuGrafico"></canvas>
                 <button onclick="chartInstance.resetZoom()" class="btn-reset">Resetar Zoom</button>
+            </div>
+            <div class="list-actives">
+                <h2>Meus Investimentos</h2>
+                <div id="carteiraList"></div>
             </div>
         </div>
 

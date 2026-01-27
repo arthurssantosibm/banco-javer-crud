@@ -32,6 +32,7 @@ document.addEventListener("DOMContentLoaded", async () => {
     await carregarDadosUsuario();
     await verificarInvestidor();
     await carregarPatrimonio();
+    await carregarCarteira();
 
     document.querySelector(".logout").addEventListener("click", (e) => {
         e.preventDefault();
@@ -397,6 +398,75 @@ async function buscarAtivo() {
         resultado.innerHTML = "Erro ao carregar dados do ativo.";
     } finally {
         hideLoading();
+    }
+}
+
+/* ================= CARTEIRA ================= */
+async function carregarCarteira() {
+    const token = localStorage.getItem("access_token");
+    const container = document.getElementById("carteiraList");
+
+    try {
+        const res = await fetch("http://127.0.0.1:8000/invest/carteira", {
+            headers: {
+                "Authorization": `Bearer ${token}`
+            }
+        });
+
+        const data = await res.json();
+
+        container.innerHTML = "";
+
+        if (data.length === 0) {
+            container.innerHTML = "<p>Nenhum investimento encontrado</p>";
+            return;
+        }
+
+        data.forEach(item => {
+            const card = document.createElement("div");
+            card.classList.add("ativo-card");
+            const precoCompra = Number(item.valor_atual);
+            const precoAtual = Number(item.preco_atual);
+            const quantidade = Number(item.quantidade);
+
+            let valorizacao = 0
+
+            
+            if (precoCompra > 0 && precoAtual > 0) {
+                valorizacao = ((precoAtual - precoCompra) / precoCompra) * 100;
+            }
+
+            const classeValorizacao = valorizacao >= 0 ? "positivo" : "negativo";
+
+            card.innerHTML = `
+                <div class="ativo-header">
+                    <strong>${item.nome_ativo}</strong>
+                    <span>${item.ticker}</span>
+                </div>
+
+                <div class="ativo-info">
+                    <p><b>Ticker:</b> ${item.ticker}</p>
+                    <p><b>Tipo:</b> ${item.tipo_ativo}</p>
+                    <p><b>Quantidade:</b> ${item.quantidade}</p>
+                    <p><b>Preço Compra:</b> R$ ${Number(item.valor_atual).toFixed(2)}</p>
+                    <p><b>Preço Mercado:</b> R$ ${data.preco ? data.preco.toFixed(2) : "N/A"}</p>
+                    <p><b>Total investido:</b> R$ ${Number(item.valor_investido).toFixed(2)}</p>
+                    <p>
+                        <b>Valorização:</b> 
+                        <span class="${classeValorizacao}">
+                            ${valorizacao.toFixed(2)}%
+                        </span>
+                    </p>
+                    <p class="data"><b>Data:</b> ${new Date(item.data_aplicacao).toLocaleDateString()}</p>
+                </div>
+            `;
+
+            container.appendChild(card);
+        });
+
+    } catch (err) {
+        console.error("Erro ao carregar carteira", err);
+        container.innerHTML = "<p>Erro ao carregar investimentos</p>";
     }
 }
 

@@ -57,7 +57,7 @@ a {
     border: none;
     padding: 10px 25px;
     border-radius: 8px;
-    font-weight: 400;
+    font-weight: 600;
     margin-top: 10px;
     cursor: pointer;
     transition: 0.3s;
@@ -568,6 +568,72 @@ body.loading-active {
     background-color: #1e1e1e;
     color: #ffffff;
 }
+
+.list-actives {
+    margin-top: 40px;
+    display: grid;
+}
+
+.list-actives h2 {
+    margin-bottom: 20px;
+    color: var(--text);
+}
+
+#carteiraList {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+}
+
+.ativo-card {
+    background: var(--card-bg);
+    border: 1px solid var(--primary);
+    border-radius: 10px;
+    padding: 16px;
+    color: var(--text);
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.ativo-card:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.35);
+}
+
+.ativo-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 10px;
+}
+
+.ativo-header strong {
+    font-size: 16px;
+}
+
+.ativo-header span {
+    background: var(--primary);
+    padding: 4px 8px;
+    border-radius: 6px;
+    font-size: 12px;
+}
+
+.ativo-info p {
+    margin: 4px 0;
+    font-size: 14px;
+}
+
+.invest-choice{
+    margin-top: 8px;
+    font-size: 12px;
+    color: #9ca3af; 
+}
+.ativo-info .data {
+    margin-top: 8px;
+    font-size: 12px;
+    color: #9ca3af;
+}
+
+
 #analises-container {
     margin-top: 25px;
     padding: 15px;
@@ -587,7 +653,7 @@ body.loading-active {
 }
 
 .analise-card h3 {
-    color: #00d1b2;
+    color: var(--text);
 }
 
 .analise-card ul li {

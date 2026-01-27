@@ -919,4 +919,47 @@ async def atualizar_perfil_investidor(
     finally:
         cursor.close()
         conn.close()
-       
+
+@invest_router.get("/carteira")
+async def listar_carteira(user_id: int = Depends(get_current_user_id)):
+    conn = get_connection()
+    cursor = conn.cursor(dictionary=True)
+
+    try:
+        cursor.execute("""
+            SELECT 
+                nome_ativo,
+                ticker,
+                tipo_ativo,
+                valor_atual,
+                valor_investido,
+                quantidade,
+                data_aplicacao
+            FROM financial_transactions
+            WHERE client_id = %s
+        """, (user_id,))
+
+        ativos = cursor.fetchall()
+
+        for ativo in ativos:
+            ticker = ativo["ticker"].strip().upper()
+
+            try:
+                yf_ativo = yf.Ticker(ticker)
+
+                # MELHOR forma
+                preco_atual = yf_ativo.fast_info.get("last_price")
+
+                if preco_atual:
+                    ativo["preco_atual"] = round(float(preco_atual), 2)
+                else:
+                    ativo["preco_atual"] = None
+
+            except Exception:
+                ativo["preco_atual"] = None
+
+        return ativos
+
+    finally:
+        cursor.close()
+        conn.close()
