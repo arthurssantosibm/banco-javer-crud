@@ -568,6 +568,32 @@ body.loading-active {
     background-color: #1e1e1e;
     color: #ffffff;
 }
+#analises-container {
+    margin-top: 25px;
+    padding: 15px;
+    background: #101010;
+    border-radius: 12px;
+    border: 1px solid #232323;
+    display: flex;
+}
+
+.analise-card {
+    margin-top: 20px;
+    width: 100%;
+    padding: 15px;
+    margin: 10px;
+    background: #181818;
+    border-radius: 10px;
+}
+
+.analise-card h3 {
+    color: #00d1b2;
+}
+
+.analise-card ul li {
+    margin: 5px 0;
+}
+
 .buy-modal {
     max-width: 420px;
 }

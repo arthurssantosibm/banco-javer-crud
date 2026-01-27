@@ -498,40 +498,131 @@ async def realizar_saque(
 # BLOCO DE INVESTIMENTOS
 @buscar_ativos.get("/{ticker}")
 async def buscar_ativo(ticker: str):
+    import pandas as pd
+    import numpy as np
+    import yfinance as yf
+
     try:
         ticker = ticker.upper().strip()
         ativo = yf.Ticker(ticker)
 
+        # Histórico completo
         hist = ativo.history(period="max", interval="1d")
-
         if hist.empty:
             raise HTTPException(status_code=404, detail="Ativo não encontrado")
 
+        # Preparar gráfico
         historico_grafico = {
             "datas": hist.index.strftime("%Y-%m-%d").tolist(),
             "precos": [float(v) for v in hist["Close"].round(2).tolist()]
         }
 
+        # Último preço
         ultimo_fechamento = float(hist["Close"].iloc[-1])
-        fechamento_anterior = (
-            float(hist["Close"].iloc[-2])
-            if len(hist) > 1
-            else ultimo_fechamento
-        )
+        fechamento_anterior = float(hist["Close"].iloc[-2]) if len(hist) > 1 else ultimo_fechamento
+        
+        variacao = round(((ultimo_fechamento - fechamento_anterior) / fechamento_anterior) * 100, 2)
 
-        variacao = round(
-            ((ultimo_fechamento - fechamento_anterior) / fechamento_anterior) * 100,
-            2
-        )
-
+        # Info geral
         info = ativo.info or {}
 
+        # ==============================
+        # 1. D I V I D E N D O S
+        # ==============================
+        dividendos = ativo.dividends
+        dividend_yield = None
+        dividendos_anuais = {}
+        payout = None
+
+        if not dividendos.empty:
+            ult_12m = dividendos[dividendos.index >= (pd.Timestamp.today() - pd.Timedelta(days=365))]
+            total_12m = ult_12m.sum()
+            dividend_yield = float((total_12m / ultimo_fechamento) * 100)
+
+            dividendos_anuais = dividendos.groupby(dividendos.index.year).sum().to_dict()
+
+            earnings = ativo.get_earnings()
+            if earnings is not None and not earnings.empty:
+                ano_lucro = earnings.index[-1]
+                lucro = earnings["Earnings"].iloc[-1]
+                div_ano = dividendos[dividendos.index.year == ano_lucro].sum()
+                if lucro > 0:
+                    payout = float(div_ano / lucro)
+
+        # ==============================
+        # 2. I N D I C A D O R E S
+        # ==============================
+        indicadores = {
+            "pe_ratio": info.get("forwardPE") or info.get("trailingPE"),
+            "eps": info.get("trailingEps"),
+            "beta": info.get("beta"),
+            "market_cap": info.get("marketCap"),
+            "industry": info.get("industry"),
+            "roe": info.get("returnOnEquity")
+        }
+
+        # ==============================
+        # 3. B E N C H M A R K  (IBOV)
+        # ==============================
+        benchmark = yf.Ticker("^BVSP")
+
+        hist_ativo_12m = ativo.history(period="1y")
+        hist_bench_12m = benchmark.history(period="1y")
+
+        retorno_ativo_12m = None
+        retorno_bench_12m = None
+        correlacao = None
+        beta_calc = None
+
+        if not hist_ativo_12m.empty and not hist_bench_12m.empty:
+            # Retorno 12 meses
+            retorno_ativo_12m = float(
+                (hist_ativo_12m["Close"].iloc[-1] / hist_ativo_12m["Close"].iloc[0] - 1) * 100
+            )
+            retorno_bench_12m = float(
+                (hist_bench_12m["Close"].iloc[-1] / hist_bench_12m["Close"].iloc[0] - 1) * 100
+            )
+
+            # Correlação
+            df_join = (
+                hist_ativo_12m["Close"].pct_change().rename("ativo").to_frame()
+                .join(hist_bench_12m["Close"].pct_change().rename("benchmark"), how="inner")
+                .dropna()
+            )
+
+            if not df_join.empty:
+                correlacao = float(df_join["ativo"].corr(df_join["benchmark"]))
+
+                # Beta calculado
+                cov = np.cov(df_join["ativo"], df_join["benchmark"])[0][1]
+                var_bench = np.var(df_join["benchmark"])
+                beta_calc = float(cov / var_bench) if var_bench != 0 else None
+
+        # ==============================
+        # R E T O R N O   F I N A L
+        # ==============================
         return {
             "ticker": ticker,
             "nome": info.get("longName") or info.get("shortName") or "Nome indisponível",
             "preco": round(ultimo_fechamento, 2),
             "variacao": variacao,
-            "historico": historico_grafico
+            "historico": historico_grafico,
+
+            "dividendos": {
+                "dividend_yield_12m": dividend_yield,
+                "dividendos_anuais": dividendos_anuais,
+                "payout": payout
+            },
+
+            "indicadores": indicadores,
+
+            "benchmark": {
+                "indice": "IBOV",
+                "retorno_ativo_12m": retorno_ativo_12m,
+                "retorno_bench_12m": retorno_bench_12m,
+                "correlacao": correlacao,
+                "beta_calculado": beta_calc
+            }
         }
 
     except HTTPException:
@@ -539,7 +630,6 @@ async def buscar_ativo(ticker: str):
     except Exception as e:
         print("ERRO buscar_ativo:", e)
         raise HTTPException(status_code=500, detail="Erro ao buscar histórico")
-
 
 
 @invest_router.get("/verify")

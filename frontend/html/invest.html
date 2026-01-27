@@ -96,6 +96,21 @@
                 </button>
             </div>
             <div id="resultado" class="hidden"></div>
+            <div id="analises-container" class="hidden">
+                <!-- <h2>Análises Fundamentais</h2> -->
+
+                <div class="analise-card">
+                    <h3>Indicadores</h3>
+                    <ul id="indicadores-list"></ul>
+                </div>
+
+                <div class="analise-card">
+                    <h3>Comparação com Benchmark</h3>
+                    <ul id="benchmark-list"></ul>
+                </div>
+
+            </div>
+
             <div id="grafico-container" style="width: 100%; margin-top: 20px;">
                 <canvas id="meuGrafico"></canvas>
                 <button onclick="chartInstance.resetZoom()" class="btn-reset">Resetar Zoom</button>

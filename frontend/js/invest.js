@@ -215,7 +215,7 @@ async function updateInvestType() {
         if (!res.ok) {
             throw new Error(data.detail || "Erro ao atualizar perfil");
         }
-        
+
         Swal.fire({
             title: "Sucesso!",
             text: "Perfil de investidor atualizado com sucesso!",
@@ -288,6 +288,7 @@ async function buscarAtivo() {
                 Comprar
             </button>
         `;
+        renderAnalises(data);
 
         /* ================= GRÁFICO ================= */
 
@@ -326,7 +327,11 @@ async function buscarAtivo() {
                     }
                 },
                 plugins: {
-                    legend: { display: false },
+                    title: {
+                        display: true,
+                        text: 'Gráfico de Histórico de Ativos (Todo Período)'
+                    },
+                    legend: { display: true },
                     zoom: {
                         pan: {
                             enabled: true,
@@ -383,10 +388,9 @@ async function buscarAtivo() {
             }
         });
 
-        /* 🔥 MOSTRA O CONTAINER (CSS) */
-        document
-            .getElementById("grafico-container")
-            .classList.add("grafico-ativo");
+    
+        document.getElementById("grafico-container").classList.add("grafico-ativo");
+
 
     } catch (err) {
         console.error(err);
@@ -396,8 +400,49 @@ async function buscarAtivo() {
     }
 }
 
+/* ================= ANALISES DE AÇÕES ================= */
+function renderAnalises(data) {
+    const analisesContainer = document.getElementById("analises-container");
+    const indicadoresList = document.getElementById("indicadores-list");
+    const benchmarkList = document.getElementById("benchmark-list");
+
+    analisesContainer.classList.remove("hidden");
+
+    /* ================= INDICADORES ================= */
+    indicadoresList.innerHTML = `
+        <li>PE Ratio: <strong>${data.indicadores.pe_ratio ?? "—"}</strong></li>
+        <li>EPS (Lucro por ação): <strong>${data.indicadores.eps ?? "—"}</strong></li>
+        <li>Beta (volatilidade): <strong>${data.indicadores.beta ?? "—"}</strong></li>
+        <li>Market Cap: <strong>${(data.indicadores.market_cap || 0)
+            .toLocaleString("en-US")}</strong></li>
+        <li>Industry: <strong>${data.indicadores.industry ?? "—"}</strong></li>
+        <li>ROE (Retorno sobre patrimônio): 
+            <strong>${data.indicadores.roe ? (data.indicadores.roe * 100).toFixed(2) + "%" : "—"}</strong>
+        </li>
+    `;
+
+
+    /* ================= BENCHMARK ================= */
+    benchmarkList.innerHTML = `
+        <li>Índice base: <strong>${data.benchmark.indice}</strong></li>
+        <li>Retorno do ativo (12m): 
+            <strong>${data.benchmark.retorno_ativo_12m?.toFixed(2) ?? "—"}%</strong>
+        </li>
+        <li>Retorno do benchmark (12m): 
+            <strong>${data.benchmark.retorno_bench_12m?.toFixed(2) ?? "—"}%</strong>
+        </li>
+        <li>Correlação ativo/benchmark: 
+            <strong>${data.benchmark.correlacao?.toFixed(3) ?? "—"}</strong>
+        </li>
+        <li>Beta calculado: 
+            <strong>${data.benchmark.beta_calculado?.toFixed(3) ?? "—"}</strong>
+        </li>
+    `;
+}
+
 
 /* ================= MODAL DE COMPRA ================= */
+
 
 function abrirModalCompra(ativo) {
     ativoSelecionado = ativo;
