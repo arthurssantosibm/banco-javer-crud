@@ -16,6 +16,13 @@
         <div class="user-info">
             <span class="material-icons">account_circle</span>
             <h3 id="client-name">Olá</h3>
+            <select class="invest-type" name="invest-type" id="perfilInvestidor">
+                <option value="" disabled selected>Selecionar</option>
+                <option value="ARROJADO">ARROJADO</option>
+                <option value="MODERADO">MODERADO</option>
+                <option value="CONSERVADOR">CONSERVADOR</option>
+            </select>
+            <button class="confirm-invest" onclick="updateInvestType()">SALVAR</button>
         </div>
 
         <nav class="sidebar-nav">

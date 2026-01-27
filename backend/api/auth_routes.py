@@ -4,7 +4,7 @@ import httpx
 from mysql.connector import Error
 from models.core.db_javer import get_connection
 from models.core.security import bcrypt_context
-from schemas.schemas import LoginSchema, UpdateUserSchema, CriarConta, TransacaoCreate, DepositoRequest, DepositoResponse, ReativarSchema, SaqueRequest, SaqueResponse, HomeSchema, InvestRegisterSchema, ComprarAtivoSchema
+from schemas.schemas import LoginSchema, UpdateUserSchema, CriarConta, TransacaoCreate, DepositoRequest, DepositoResponse, ReativarSchema, SaqueRequest, SaqueResponse, HomeSchema, InvestRegisterSchema, ComprarAtivoSchema, UpdateInvestType
 from api.jwt import create_access_token, get_current_user_id
 from decimal import Decimal
 import yfinance as yf
@@ -790,3 +790,43 @@ async def get_patrimony(user_id: int = Depends(get_current_user_id)):
         cursor.close()
         conn.close()
 
+@invest_router.put("/perfil-investidor")
+async def atualizar_perfil_investidor(
+    data: UpdateInvestType,
+    user_id: int = Depends(get_current_user_id)
+):
+    conn = get_connection()
+    cursor = conn.cursor()
+
+    try:
+        cursor.execute(
+            """
+            UPDATE invest_client
+            SET perfil_investidor = %s
+            WHERE client_id = %s
+            """,
+            (data.perfil_investidor, user_id)
+        )
+
+        if cursor.rowcount == 0:
+            raise HTTPException(
+                status_code=404,
+                detail="Usuário não possui perfil de investidor"
+            )
+
+        conn.commit()
+
+        return {
+            "message": "Perfil de investidor atualizado com sucesso",
+            "perfil_investidor": data.perfil_investidor
+        }
+
+    except Exception as e:
+        conn.rollback()
+        print("ERRO PERFIL INVESTIDOR:", e)
+        raise HTTPException(status_code=500, detail="Erro ao atualizar perfil")
+
+    finally:
+        cursor.close()
+        conn.close()
+       

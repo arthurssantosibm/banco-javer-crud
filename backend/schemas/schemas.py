@@ -7,7 +7,6 @@ class LoginSchema(BaseModel, extra="ignore"):
     email: EmailStr
     senha: str
 
-
 class ReativarSchema(BaseModel):
     email: EmailStr
     
@@ -71,3 +70,6 @@ class ComprarAtivoSchema(BaseModel):
     @classmethod
     def normalizar_ticker(cls, v: str) -> str:
         return v.strip().upper()
+
+class UpdateInvestType(BaseModel):
+    perfil_investidor: str = Field(..., min_length=3, max_length=20)

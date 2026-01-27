@@ -182,6 +182,56 @@ async function carregarPatrimonio() {
     }
 }
 
+/* ================= ATUALIZAR PERFIL DE INVESTIDOR ================= */
+async function updateInvestType() {
+    const perfil = document.getElementById("perfilInvestidor").value;
+    const token = localStorage.getItem("access_token");
+
+    if (!perfil) {
+        Swal.fire({
+            title: "Selecione um perfil!",
+            text: "Você precisa selecionar um perfil de investidor",
+            icon: "warning"
+            });
+        return;
+    }
+
+    try {
+        showLoading()
+        const res = await fetch("http://127.0.0.1:8000/invest/perfil-investidor", {
+            method: "PUT",
+            headers: {
+                "Content-Type": "application/json",
+                "Authorization": `Bearer ${token}`
+            },
+            body: JSON.stringify({
+                perfil_investidor: perfil
+            })
+        });
+
+        const data = await res.json();
+
+        hideLoading()
+        if (!res.ok) {
+            throw new Error(data.detail || "Erro ao atualizar perfil");
+        }
+        
+        Swal.fire({
+            title: "Sucesso!",
+            text: "Perfil de investidor atualizado com sucesso!",
+            icon: "success"
+        });
+
+    } catch (err) {
+        console.error(err);
+        Swal.fire({
+            title: "Erro",
+            text: "Erro ao salvar o perfil",
+            icon: "warning"
+        });
+    }
+}
+
 
 /* ================= ALERTA ================= */
 

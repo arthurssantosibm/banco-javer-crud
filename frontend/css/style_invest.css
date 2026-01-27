@@ -48,6 +48,38 @@ a {
     padding: 20px;
     margin-bottom: 20px;
     border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+    display: grid;
+}
+
+.user-info button{
+    background: var(--primary);
+    color: #000;
+    border: none;
+    padding: 10px 25px;
+    border-radius: 8px;
+    font-weight: 400;
+    margin-top: 10px;
+    cursor: pointer;
+    transition: 0.3s;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+}
+
+.user-info select,
+.user-info option{
+    background: var(--card-bg);
+    color: #fff;
+    border: none;
+    padding: 10px 25px;
+    border-radius: 8px;
+    font-weight: 400;
+    margin-top: 10px;
+    cursor: pointer;
+    transition: 0.3s;
+    display: flex;
+    gap: 8px;
 }
 
 .user-info .material-icons {
