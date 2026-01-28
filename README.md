@@ -11,6 +11,7 @@ A aplicação expõe uma **API REST** responsável por **cadastrar, visualizar, 
 ## 🚀 Tecnologias Utilizadas
 
 * **Python 3.12+**
+* **YFinance (Investimentos em tempo real)**
 * **FastAPI** (API REST assíncrona)
 * **Uvicorn** (servidor ASGI)
 * **MySQL** (AWS RDS)
@@ -24,7 +25,7 @@ A aplicação expõe uma **API REST** responsável por **cadastrar, visualizar, 
 
 ## 🧠 Arquitetura do Projeto
 
-* A aplicação é dividida em **módulos de rotas** (usuários, login, atualização, transações, depósitos).
+* A aplicação é dividida em **módulos de rotas** (usuários, login, atualização, transações, depósitos, saques, investimentos).
 * O FastAPI gerencia o roteamento e a documentação automática (`/docs`).
 * A autenticação é feita via **JWT**, validando o usuário em rotas protegidas.
 * O banco de dados MySQL roda na AWS, garantindo persistência e acesso remoto.
@@ -95,15 +96,7 @@ pip install -r requirements.txt
 
 ### 5️⃣ Configurar variáveis de ambiente
 
-Crie um arquivo `.env` na raiz do projeto com as configurações do banco e da API, por exemplo:
-
-```env
-DB_HOST=seu_host_mysql
-DB_USER=seu_usuario
-DB_PASSWORD=sua_senha
-DB_NAME=seu_banco
-SECRET_KEY=sua_chave_secreta
-```
+Crie um arquivo `.env` na raiz do projeto com as configurações do banco e da API
 
 ---
 
@@ -128,20 +121,12 @@ Esse comando:
   ```
   http://127.0.0.1:8000/docs
   ```
+> 📌 Importante lembrar que, para testar no swagger, é necessário anexar a X-Internal-key, que foi implementada por questões de segurança, e é sempre enviada junto com o JSON daquela requisição
+
 
 ---
 
-## ✅ Funcionalidades Principais
 
-* Cadastro de clientes
-* Login com autenticação JWT
-* Atualização de dados do usuário
-* Suspensão e reativação de contas
-* Depósitos
-* Transferências entre contas
-* Registro de transações financeiras
-
----
 
 ## 📌 Observações Importantes
 
