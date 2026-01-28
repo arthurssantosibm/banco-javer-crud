@@ -505,6 +505,8 @@ async def buscar_ativo(ticker: str):
     try:
         ticker = ticker.upper().strip()
         ativo = yf.Ticker(ticker)
+        # Info geral
+        info = ativo.info if isinstance(ativo.info, dict) else {}
 
         # Histórico completo
         hist = ativo.history(period="max", interval="1d")
@@ -519,35 +521,86 @@ async def buscar_ativo(ticker: str):
 
         # Último preço
         ultimo_fechamento = float(hist["Close"].iloc[-1])
-        fechamento_anterior = float(hist["Close"].iloc[-2]) if len(hist) > 1 else ultimo_fechamento
+        preco_atual_usd = float(hist["Close"].iloc[-1])
         
-        variacao = round(((ultimo_fechamento - fechamento_anterior) / fechamento_anterior) * 100, 2)
+        currency = info.get("currency", "USD")
+        preco_original = ultimo_fechamento
+        taxa_cambio = 1.0
+        
+        if currency != "BRL":
+            try:
+                par_moeda = f"{currency}BRL=X"
+                fx = yf.Ticker(par_moeda)
+                fx_hist = fx.history(period="1d")
+                
+                if not fx_hist.empty:
+                    taxa_cambio = float(fx_hist["Close"].iloc[-1])
+                    ultimo_fechamento = preco_original * taxa_cambio
+            except Exception:
+                pass
+        
+        
 
-        # Info geral
-        info = ativo.info or {}
+        fechamento_anterior = (
+            float(hist["Close"].iloc[-2])
+            if len(hist) > 1
+            else ultimo_fechamento
+        )
+        preco_anterior_usd = (
+            float(hist["Close"].iloc[-2])
+            if len(hist) > 1
+            else ultimo_fechamento
+        )
+        
+        preco_atual = preco_atual_usd * taxa_cambio
+        preco_anterior = preco_anterior_usd * taxa_cambio
+
+        variacao = round(
+            ((preco_atual_usd - preco_anterior_usd) / preco_anterior_usd) * 100,
+            2
+        )
+
+        
+
 
         # ==============================
         # 1. D I V I D E N D O S
         # ==============================
-        dividendos = ativo.dividends
         dividend_yield = None
         dividendos_anuais = {}
         payout = None
+        dividendos = ativo.dividends
 
-        if not dividendos.empty:
+        if dividendos is not None and not dividendos.empty:
+            dividendos.index = dividendos.index.tz_localize(None)
+            
             ult_12m = dividendos[dividendos.index >= (pd.Timestamp.today() - pd.Timedelta(days=365))]
             total_12m = ult_12m.sum()
-            dividend_yield = float((total_12m / ultimo_fechamento) * 100)
 
-            dividendos_anuais = dividendos.groupby(dividendos.index.year).sum().to_dict()
+            if total_12m and ultimo_fechamento:
+                dividend_yield = float((total_12m / ultimo_fechamento) * 100)
 
-            earnings = ativo.get_earnings()
+            dividendos_anuais = (
+                dividendos.groupby(dividendos.index.year).sum().to_dict()
+            )
+
+            earnings = None
+            try:
+                earnings = ativo.get_earnings()
+            except Exception:
+                earnings = None
+
             if earnings is not None and not earnings.empty:
-                ano_lucro = earnings.index[-1]
-                lucro = earnings["Earnings"].iloc[-1]
-                div_ano = dividendos[dividendos.index.year == ano_lucro].sum()
-                if lucro > 0:
-                    payout = float(div_ano / lucro)
+                try:
+                    lucro = earnings.iloc[-1].get("Earnings")
+                    if lucro and lucro > 0:
+                        div_ano = dividendos[
+                            dividendos.index.year == earnings.index[-1]
+                        ].sum()
+                        payout = float(div_ano / lucro)
+                except Exception:
+                    payout = None
+
 
         # ==============================
         # 2. I N D I C A D O R E S
@@ -561,42 +614,47 @@ async def buscar_ativo(ticker: str):
             "roe": info.get("returnOnEquity")
         }
 
+
         # ==============================
         # 3. B E N C H M A R K  (IBOV)
         # ==============================
-        benchmark = yf.Ticker("^BVSP")
-
-        hist_ativo_12m = ativo.history(period="1y")
-        hist_bench_12m = benchmark.history(period="1y")
-
         retorno_ativo_12m = None
         retorno_bench_12m = None
         correlacao = None
         beta_calc = None
 
-        if not hist_ativo_12m.empty and not hist_bench_12m.empty:
-            # Retorno 12 meses
-            retorno_ativo_12m = float(
-                (hist_ativo_12m["Close"].iloc[-1] / hist_ativo_12m["Close"].iloc[0] - 1) * 100
-            )
-            retorno_bench_12m = float(
-                (hist_bench_12m["Close"].iloc[-1] / hist_bench_12m["Close"].iloc[0] - 1) * 100
-            )
+        try:
+            hist_ativo_12m = ativo.history(period="1y")
+            hist_bench_12m = yf.Ticker("^BVSP").history(period="1y")
 
-            # Correlação
-            df_join = (
-                hist_ativo_12m["Close"].pct_change().rename("ativo").to_frame()
-                .join(hist_bench_12m["Close"].pct_change().rename("benchmark"), how="inner")
-                .dropna()
-            )
+            if not hist_ativo_12m.empty and not hist_bench_12m.empty:
+                retorno_ativo_12m = float(
+                    (hist_ativo_12m["Close"].iloc[-1] / hist_ativo_12m["Close"].iloc[0] - 1) * 100
+                )
+                retorno_bench_12m = float(
+                    (hist_bench_12m["Close"].iloc[-1] / hist_bench_12m["Close"].iloc[0] - 1) * 100
+                )
 
-            if not df_join.empty:
-                correlacao = float(df_join["ativo"].corr(df_join["benchmark"]))
+                df_join = (
+                    hist_ativo_12m["Close"].pct_change()
+                    .rename("ativo")
+                    .to_frame()
+                    .join(
+                        hist_bench_12m["Close"].pct_change().rename("benchmark"),
+                        how="inner"
+                    )
+                    .dropna()
+                )
 
-                # Beta calculado
-                cov = np.cov(df_join["ativo"], df_join["benchmark"])[0][1]
-                var_bench = np.var(df_join["benchmark"])
-                beta_calc = float(cov / var_bench) if var_bench != 0 else None
+                if not df_join.empty:
+                    correlacao = float(df_join["ativo"].corr(df_join["benchmark"]))
+
+                    cov = np.cov(df_join["ativo"], df_join["benchmark"])[0][1]
+                    var_bench = np.var(df_join["benchmark"])
+                    beta_calc = float(cov / var_bench) if var_bench else None
+
+        except Exception:
+            pass
 
         # ==============================
         # R E T O R N O   F I N A L
@@ -947,7 +1005,6 @@ async def listar_carteira(user_id: int = Depends(get_current_user_id)):
             try:
                 yf_ativo = yf.Ticker(ticker)
 
-                # MELHOR forma
                 preco_atual = yf_ativo.fast_info.get("last_price")
 
                 if preco_atual:

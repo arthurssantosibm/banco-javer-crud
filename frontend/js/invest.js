@@ -257,7 +257,7 @@ function dispararAlerta() {
     });
 }
 
-/* ================= BUSCAR ATIVO (GRÁFICO RESTAURADO) ================= */
+/* ================= BUSCAR ATIVO ================= */
 
 async function buscarAtivo() {
     const ticker = document.getElementById("ticker").value.trim().toUpperCase();
