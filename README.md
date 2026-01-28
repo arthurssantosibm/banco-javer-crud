@@ -1,4 +1,4 @@
-# 🏦 Banco Javer – CRUD de Clientes
+# 🏦 BankPY – CRUD de Clientes
 
 LINK DO REPOSITORIO DA API 2: https://github.com/arthurssantosibm/api_client.git
 
@@ -138,5 +138,5 @@ Esse comando:
 
 ## 👨‍💻 Autor
 
-Projeto desenvolvido por **Arthur Santana dos Santos**
+Projeto desenvolvido por **Arthur Santana dos Santos**  
 Desafio prático de backend com Python, FastAPI e AWS.
