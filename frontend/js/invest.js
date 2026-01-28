@@ -88,32 +88,25 @@ async function carregarDadosUsuario() {
 
 async function verificarInvestidor() {
     try {
-        showLoading();
-
-        const res = await fetch(
-            "http://127.0.0.1:8000/invest/verify",
-            { headers }
-        );
+        const res = await fetch("http://127.0.0.1:8000/invest/verify", { headers });
 
         if (!res.ok) throw new Error("Erro na verificação");
 
         const data = await res.json();
 
         if (!data.is_investor) {
-            document
-                .getElementById("investorModal")
-                .classList.remove("hidden");
+            document.getElementById("investorModal").classList.remove("hidden");
         }
 
     } catch (err) {
         console.error(err);
-        Swal.fire("Erro", "Erro ao validar Perfil de Investidor", "error").then(() => {
-            window.location.href = "../html/login.html"
-        })
-    } finally {
-        hideLoading();
+
+        // Mostra o alerta e redireciona depois que o usuário fechar
+        await Swal.fire("Erro", "Erro ao validar Perfil de Investidor", "error");
+        window.location.href = "../html/login.html";
     }
 }
+
 
 /* ================= REGISTRAR INVESTIDOR ================= */
 
