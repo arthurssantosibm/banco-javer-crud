@@ -783,7 +783,7 @@ def identificar_tipo_ativo(ticker: str) -> str:
         return "fii"
 
     # Renda fixa (exemplo interno)
-    if ticker.startswith("TESOURO"):
+    if ticker.endswith("11.SA"):
         return "renda_fixa"
 
     # Ações
