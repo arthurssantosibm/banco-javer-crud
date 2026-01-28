@@ -3,7 +3,6 @@
 let headers = {};
 let user = null;
 let saldo = 0;
-
 let chartInstance = null;
 let ativoSelecionado = null;
 let precoUnitarioAtual = 0;
@@ -33,6 +32,8 @@ document.addEventListener("DOMContentLoaded", async () => {
     await verificarInvestidor();
     await carregarPatrimonio();
     await carregarCarteira();
+    await carregarGraficoProjecao();
+
 
     document.querySelector(".logout").addEventListener("click", (e) => {
         e.preventDefault();
@@ -163,6 +164,7 @@ async function registrarInvestidor() {
 
 async function carregarPatrimonio() {
     try {
+        showLoading();
         const res = await fetch(
             "http://127.0.0.1:8000/invest/patrimony",
             { headers }
@@ -177,6 +179,7 @@ async function carregarPatrimonio() {
                 style: "currency",
                 currency: "BRL"
             });
+    hideLoading()
 
     } catch (err) {
         console.error(err);
@@ -407,6 +410,7 @@ async function carregarCarteira() {
     const container = document.getElementById("carteiraList");
 
     try {
+        showLoading()
         const res = await fetch("http://127.0.0.1:8000/invest/carteira", {
             headers: {
                 "Authorization": `Bearer ${token}`
@@ -463,6 +467,8 @@ async function carregarCarteira() {
 
             container.appendChild(card);
         });
+    
+    hideLoading()
 
     } catch (err) {
         console.error("Erro ao carregar carteira", err);
@@ -594,5 +600,148 @@ async function confirmarCompra() {
         Swal.fire("Erro", err.message, "error");
     } finally {
         hideLoading();
+    }
+}
+
+/* ================= GRAFICO DE PROJECOES ================= */
+let graficoProjecaoInstance = null;
+
+async function carregarGraficoProjecao() {
+    try {
+        showLoading()
+        const res = await fetch("http://127.0.0.1:8000/invest/projecao-patrimonio", {
+            headers: {
+                Authorization: `Bearer ${localStorage.getItem("access_token")}`
+            }
+        });
+
+        if (!res.ok) {
+            throw new Error("Erro ao buscar dados da rota de projeção.");
+        }
+
+        // 1. Extraindo os dados conforme o seu retorno Python
+        const data = await res.json();
+        const valorInicial = Number(data.total_renda_fixa) || 0;
+        const perfilUsuario = data.perfil_usuario;
+
+        const meses = 60; // Projeção para 5 anos
+
+        // 2. Labels do eixo X (Hoje, 1m, 2m...)
+        const labels = Array.from({ length: meses + 1 }, (_, i) =>
+            i === 0 ? "Hoje" : `${i}m`
+        );
+
+        // 3. Função de cálculo de Juros Compostos (Crescimento Exponencial)
+        function gerarDadosProjecao(valorBase, taxaAnual) {
+            // Converte taxa anual para mensal: (1 + i_anual)^(1/12) - 1
+            const taxaMensal = Math.pow(1 + taxaAnual, 1 / 12) - 1;
+            let pontos = [valorBase];
+            let acumulado = valorBase;
+
+            for (let i = 1; i <= meses; i++) {
+                acumulado *= (1 + taxaMensal);
+                pontos.push(Number(acumulado.toFixed(2)));
+            }
+            return pontos;
+        }
+
+        const ctx = document.getElementById("graficoProjecao").getContext("2d");
+
+        // 4. Limpeza de instância anterior para evitar sobreposição
+        if (graficoProjecaoInstance) {
+            graficoProjecaoInstance.destroy();
+        }
+
+        // 5. Configuração do Chart.js
+        graficoProjecaoInstance = new Chart(ctx, {
+            type: "line",
+            data: {
+                labels,
+                datasets: [
+                    {
+                        label: "Conservador (8% a.a)",
+                        data: gerarDadosProjecao(valorInicial, 0.08),
+                        borderColor: "#00d1b2",
+                        backgroundColor: "transparent",
+                        borderWidth: 3,
+                        fill: false,
+                        tension: 1, // Curva suave
+                        pointRadius: 0
+                    },
+                    {
+                        label: "Moderado (12% a.a)",
+                        data: gerarDadosProjecao(valorInicial, 0.12),
+                        borderColor: "#737b80",
+                        backgroundColor: "transparent",
+                        borderWidth: 3,
+                        fill: false,
+                        tension: 0.4,
+                        pointRadius: 0
+                    },
+                    {
+                        label: "Arrojado (18% a.a)",
+                        data: gerarDadosProjecao(valorInicial, 0.18),
+                        borderColor: "#e74c3c",
+                        backgroundColor: "transparent",
+                        borderWidth: 3,
+                        fill: false,
+                        tension: 0.4,
+                        pointRadius: 0
+                    }
+                ]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    title: {
+                        display: true,
+                        text: "Projeção de Patrimonio em Renda Fixa (Total)",
+                        padding: {
+                            top: 10,
+                            bottom: 30
+                        }
+                    },
+                    legend: {
+                        labels: { color: "#e5e7eb", usePointStyle: true }
+                    },
+                    tooltip: {
+                        mode: "index",
+                        intersect: false,
+                        callbacks: {
+                            label: (ctx) => {
+                                let valor = ctx.parsed.y.toLocaleString("pt-BR", {
+                                    style: "currency",
+                                    currency: "BRL"
+                                });
+                                return `${ctx.dataset.label}: ${valor}`;
+                            }
+                        }
+                    }
+                },
+                scales: {
+                    x: {
+                        ticks: { color: "#9ca3af" },
+                        grid: { color: "rgba(255,255,255,0.05)" }
+                    },
+                    y: {
+                        beginAtZero: false,
+                        ticks: {
+                            color: "#9ca3af",
+                            callback: (value) => value.toLocaleString("pt-BR", {
+                                style: "currency",
+                                currency: "BRL",
+                                maximumFractionDigits: 0
+                            })
+                        },
+                        grid: { color: "rgba(255,255,255,0.08)" }
+                    }
+                }
+            }
+        });
+    
+    hideLoading()
+    } catch (error) {
+        console.error("Erro ao carregar gráfico:", error);
     }
 }

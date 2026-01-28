@@ -1094,3 +1094,37 @@ async def listar_carteira(user_id: int = Depends(get_current_user_id)):
     finally:
         cursor.close()
         conn.close()
+
+@invest_router.get("/projecao-patrimonio")
+async def projecao_patrimonio(user_id: int = Depends(get_current_user_id)):
+    conn = get_connection()
+    cursor = conn.cursor(dictionary=True)
+
+    try:
+        # 1️⃣ Soma apenas renda fixa
+        cursor.execute("""
+            SELECT COALESCE(SUM(ft.valor_investido), 0) AS total_renda_fixa, ic.perfil_investidor FROM invest_client ic LEFT JOIN financial_transactions ft ON ic.client_id = ft.client_id AND ft.tipo_ativo = 'renda_fixa' WHERE ic.client_id = %s GROUP BY ic.perfil_investidor
+        """, (user_id,))
+
+        row = cursor.fetchone()
+
+        total_renda_fixa = float(row["total_renda_fixa"] or 0)
+        perfil = row["perfil_investidor"]
+
+
+        # 3️⃣ Projeções
+        projecoes = {
+            "CONSERVADOR": round(total_renda_fixa * 0.08, 2),
+            "MODERADO": round(total_renda_fixa * 0.12, 2),
+            "ARROJADO": round(total_renda_fixa * 0.18, 2),
+        }
+
+        return {
+            "total_renda_fixa": float(total_renda_fixa),
+            "perfil_usuario": perfil,
+            "projecoes": projecoes
+        }
+
+    finally:
+        cursor.close()
+        conn.close()
