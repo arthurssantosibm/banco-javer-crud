@@ -448,9 +448,9 @@ async function carregarCarteira() {
                     <p><b>Ticker:</b> ${item.ticker}</p>
                     <p><b>Tipo:</b> ${item.tipo_ativo}</p>
                     <p><b>Quantidade:</b> ${item.quantidade}</p>
-                    <p><b>Preço Compra:</b> R$ ${Number(item.valor_atual).toFixed(2)}</p>
-                    <p><b>Preço Mercado:</b> R$ ${data.preco ? data.preco.toFixed(2) : "N/A"}</p>
-                    <p><b>Total investido:</b> R$ ${Number(item.valor_investido).toFixed(2)}</p>
+                    <p><b>Preço Compra:</b> R$ ${Number(item.valor_atual).toLocaleString("pt-BR", { style: "currency", currency: "BRL" })}</p>
+                    <p><b>Preço Mercado:</b> R$ ${precoAtual > 0 ? precoAtual.toLocaleString("pt-BR", { style: "currency", currency: "BRL" }) : "N/A"}</p>
+                    <p><b>Total investido:</b> R$ ${Number(item.valor_investido).toLocaleString("pt-BR", { style: "currency", currency: "BRL" })}</p>
                     <p>
                         <b>Valorização:</b> 
                         <span class="${classeValorizacao}">

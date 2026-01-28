@@ -81,11 +81,23 @@ a {
     display: flex;
     gap: 8px;
 }
-
 .user-info .material-icons {
     font-size: 48px;
     margin-bottom: 5px;
     color: var(--primary);
+}
+.analise-card{
+    background: rgba(255, 255, 255, 0.1);
+    padding: 12px;
+    border-radius: 10px;
+    display: flex;
+    align-items: center;
+    gap: 15px;
+}
+.analise-card.mini-card {
+    display: flex;
+    align-items: center;
+    gap: 15px; /* espaço entre ícone e texto */
 }
 
 .user-info h3 {
@@ -498,7 +510,6 @@ body.loading-active {
     border-radius: 12px;
     padding: 0;
     box-shadow: none;
-    width: 100%;
     height: 0;
     overflow: hidden;
     opacity: 0;
@@ -649,11 +660,13 @@ body.loading-active {
     padding: 15px;
     margin: 10px;
     background: #181818;
+    display: grid;
     border-radius: 10px;
 }
 
 .analise-card h3 {
     color: var(--text);
+    margin-bottom: -15px;
 }
 
 .analise-card ul li {
@@ -718,4 +731,13 @@ body.loading-active {
     color: #fff;
     border: none;
     cursor: pointer;
+}
+.positivo {
+    color: #04b197; /* verde */
+    font-weight: bold;
+}
+
+.negativo {
+    color: #ff4d4f; /* vermelho */
+    font-weight: bold;
 }

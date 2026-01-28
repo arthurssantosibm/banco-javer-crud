@@ -879,10 +879,14 @@ async def comprar_ativo(
 
 @invest_router.get("/patrimony")
 async def get_patrimony(user_id: int = Depends(get_current_user_id)):
+    import yfinance as yf
+    from decimal import Decimal
+
     conn = get_connection()
     cursor = conn.cursor(dictionary=True)
 
     try:
+        # 🔹 Buscar saldo da conta corrente
         cursor.execute(
             "SELECT saldo_cc FROM usuarios WHERE id = %s",
             (user_id,)
@@ -890,6 +894,7 @@ async def get_patrimony(user_id: int = Depends(get_current_user_id)):
         user = cursor.fetchone()
         saldo = Decimal(user["saldo_cc"] or 0)
 
+        # 🔹 Buscar ativos do usuário
         cursor.execute(
             """
             SELECT ticker, valor_investido, valor_atual
@@ -899,37 +904,59 @@ async def get_patrimony(user_id: int = Depends(get_current_user_id)):
             (user_id,)
         )
         ativos = cursor.fetchall()
-
         total_ativos = Decimal("0")
 
         for ativo in ativos:
-            ticker = (ativo.get("ticker") or "").strip()
-
+            ticker = (ativo.get("ticker") or "").strip().upper()
             if not ticker:
-                continue 
-
-            yf_ativo = yf.Ticker(ticker)
-            hist = yf_ativo.history(period="1d")
-
-            if hist.empty:
                 continue
 
-            preco_hoje = Decimal(str(hist["Close"].iloc[-1]))
-            preco_compra = Decimal(str(ativo["valor_atual"]))
-            valor_investido = Decimal(str(ativo["valor_investido"]))
+            try:
+                yf_ativo = yf.Ticker(ticker)
+                hist = yf_ativo.history(period="1d")
+                info = yf_ativo.info if isinstance(yf_ativo.info, dict) else {}
 
-            if preco_compra <= 0:
+                if hist.empty:
+                    continue
+
+                # 🔹 Determinar moeda e taxa de câmbio
+                currency = info.get("currency", "USD")
+                taxa_cambio = Decimal("1")
+
+                if currency != "BRL":
+                    try:
+                        fx = yf.Ticker(f"{currency}BRL=X")
+                        fx_hist = fx.history(period="1d")
+                        if not fx_hist.empty:
+                            taxa_cambio = Decimal(str(fx_hist["Close"].iloc[-1]))
+                    except Exception:
+                        pass
+
+                # 🔹 Preço atual convertido para BRL
+                preco_hoje = Decimal(str(hist["Close"].iloc[-1])) * taxa_cambio
+
+                # 🔹 Preço de compra salvo no banco
+                preco_compra = Decimal(str(ativo["valor_atual"]))
+                valor_investido = Decimal(str(ativo["valor_investido"]))
+
+                if preco_compra <= 0:
+                    continue
+
+                # 🔹 Calcular valorização e valor atualizado
+                fator = preco_hoje / preco_compra
+                valor_atualizado = valor_investido * fator
+
+                total_ativos += valor_atualizado
+
+            except Exception as e:
+                # Se algum ativo falhar, continua com os outros
+                print(f"Erro ao processar {ticker}: {e}")
                 continue
 
-            fator = preco_hoje / preco_compra
-            valor_atualizado = valor_investido * fator
-
-            total_ativos += valor_atualizado
-
-        patrimonio_total = total_ativos
+        patrimonio_total = saldo + total_ativos
 
         return {
-            "saldo": float(saldo),
+            "saldo": float(round(saldo, 2)),
             "total_ativos": float(round(total_ativos, 2)),
             "patrimonio_total": float(round(patrimonio_total, 2))
         }
@@ -937,6 +964,7 @@ async def get_patrimony(user_id: int = Depends(get_current_user_id)):
     finally:
         cursor.close()
         conn.close()
+
 
 @invest_router.put("/perfil-investidor")
 async def atualizar_perfil_investidor(
@@ -980,6 +1008,9 @@ async def atualizar_perfil_investidor(
 
 @invest_router.get("/carteira")
 async def listar_carteira(user_id: int = Depends(get_current_user_id)):
+    import yfinance as yf
+    from decimal import Decimal
+
     conn = get_connection()
     cursor = conn.cursor(dictionary=True)
 
@@ -1000,20 +1031,63 @@ async def listar_carteira(user_id: int = Depends(get_current_user_id)):
         ativos = cursor.fetchall()
 
         for ativo in ativos:
-            ticker = ativo["ticker"].strip().upper()
+            ticker = (ativo["ticker"] or "").strip().upper()
+            if not ticker:
+                ativo["preco_atual"] = None
+                ativo["valor_atualizado"] = None
+                ativo["rentabilidade_pct"] = None
+                continue
 
             try:
                 yf_ativo = yf.Ticker(ticker)
+                hist = yf_ativo.history(period="1d")
+                info = yf_ativo.info if isinstance(yf_ativo.info, dict) else {}
 
-                preco_atual = yf_ativo.fast_info.get("last_price")
-
-                if preco_atual:
-                    ativo["preco_atual"] = round(float(preco_atual), 2)
-                else:
+                if hist.empty:
                     ativo["preco_atual"] = None
+                    ativo["valor_atualizado"] = None
+                    ativo["rentabilidade_pct"] = None
+                    continue
 
-            except Exception:
+                # 🔹 Moeda e taxa de câmbio
+                currency = info.get("currency", "USD")
+                taxa_cambio = Decimal("1")
+
+                if currency != "BRL":
+                    try:
+                        fx = yf.Ticker(f"{currency}BRL=X")
+                        fx_hist = fx.history(period="1d")
+                        if not fx_hist.empty:
+                            taxa_cambio = Decimal(str(fx_hist["Close"].iloc[-1]))
+                    except Exception:
+                        pass
+
+                # 🔹 Preço atual convertido
+                preco_atual = Decimal(str(hist["Close"].iloc[-1])) * taxa_cambio
+
+                # 🔹 Preço de compra e valor investido
+                preco_compra = Decimal(str(ativo["valor_atual"]))
+                valor_investido = Decimal(str(ativo["valor_investido"]))
+
+                if preco_compra <= 0:
+                    ativo["preco_atual"] = round(float(preco_atual), 2)
+                    ativo["valor_atualizado"] = None
+                    ativo["rentabilidade_pct"] = None
+                    continue
+
+                # 🔹 Valor atualizado e rentabilidade %
+                valor_atualizado = valor_investido * (preco_atual / preco_compra)
+                rentabilidade_pct = ((preco_atual / preco_compra - 1) * 100)
+
+                ativo["preco_atual"] = round(float(preco_atual), 2)
+                ativo["valor_atualizado"] = round(float(valor_atualizado), 2)
+                ativo["rentabilidade_pct"] = round(float(rentabilidade_pct), 2)
+
+            except Exception as e:
+                print(f"Erro ao processar {ticker}: {e}")
                 ativo["preco_atual"] = None
+                ativo["valor_atualizado"] = None
+                ativo["rentabilidade_pct"] = None
 
         return ativos
 
