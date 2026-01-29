@@ -33,6 +33,7 @@ document.addEventListener("DOMContentLoaded", async () => {
     await carregarPatrimonio();
     await carregarCarteira();
     await carregarGraficoProjecao();
+    await carregarGraficoInflacao();
 
 
     document.querySelector(".logout").addEventListener("click", (e) => {
@@ -155,6 +156,7 @@ async function registrarInvestidor() {
     }
 }
 
+/* ================= PATRIMONIO ================= */
 async function carregarPatrimonio() {
     try {
         showLoading();
@@ -177,6 +179,46 @@ async function carregarPatrimonio() {
     } catch (err) {
         console.error(err);
     }
+}
+
+
+async function carregarGraficoInflacao() {
+    const res = await fetch("http://127.0.0.1:8000/invest/comparacao-inflacao", {
+        headers
+    });
+
+    const data = await res.json();
+
+    new Chart(document.getElementById("graficoInflacao"), {
+        type: "line",
+        data: {
+            labels: data.labels,
+            datasets: [
+                {
+                    label: "Seu Patrimônio",
+                    data: data.patrimonio,
+                    borderWidth: 3,
+                    tension: 0.4
+                },
+                {
+                    label: "Inflação",
+                    data: data.inflacao,
+                    borderWidth: 2,
+                    borderDash: [6, 6],
+                    tension: 0.4
+                }
+            ]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+                display: true,
+                text: data.perfil_investidor
+            }
+        }
+
+    });
 }
 
 /* ================= ATUALIZAR PERFIL DE INVESTIDOR ================= */

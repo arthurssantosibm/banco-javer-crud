@@ -1099,7 +1099,7 @@ def get_perfil_investidor_usuario(
 
     try:
         cursor.execute("""
-            SELECT tipo_investidor
+            SELECT perfil_investidor
             FROM invest_client
             WHERE client_id = %s
             LIMIT 1
@@ -1107,25 +1107,27 @@ def get_perfil_investidor_usuario(
 
         perfil = cursor.fetchone()
 
-        if not perfil or not perfil["tipo_investidor"]:
+        if not perfil or not perfil["perfil_investidor"]:
             raise HTTPException(
                 status_code=400,
                 detail="Perfil de investidor não definido"
             )
 
-        return perfil["tipo_investidor"].upper()
+        return perfil["perfil_investidor"].upper()
 
     finally:
         cursor.close()
         conn.close()
         
-@invest_router.get("comparacao-inflacao")
+@invest_router.get("/comparacao-inflacao")
 async def comparacao_inflacao(
-    patrimonio: float = Depends(get_patrimony),
+    patrimonio: dict = Depends(get_patrimony),
     perfil_investidor: str = Depends(get_perfil_investidor_usuario)):
-    meses = 12
     
-    inflacao_mensal = 0.48
+    meses = 12
+    patrimonio_inicial = float(patrimonio["patrimonio_total"])
+    inflacao_mensal = 0.004
+    
     if perfil_investidor == "CONSERVADOR":
         rendimento_mensal = 0.006   
     elif perfil_investidor == "MODERADO":
@@ -1135,8 +1137,8 @@ async def comparacao_inflacao(
     else:
         rendimento_mensal = 0.006   
 
-    patrimonio_vals = [patrimonio]
-    inflacao_vals = [patrimonio]
+    patrimonio_vals = [round(patrimonio_inicial, 2)]
+    inflacao_vals = [round(patrimonio_inicial, 2)]
 
     for _ in range(meses):
         patrimonio_vals.append(
