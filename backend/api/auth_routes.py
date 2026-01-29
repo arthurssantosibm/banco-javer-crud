@@ -1,6 +1,5 @@
 from fastapi import APIRouter, HTTPException, Depends
-import mysql.connector
-import httpx
+from decimal import Decimal
 from mysql.connector import Error
 from models.core.db_javer import get_connection
 from models.core.security import bcrypt_context
@@ -8,7 +7,10 @@ from schemas.schemas import LoginSchema, UpdateUserSchema, CriarConta, Transacao
 from api.jwt import create_access_token, get_current_user_id
 from decimal import Decimal
 import yfinance as yf
-import re
+import pandas as pd
+import numpy as np
+import mysql.connector
+import httpx
 
 
 auth_router = APIRouter(prefix="/auth", tags=["auth"])
@@ -498,28 +500,19 @@ async def realizar_saque(
 # BLOCO DE INVESTIMENTOS
 @buscar_ativos.get("/{ticker}")
 async def buscar_ativo(ticker: str):
-    import pandas as pd
-    import numpy as np
-    import yfinance as yf
-
     try:
         ticker = ticker.upper().strip()
         ativo = yf.Ticker(ticker)
-        # Info geral
         info = ativo.info if isinstance(ativo.info, dict) else {}
-
-        # Histórico completo
         hist = ativo.history(period="max", interval="1d")
         if hist.empty:
             raise HTTPException(status_code=404, detail="Ativo não encontrado")
 
-        # Preparar gráfico
         historico_grafico = {
             "datas": hist.index.strftime("%Y-%m-%d").tolist(),
             "precos": [float(v) for v in hist["Close"].round(2).tolist()]
         }
 
-        # Último preço
         ultimo_fechamento = float(hist["Close"].iloc[-1])
         preco_atual_usd = float(hist["Close"].iloc[-1])
         
@@ -560,12 +553,6 @@ async def buscar_ativo(ticker: str):
             2
         )
 
-        
-
-
-        # ==============================
-        # 1. D I V I D E N D O S
-        # ==============================
         dividend_yield = None
         dividendos_anuais = {}
         payout = None
@@ -602,9 +589,6 @@ async def buscar_ativo(ticker: str):
                     payout = None
 
 
-        # ==============================
-        # 2. I N D I C A D O R E S
-        # ==============================
         indicadores = {
             "pe_ratio": info.get("forwardPE") or info.get("trailingPE"),
             "eps": info.get("trailingEps"),
@@ -614,10 +598,6 @@ async def buscar_ativo(ticker: str):
             "roe": info.get("returnOnEquity")
         }
 
-
-        # ==============================
-        # 3. B E N C H M A R K  (IBOV)
-        # ==============================
         retorno_ativo_12m = None
         retorno_bench_12m = None
         correlacao = None
@@ -656,9 +636,6 @@ async def buscar_ativo(ticker: str):
         except Exception:
             pass
 
-        # ==============================
-        # R E T O R N O   F I N A L
-        # ==============================
         return {
             "ticker": ticker,
             "nome": info.get("longName") or info.get("shortName") or "Nome indisponível",
@@ -879,14 +856,10 @@ async def comprar_ativo(
 
 @invest_router.get("/patrimony")
 async def get_patrimony(user_id: int = Depends(get_current_user_id)):
-    import yfinance as yf
-    from decimal import Decimal
-
     conn = get_connection()
     cursor = conn.cursor(dictionary=True)
 
     try:
-        # 🔹 Buscar saldo da conta corrente
         cursor.execute(
             "SELECT saldo_cc FROM usuarios WHERE id = %s",
             (user_id,)
@@ -894,7 +867,6 @@ async def get_patrimony(user_id: int = Depends(get_current_user_id)):
         user = cursor.fetchone()
         saldo = Decimal(user["saldo_cc"] or 0)
 
-        # 🔹 Buscar ativos do usuário
         cursor.execute(
             """
             SELECT ticker, valor_investido, valor_atual
@@ -919,7 +891,6 @@ async def get_patrimony(user_id: int = Depends(get_current_user_id)):
                 if hist.empty:
                     continue
 
-                # 🔹 Determinar moeda e taxa de câmbio
                 currency = info.get("currency", "USD")
                 taxa_cambio = Decimal("1")
 
@@ -932,24 +903,20 @@ async def get_patrimony(user_id: int = Depends(get_current_user_id)):
                     except Exception:
                         pass
 
-                # 🔹 Preço atual convertido para BRL
                 preco_hoje = Decimal(str(hist["Close"].iloc[-1])) * taxa_cambio
 
-                # 🔹 Preço de compra salvo no banco
                 preco_compra = Decimal(str(ativo["valor_atual"]))
                 valor_investido = Decimal(str(ativo["valor_investido"]))
 
                 if preco_compra <= 0:
                     continue
 
-                # 🔹 Calcular valorização e valor atualizado
                 fator = preco_hoje / preco_compra
                 valor_atualizado = valor_investido * fator
 
                 total_ativos += valor_atualizado
 
             except Exception as e:
-                # Se algum ativo falhar, continua com os outros
                 print(f"Erro ao processar {ticker}: {e}")
                 continue
 
@@ -1008,9 +975,6 @@ async def atualizar_perfil_investidor(
 
 @invest_router.get("/carteira")
 async def listar_carteira(user_id: int = Depends(get_current_user_id)):
-    import yfinance as yf
-    from decimal import Decimal
-
     conn = get_connection()
     cursor = conn.cursor(dictionary=True)
 
@@ -1101,7 +1065,6 @@ async def projecao_patrimonio(user_id: int = Depends(get_current_user_id)):
     cursor = conn.cursor(dictionary=True)
 
     try:
-        # 1️⃣ Soma apenas renda fixa
         cursor.execute("""
             SELECT COALESCE(SUM(ft.valor_investido), 0) AS total_renda_fixa, ic.perfil_investidor FROM invest_client ic LEFT JOIN financial_transactions ft ON ic.client_id = ft.client_id AND ft.tipo_ativo = 'renda_fixa' WHERE ic.client_id = %s GROUP BY ic.perfil_investidor
         """, (user_id,))
@@ -1112,7 +1075,6 @@ async def projecao_patrimonio(user_id: int = Depends(get_current_user_id)):
         perfil = row["perfil_investidor"]
 
 
-        # 3️⃣ Projeções
         projecoes = {
             "CONSERVADOR": round(total_renda_fixa * 0.08, 2),
             "MODERADO": round(total_renda_fixa * 0.12, 2),
@@ -1128,3 +1090,65 @@ async def projecao_patrimonio(user_id: int = Depends(get_current_user_id)):
     finally:
         cursor.close()
         conn.close()
+
+
+def get_perfil_investidor_usuario(
+    user_id: int = Depends(get_current_user_id)) -> str:
+    conn = get_connection()
+    cursor = conn.cursor(dictionary=True)
+
+    try:
+        cursor.execute("""
+            SELECT tipo_investidor
+            FROM invest_client
+            WHERE client_id = %s
+            LIMIT 1
+        """, (user_id,))
+
+        perfil = cursor.fetchone()
+
+        if not perfil or not perfil["tipo_investidor"]:
+            raise HTTPException(
+                status_code=400,
+                detail="Perfil de investidor não definido"
+            )
+
+        return perfil["tipo_investidor"].upper()
+
+    finally:
+        cursor.close()
+        conn.close()
+        
+@invest_router.get("comparacao-inflacao")
+async def comparacao_inflacao(
+    patrimonio: float = Depends(get_patrimony),
+    perfil_investidor: str = Depends(get_perfil_investidor_usuario)):
+    meses = 12
+    
+    inflacao_mensal = 0.48
+    if perfil_investidor == "CONSERVADOR":
+        rendimento_mensal = 0.006   
+    elif perfil_investidor == "MODERADO":
+        rendimento_mensal = 0.01    
+    elif perfil_investidor == "ARROJADO":
+        rendimento_mensal = 0.015   
+    else:
+        rendimento_mensal = 0.006   
+
+    patrimonio_vals = [patrimonio]
+    inflacao_vals = [patrimonio]
+
+    for _ in range(meses):
+        patrimonio_vals.append(
+            round(patrimonio_vals[-1] * (1 + rendimento_mensal), 2)
+        )
+        inflacao_vals.append(
+            round(inflacao_vals[-1] * (1 + inflacao_mensal), 2)
+        )
+
+    return {
+        "perfil": perfil_investidor,
+        "labels": [f"M{i}" for i in range(meses + 1)],
+        "patrimonio": patrimonio_vals,
+        "inflacao": inflacao_vals
+    }
