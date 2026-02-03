@@ -124,17 +124,6 @@
                 <div class="perfil-investidor">
                     <span id="perfilBadge"></span>
                 </div>
-
-                <div class="inflacao-header">
-                    <h3>Patrimônio x Inflação</h3>
-                    <span class="inflacao-subtitle">
-                        Veja se seus investimentos estão superando a inflação
-                    </span>
-                </div>
-
-                <div class="inflacao-grafico">
-                    <canvas id="graficoInflacao"></canvas>
-                </div>
             </div>
             <div class="list-actives">
                 <h2>Carteira</h2>
@@ -193,9 +182,47 @@
         </div>
     </div>
 </div>
+<div id="sellAssetModal" class="modal hidden">
+    <div class="modal-content sell-modal">
+        <h2>Vender Ativo</h2>
+
+        <div class="sell-info">
+            <p><strong>Ativo:</strong> <span id="sell-nome-ativo"></span></p>
+            <p><strong>Ticker:</strong> <span id="sell-ticker"></span></p>
+            <p><strong>Preço Unitário:</strong> <span id="sell-preco-unitario"></span></p>
+            <p><strong>Quantidade disponível:</strong> <span id="sell-quantidade-disponivel"></span></p>
+        </div>
+
+        <div class="sell-form">
+            <label for="quantidadeVenda">Quantidade a vender</label>
+            <input
+                type="number"
+                id="quantidadeVenda"
+                min="1"
+                oninput="calcularTotalVenda()"
+            />
+
+            <p class="total-preview">
+                Valor a receber:
+                <strong id="sell-total">R$ 0,00</strong>
+            </p>
+        </div>
+
+        <div class="modal-actions">
+            <button class="btn-cancel" onclick="fecharModalVenda()">
+                Cancelar
+            </button>
+            <button class="btn-confirm" onclick="confirmarVenda()">
+                Confirmar Venda
+            </button>
+        </div>
+    </div>
+</div>
+
 
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-zoom"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chartjs-adapter-date-fns"></script>
     <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-annotation"></script>
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <script src="../js/invest.js"></script>
@@ -205,7 +232,7 @@
         <h2>Perfil de Investidor</h2>
         <p>Para acessar investimentos, selecione seu perfil:</p>
 
-        <select id="perfilInvestidor">
+        <select id="perfilInvestidorModal">
             <option value="">Selecione</option>
             <option value="CONSERVADOR">Conservador</option>
             <option value="MODERADO">Moderado</option>

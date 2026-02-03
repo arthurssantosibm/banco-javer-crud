@@ -3,7 +3,8 @@ from decimal import Decimal
 from mysql.connector import Error
 from models.core.db_javer import get_connection
 from models.core.security import bcrypt_context
-from schemas.schemas import LoginSchema, UpdateUserSchema, CriarConta, TransacaoCreate, DepositoRequest, DepositoResponse, ReativarSchema, SaqueRequest, SaqueResponse, HomeSchema, InvestRegisterSchema, ComprarAtivoSchema, UpdateInvestType
+from datetime import timezone
+from schemas.schemas import LoginSchema, UpdateUserSchema, CriarConta, TransacaoCreate, DepositoRequest, DepositoResponse, ReativarSchema, SaqueRequest, SaqueResponse, HomeSchema, InvestRegisterSchema, ComprarAtivoSchema, UpdateInvestType, VenderAtivoSchema
 from api.jwt import create_access_token, get_current_user_id
 from decimal import Decimal
 import yfinance as yf
@@ -503,48 +504,48 @@ async def buscar_ativo(ticker: str):
     try:
         ticker = ticker.upper().strip()
         ativo = yf.Ticker(ticker)
+
         info = ativo.info if isinstance(ativo.info, dict) else {}
+
         hist = ativo.history(period="max", interval="1d")
         if hist.empty:
             raise HTTPException(status_code=404, detail="Ativo não encontrado")
 
-        historico_grafico = {
-            "datas": hist.index.strftime("%Y-%m-%d").tolist(),
-            "precos": [float(v) for v in hist["Close"].round(2).tolist()]
-        }
+        preco_original = float(hist["Close"].iloc[-1])
+        preco_atual_usd = preco_original
 
-        ultimo_fechamento = float(hist["Close"].iloc[-1])
-        preco_atual_usd = float(hist["Close"].iloc[-1])
-        
         currency = info.get("currency", "USD")
-        preco_original = ultimo_fechamento
         taxa_cambio = 1.0
-        
+
         if currency != "BRL":
             try:
                 par_moeda = f"{currency}BRL=X"
                 fx = yf.Ticker(par_moeda)
                 fx_hist = fx.history(period="1d")
-                
+
                 if not fx_hist.empty:
                     taxa_cambio = float(fx_hist["Close"].iloc[-1])
-                    ultimo_fechamento = preco_original * taxa_cambio
             except Exception:
-                pass
-        
-        
+                taxa_cambio = 1.0
 
-        fechamento_anterior = (
-            float(hist["Close"].iloc[-2])
-            if len(hist) > 1
-            else ultimo_fechamento
-        )
+
+        historico_grafico = {
+            "datas": hist.index.strftime("%Y-%m-%d").tolist(),
+            "precos": [
+                round(float(v) * taxa_cambio, 2)
+                for v in hist["Close"].tolist()
+            ]
+        }
+
+
+        ultimo_fechamento = preco_original * taxa_cambio
+
         preco_anterior_usd = (
             float(hist["Close"].iloc[-2])
             if len(hist) > 1
-            else ultimo_fechamento
+            else preco_atual_usd
         )
-        
+
         preco_atual = preco_atual_usd * taxa_cambio
         preco_anterior = preco_anterior_usd * taxa_cambio
 
@@ -553,15 +554,18 @@ async def buscar_ativo(ticker: str):
             2
         )
 
+
         dividend_yield = None
         dividendos_anuais = {}
         payout = None
-        dividendos = ativo.dividends
 
+        dividendos = ativo.dividends
         if dividendos is not None and not dividendos.empty:
             dividendos.index = dividendos.index.tz_localize(None)
-            
-            ult_12m = dividendos[dividendos.index >= (pd.Timestamp.today() - pd.Timedelta(days=365))]
+
+            ult_12m = dividendos[
+                dividendos.index >= (pd.Timestamp.today() - pd.Timedelta(days=365))
+            ]
             total_12m = ult_12m.sum()
 
             if total_12m and ultimo_fechamento:
@@ -571,23 +575,17 @@ async def buscar_ativo(ticker: str):
                 dividendos.groupby(dividendos.index.year).sum().to_dict()
             )
 
-            earnings = None
             try:
                 earnings = ativo.get_earnings()
-            except Exception:
-                earnings = None
-
-            if earnings is not None and not earnings.empty:
-                try:
+                if earnings is not None and not earnings.empty:
                     lucro = earnings.iloc[-1].get("Earnings")
                     if lucro and lucro > 0:
                         div_ano = dividendos[
                             dividendos.index.year == earnings.index[-1]
                         ].sum()
                         payout = float(div_ano / lucro)
-                except Exception:
-                    payout = None
-
+            except Exception:
+                payout = None
 
         indicadores = {
             "pe_ratio": info.get("forwardPE") or info.get("trailingPE"),
@@ -597,6 +595,7 @@ async def buscar_ativo(ticker: str):
             "industry": info.get("industry"),
             "roe": info.get("returnOnEquity")
         }
+
 
         retorno_ativo_12m = None
         retorno_bench_12m = None
@@ -609,10 +608,12 @@ async def buscar_ativo(ticker: str):
 
             if not hist_ativo_12m.empty and not hist_bench_12m.empty:
                 retorno_ativo_12m = float(
-                    (hist_ativo_12m["Close"].iloc[-1] / hist_ativo_12m["Close"].iloc[0] - 1) * 100
+                    (hist_ativo_12m["Close"].iloc[-1] /
+                     hist_ativo_12m["Close"].iloc[0] - 1) * 100
                 )
                 retorno_bench_12m = float(
-                    (hist_bench_12m["Close"].iloc[-1] / hist_bench_12m["Close"].iloc[0] - 1) * 100
+                    (hist_bench_12m["Close"].iloc[-1] /
+                     hist_bench_12m["Close"].iloc[0] - 1) * 100
                 )
 
                 df_join = (
@@ -627,9 +628,13 @@ async def buscar_ativo(ticker: str):
                 )
 
                 if not df_join.empty:
-                    correlacao = float(df_join["ativo"].corr(df_join["benchmark"]))
+                    correlacao = float(
+                        df_join["ativo"].corr(df_join["benchmark"])
+                    )
 
-                    cov = np.cov(df_join["ativo"], df_join["benchmark"])[0][1]
+                    cov = np.cov(
+                        df_join["ativo"], df_join["benchmark"]
+                    )[0][1]
                     var_bench = np.var(df_join["benchmark"])
                     beta_calc = float(cov / var_bench) if var_bench else None
 
@@ -638,7 +643,9 @@ async def buscar_ativo(ticker: str):
 
         return {
             "ticker": ticker,
-            "nome": info.get("longName") or info.get("shortName") or "Nome indisponível",
+            "nome": info.get("longName")
+            or info.get("shortName")
+            or "Nome indisponível",
             "preco": round(ultimo_fechamento, 2),
             "variacao": variacao,
             "historico": historico_grafico,
@@ -664,8 +671,10 @@ async def buscar_ativo(ticker: str):
         raise
     except Exception as e:
         print("ERRO buscar_ativo:", e)
-        raise HTTPException(status_code=500, detail="Erro ao buscar histórico")
-
+        raise HTTPException(
+            status_code=500,
+            detail="Erro ao buscar histórico"
+        )
 
 @invest_router.get("/verify")
 async def verify_investor(user_id: int = Depends(get_current_user_id)):
@@ -867,19 +876,18 @@ async def get_patrimony(user_id: int = Depends(get_current_user_id)):
         user = cursor.fetchone()
         saldo = Decimal(user["saldo_cc"] or 0)
 
-        cursor.execute(
-            """
-            SELECT ticker, valor_investido, valor_atual
+        cursor.execute("""
+            SELECT ticker, quantidade, valor_atual
             FROM financial_transactions
             WHERE client_id = %s
-            """,
-            (user_id,)
-        )
+            AND quantidade > 0
+        """, (user_id,))
+
         ativos = cursor.fetchall()
         total_ativos = Decimal("0")
 
         for ativo in ativos:
-            ticker = (ativo.get("ticker") or "").strip().upper()
+            ticker = (ativo["ticker"] or "").strip().upper()
             if not ticker:
                 continue
 
@@ -895,32 +903,21 @@ async def get_patrimony(user_id: int = Depends(get_current_user_id)):
                 taxa_cambio = Decimal("1")
 
                 if currency != "BRL":
-                    try:
-                        fx = yf.Ticker(f"{currency}BRL=X")
-                        fx_hist = fx.history(period="1d")
-                        if not fx_hist.empty:
-                            taxa_cambio = Decimal(str(fx_hist["Close"].iloc[-1]))
-                    except Exception:
-                        pass
+                    fx = yf.Ticker(f"{currency}BRL=X")
+                    fx_hist = fx.history(period="1d")
+                    if not fx_hist.empty:
+                        taxa_cambio = Decimal(str(fx_hist["Close"].iloc[-1]))
 
                 preco_hoje = Decimal(str(hist["Close"].iloc[-1])) * taxa_cambio
+                quantidade = Decimal(str(ativo["quantidade"]))
 
-                preco_compra = Decimal(str(ativo["valor_atual"]))
-                valor_investido = Decimal(str(ativo["valor_investido"]))
-
-                if preco_compra <= 0:
-                    continue
-
-                fator = preco_hoje / preco_compra
-                valor_atualizado = valor_investido * fator
-
-                total_ativos += valor_atualizado
+                total_ativos += preco_hoje * quantidade
 
             except Exception as e:
                 print(f"Erro ao processar {ticker}: {e}")
                 continue
 
-        patrimonio_total = saldo + total_ativos
+        patrimonio_total = total_ativos
 
         return {
             "saldo": float(round(saldo, 2)),
@@ -989,7 +986,7 @@ async def listar_carteira(user_id: int = Depends(get_current_user_id)):
                 quantidade,
                 data_aplicacao
             FROM financial_transactions
-            WHERE client_id = %s
+            WHERE client_id = %s AND quantidade > 0
         """, (user_id,))
 
         ativos = cursor.fetchall()
@@ -1066,10 +1063,20 @@ async def projecao_patrimonio(user_id: int = Depends(get_current_user_id)):
 
     try:
         cursor.execute("""
-            SELECT COALESCE(SUM(ft.valor_investido), 0) AS total_renda_fixa, ic.perfil_investidor FROM invest_client ic LEFT JOIN financial_transactions ft ON ic.client_id = ft.client_id AND ft.tipo_ativo = 'renda_fixa' WHERE ic.client_id = %s GROUP BY ic.perfil_investidor
+            SELECT COALESCE(SUM(ft.valor_atual * ft.quantidade), 0) AS total_renda_fixa, ic.perfil_investidor FROM invest_client ic LEFT JOIN financial_transactions ft ON ic.client_id = ft.client_id AND ft.tipo_ativo = 'renda_fixa' AND ft.quantidade > 0 WHERE ic.client_id = %s GROUP BY ic.perfil_investidor
         """, (user_id,))
 
         row = cursor.fetchone()
+        if not row:
+            return {
+                "total_renda_fixa": 0.0,
+                "perfil_usuario": None,
+                "projecoes": {
+                    "CONSERVADOR": 0.0,
+                    "MODERADO": 0.0,
+                    "ARROJADO": 0.0,
+                }
+            }
 
         total_renda_fixa = float(row["total_renda_fixa"] or 0)
         perfil = row["perfil_investidor"]
@@ -1119,38 +1126,177 @@ def get_perfil_investidor_usuario(
         cursor.close()
         conn.close()
         
-@invest_router.get("/comparacao-inflacao")
-async def comparacao_inflacao(
-    patrimonio: dict = Depends(get_patrimony),
-    perfil_investidor: str = Depends(get_perfil_investidor_usuario)):
-    
-    meses = 12
-    patrimonio_inicial = float(patrimonio["patrimonio_total"])
-    inflacao_mensal = 0.004
-    
-    if perfil_investidor == "CONSERVADOR":
-        rendimento_mensal = 0.006   
-    elif perfil_investidor == "MODERADO":
-        rendimento_mensal = 0.01    
-    elif perfil_investidor == "ARROJADO":
-        rendimento_mensal = 0.015   
-    else:
-        rendimento_mensal = 0.006   
 
-    patrimonio_vals = [round(patrimonio_inicial, 2)]
-    inflacao_vals = [round(patrimonio_inicial, 2)]
+@invest_router.get("/evolucao-patrimonio")
+async def evolucao_patrimonio(user_id: int = Depends(get_current_user_id)):
+    conn = get_connection()
+    cursor = conn.cursor(dictionary=True)
 
-    for _ in range(meses):
-        patrimonio_vals.append(
-            round(patrimonio_vals[-1] * (1 + rendimento_mensal), 2)
+    try:
+        cursor.execute("""
+            SELECT ticker, quantidade, data_aplicacao
+            FROM financial_transactions
+            WHERE client_id = %s AND quantidade > 0
+            ORDER BY data_aplicacao ASC
+        """, (user_id,))
+        compras = cursor.fetchall()
+
+        if not compras:
+            return {"labels": [], "patrimonio": [], "ibov": []}
+
+        df_compras = pd.DataFrame(compras)
+        
+        # 🔹 CORREÇÃO DE TIPO: Converte quantidade (Decimal) para float explicitamente
+        df_compras["quantidade"] = df_compras["quantidade"].astype(float)
+        
+        df_compras["data_aplicacao"] = pd.to_datetime(df_compras["data_aplicacao"])
+        if df_compras["data_aplicacao"].dt.tz is not None:
+            df_compras["data_aplicacao"] = df_compras["data_aplicacao"].dt.tz_localize(None)
+        
+        data_inicio = df_compras["data_aplicacao"].min()
+        
+        # Buscar IBOV
+        ibov_ticker = yf.Ticker("^BVSP")
+        hist_ibov = ibov_ticker.history(start=data_inicio)
+        
+        if hist_ibov.empty:
+            hist_ibov = ibov_ticker.history(period="1mo")
+
+        if hist_ibov.index.tz is not None:
+            hist_ibov.index = hist_ibov.index.tz_localize(None)
+            
+        datas_mercado = hist_ibov.index
+        df_consolidado = pd.DataFrame(index=datas_mercado)
+
+        tickers = df_compras["ticker"].unique()
+        for ticker in tickers:
+            tk_yf = ticker if "." in ticker else f"{ticker}.SA"
+            hist_ativo = yf.Ticker(tk_yf).history(start=data_inicio)
+            
+            if hist_ativo.empty:
+                continue
+            
+            if hist_ativo.index.tz is not None:
+                hist_ativo.index = hist_ativo.index.tz_localize(None)
+
+            # Agrupa e acumula quantidades
+            compras_ticker = df_compras[df_compras["ticker"] == ticker].groupby("data_aplicacao")["quantidade"].sum().cumsum()
+            
+            # Sincroniza com o calendário da bolsa
+            qtd = compras_ticker.reindex(datas_mercado, method='ffill').fillna(0)
+            
+            # 🔹 GARANTIA: Converte preços do yfinance para float (caso venham como objetos)
+            preco = hist_ativo["Close"].reindex(datas_mercado, method='ffill').bfill().astype(float)
+            
+            # Agora a multiplicação de float * float funcionará perfeitamente
+            df_consolidado[ticker] = qtd * preco
+
+        patrimonio_serie = df_consolidado.sum(axis=1)
+        patrimonio_serie = patrimonio_serie[patrimonio_serie > 0]
+        
+        if patrimonio_serie.empty:
+            return {"labels": [], "patrimonio": [], "ibov": []}
+
+        primeiro_dia = patrimonio_serie.index[0]
+        valor_inicial = float(patrimonio_serie.iloc[0])
+
+        hist_ibov_filtrado = hist_ibov.loc[primeiro_dia:]
+        if hist_ibov_filtrado.empty:
+             return {"labels": patrimonio_serie.index.strftime("%Y-%m-%d").tolist(), 
+                     "patrimonio": patrimonio_serie.round(2).tolist(), 
+                     "ibov": []}
+
+        ibov_base = float(hist_ibov_filtrado["Close"].iloc[0])
+        
+        # Normalização (float * float)
+        ibov_normalizado = (hist_ibov_filtrado["Close"].astype(float) / ibov_base) * valor_inicial
+
+        return {
+            "labels": patrimonio_serie.index.strftime("%Y-%m-%d").tolist(),
+            "patrimonio": patrimonio_serie.round(2).tolist(),
+            "ibov": ibov_normalizado.round(2).tolist()
+        }
+
+    except Exception as e:
+        print(f"Erro Evolução: {e}")
+        return {"error": str(e)}
+    finally:
+        cursor.close()
+        conn.close()
+        
+
+@invest_router.post("/sell")
+async def vender_ativo(
+    data: VenderAtivoSchema,
+    user_id: int = Depends(get_current_user_id)
+):
+    conn = get_connection()
+    cursor = conn.cursor(dictionary=True)
+
+    try:
+        cursor.execute(
+            "SELECT id, email, saldo_cc FROM usuarios WHERE id = %s",
+            (user_id,)
         )
-        inflacao_vals.append(
-            round(inflacao_vals[-1] * (1 + inflacao_mensal), 2)
+        user = cursor.fetchone()
+
+        if not user:
+            raise HTTPException(status_code=404, detail="Usuário não encontrado")
+
+        cursor.execute("""
+            SELECT id, quantidade, valor_atual, nome_ativo, tipo_ativo
+            FROM financial_transactions
+            WHERE client_id = %s
+              AND ticker = %s
+              AND quantidade > 0
+            LIMIT 1
+        """, (user_id, data.ticker.upper()))
+
+        ativo = cursor.fetchone()
+
+        if not ativo:
+            raise HTTPException(
+                status_code=400,
+                detail="Ativo não encontrado na carteira"
+            )
+
+        quantidade_disponivel = Decimal(str(ativo["quantidade"]))
+        quantidade_venda = Decimal(str(data.quantidade))
+
+        if quantidade_disponivel < quantidade_venda:
+            raise HTTPException(
+                status_code=400,
+                detail="Quantidade insuficiente na carteira"
+            )
+
+        valor_total = Decimal(str(ativo["valor_atual"])) * quantidade_venda
+        novo_saldo = Decimal(str(user["saldo_cc"])) + valor_total
+        nova_quantidade = quantidade_disponivel - quantidade_venda
+
+        cursor.execute(
+            "UPDATE usuarios SET saldo_cc = %s WHERE id = %s",
+            (float(novo_saldo), user_id)
         )
 
-    return {
-        "perfil": perfil_investidor,
-        "labels": [f"M{i}" for i in range(meses + 1)],
-        "patrimonio": patrimonio_vals,
-        "inflacao": inflacao_vals
-    }
+        cursor.execute(
+            "UPDATE financial_transactions SET quantidade = %s WHERE id = %s",
+            (float(nova_quantidade), ativo["id"])
+        )
+
+        conn.commit()
+
+        return {
+            "message": "Ativo vendido com sucesso",
+            "valor_recebido": float(round(valor_total, 2)),
+            "saldo_atual": float(round(novo_saldo, 2))
+        }
+
+    except HTTPException:
+        conn.rollback()
+        raise
+    except Exception as e:
+        conn.rollback()
+        raise HTTPException(status_code=500, detail=str(e))
+    finally:
+        cursor.close()
+        conn.close()

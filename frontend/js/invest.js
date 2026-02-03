@@ -6,14 +6,13 @@ let saldo = 0;
 let chartInstance = null;
 let ativoSelecionado = null;
 let precoUnitarioAtual = 0;
-
-/* ================= REGISTRO DE PLUGINS (OBRIGATÓRIO NO CHART.JS v4) ================= */
+let ativoVendaSelecionado = null;
+let precoVendaAtual = 0;
+let quantidadeDisponivel = 0;
 
 if (window.Chart && Chart.registry) {
     Chart.register(ChartZoom);
 }
-
-/* ================= INIT ================= */
 
 document.addEventListener("DOMContentLoaded", async () => {
     const token = localStorage.getItem("access_token");
@@ -33,7 +32,7 @@ document.addEventListener("DOMContentLoaded", async () => {
     await carregarPatrimonio();
     await carregarCarteira();
     await carregarGraficoProjecao();
-    await carregarGraficoInflacao();
+    await carregarGraficoEvolucaoPatrimonio();
 
 
     document.querySelector(".logout").addEventListener("click", (e) => {
@@ -112,7 +111,7 @@ async function verificarInvestidor() {
 /* ================= REGISTRAR INVESTIDOR ================= */
 
 async function registrarInvestidor() {
-    const perfil = document.getElementById("perfilInvestidor").value;
+    const perfil = document.getElementById("perfilInvestidorModal").value;
 
     if (!perfil) {
         Swal.fire("Atenção", "Selecione um perfil válido", "warning");
@@ -182,42 +181,68 @@ async function carregarPatrimonio() {
 }
 
 
-async function carregarGraficoInflacao() {
-    const res = await fetch("http://127.0.0.1:8000/invest/comparacao-inflacao", {
-        headers
-    });
-
+async function carregarGraficoEvolucaoPatrimonio() {
+    const res = await fetch("http://127.0.0.1:8000/invest/evolucao-patrimonio", { headers });
     const data = await res.json();
 
-    new Chart(document.getElementById("graficoInflacao"), {
+    if (!data.labels || data.labels.length === 0) {
+        console.error("Dados insuficientes para o gráfico");
+        return;
+    }
+
+    const canvas = document.getElementById("graficoInflacao");
+    if (graficoEvolucaoInstance) {
+        graficoEvolucaoInstance.destroy();
+    }
+
+    // Garante que o container esteja visível
+    document.getElementById("grafico-container").classList.add("grafico-ativo");
+
+    graficoEvolucaoInstance = new Chart(canvas, {
         type: "line",
         data: {
             labels: data.labels,
             datasets: [
                 {
-                    label: "Seu Patrimônio",
+                    label: "Minha Carteira",
                     data: data.patrimonio,
+                    borderColor: "#00d1b2",
                     borderWidth: 3,
-                    tension: 0.4
+                    tension: 0.1,
+                    pointRadius: 2, // Pequeno ponto para visibilidade
+                    fill: false
                 },
                 {
-                    label: "Inflação",
-                    data: data.inflacao,
+                    label: "Benchmark IBOV",
+                    data: data.ibov,
+                    borderColor: "#ff3860",
+                    borderDash: [5, 5],
                     borderWidth: 2,
-                    borderDash: [6, 6],
-                    tension: 0.4
+                    tension: 0.1,
+                    pointRadius: 0,
+                    fill: false
                 }
             ]
         },
         options: {
             responsive: true,
             maintainAspectRatio: false,
-            plugins: {
-                display: true,
-                text: data.perfil_investidor
+            scales: {
+                y: {
+                    beginAtZero: false,
+                    ticks: {
+                        callback: function(value) {
+                            return 'R$ ' + value.toLocaleString('pt-BR');
+                        }
+                    }
+                },
+                x: {
+                    ticks: {
+                        maxTicksLimit: 8 // Evita poluição visual no eixo X
+                    }
+                }
             }
         }
-
     });
 }
 
@@ -496,6 +521,7 @@ async function carregarCarteira() {
                             ${valorizacao.toFixed(2)}%
                         </span>
                     </p>
+                    <button class="btn-sell" id="btn-sell" onclick='abrirModalVenda(${JSON.stringify(item)})'">Vender Ativo</button>
                     <p class="data"><b>Data:</b> ${new Date(item.data_aplicacao).toLocaleDateString()}</p>
                 </div>
             `;
@@ -637,6 +663,100 @@ async function confirmarCompra() {
         hideLoading();
     }
 }
+/* ================= MODAL DE COMPRA ====================*/
+
+function abrirModalVenda(ativo) {
+    ativoVendaSelecionado = ativo;
+
+    precoVendaAtual = Number(
+        ativo.preco_atual ??
+        ativo.valor_atual ??
+        ativo.preco ??
+        0
+    );
+
+    quantidadeDisponivel = Number(ativo.quantidade || 0);
+
+    document.getElementById("sell-nome-ativo").textContent =
+        ativo.nome_ativo || ativo.nome || ativo.ticker;
+
+    document.getElementById("sell-ticker").textContent = ativo.ticker;
+
+    document.getElementById("sell-preco-unitario").textContent =
+        precoVendaAtual.toLocaleString("pt-BR", {
+            style: "currency",
+            currency: "BRL"
+        });
+
+    document.getElementById("sell-quantidade-disponivel").textContent =
+        quantidadeDisponivel;
+
+    document.getElementById("quantidadeVenda").value = "";
+    document.getElementById("quantidadeVenda").max = quantidadeDisponivel;
+    document.getElementById("sell-total").textContent = "R$ 0,00";
+
+    document.getElementById("sellAssetModal").classList.remove("hidden");
+}
+
+function fecharModalVenda() {
+    document.getElementById("sellAssetModal").classList.add("hidden");
+}
+
+function calcularTotalVenda() {
+    const qtd = Number(document.getElementById("quantidadeVenda").value);
+
+    if (!qtd || qtd <= 0 || qtd > quantidadeDisponivel) {
+        document.getElementById("sell-total").textContent = "R$ 0,00";
+        return;
+    }
+
+    const total = qtd * precoVendaAtual;
+
+    document.getElementById("sell-total").textContent =
+        total.toLocaleString("pt-BR", {
+            style: "currency",
+            currency: "BRL"
+        });
+}
+
+async function confirmarVenda() {
+    const qtd = Number(document.getElementById("quantidadeVenda").value);
+
+    if (!qtd || qtd <= 0 || qtd > quantidadeDisponivel) {
+        Swal.fire("Erro", "Quantidade inválida", "error");
+        return;
+    }
+
+    try {
+        showLoading()
+        const res = await fetch("http://127.0.0.1:8000/invest/sell", {
+            method: "POST",
+            headers,
+            body: JSON.stringify({
+                ticker: ativoVendaSelecionado.ticker,
+                quantidade: qtd
+            })
+        });
+
+        const data = await res.json();
+
+        if (!res.ok) throw new Error(data.detail);
+        hideLoading()
+
+        Swal.fire("Sucesso", data.message, "success").then(() => {
+            window.location.reload()
+        })
+        fecharModalVenda();
+
+        
+        carregarCarteira();
+    
+    hideLoading()
+    } catch (err) {
+        Swal.fire("Erro", err.message, "error");
+    }
+}
+
 
 /* ================= GRAFICO DE PROJECOES ================= */
 let graficoProjecaoInstance = null;
