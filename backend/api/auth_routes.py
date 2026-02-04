@@ -1224,7 +1224,6 @@ async def evolucao_patrimonio(user_id: int = Depends(get_current_user_id)):
         cursor.close()
         conn.close()
         
-
 @invest_router.post("/sell")
 async def vender_ativo(
     data: VenderAtivoSchema,
